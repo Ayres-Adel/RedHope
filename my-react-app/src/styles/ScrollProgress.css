@@ -1,0 +1,19 @@
+/* src/styles/ScrollProgress.css */
+
+.scroll-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px; /* Thickness of the progress bar */
+    background-color: rgba(0, 0, 0, 0.1); /* Background color of the container */
+    z-index: 9999; /* Ensure it's on top of other elements */
+  }
+  
+  .scroll-progress-bar {
+    height: 100%;
+    background-color: #ff4747; /* Color of the progress bar */
+    width: 0%;
+    transition: width 0.25s ease-out;
+  }
+  

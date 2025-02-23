@@ -1,0 +1,2164 @@
+{
+  "hospitals": [
+    {
+      "latitude": 36.2647176,
+      "longitude": 1.9622604,
+      "name": "CWTS EPH Ain Defla",
+      "structure": "CWTS EPH Ain Defla",
+      "telephone": "027 50 38 53",
+      "fax": "027 50 62 96",
+      "wilaya": "Ain Defla"
+    },
+    {
+      "latitude": 36.2799591,
+      "longitude": 2.210959,
+      "name": "PTS EPH Miliana",
+      "structure": "PTS EPH Miliana",
+      "telephone": "027 64 96 49",
+      "fax": "027 64 84 66",
+      "wilaya": "ain Defla"
+    },
+    {
+      "latitude": 36.2579262,
+      "longitude": 2.2306377,
+      "name": "PTS EPH Khemis Miliana",
+      "structure": "PTS EPH Khemis Miliana",
+      "telephone": "027 55 91 59",
+      "fax": "027 55 91 59",
+      "wilaya": "ain Defla"
+    },
+    {
+      "latitude": 36.2215086,
+      "longitude": 1.6353524,
+      "name": "PTS EPH El Attaf",
+      "structure": "PTS EPH El Attaf",
+      "telephone": "027 61 52 94",
+      "fax": "027 61 52 96",
+      "wilaya": "ain Defla"
+    },
+    {
+      "latitude": 36.7620097,
+      "longitude": 3.0512317,
+      "name": "CTS CHU Mustapha",
+      "structure": "CTS CHU Mustapha",
+      "telephone": "021 23 66 64",
+      "fax": "021 23 66 64",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7802649,
+      "longitude": 2.9792202,
+      "name": "CTS CHU Beni Messous",
+      "structure": "CTS CHU Beni Messous",
+      "telephone": "023 11 32 23",
+      "fax": "023 11 32 23",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7948611,
+      "longitude": 3.0473955,
+      "name": "CTS CHU Bab El Oued",
+      "structure": "CTS CHU Bab El Oued",
+      "telephone": "",
+      "fax": "",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7365635,
+      "longitude": 3.1034771,
+      "name": "CTS CHU Hussein Dey",
+      "structure": "CTS CHU Hussein Dey",
+      "telephone": "021 23 29 86",
+      "fax": "021 23 29 86",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7034328,
+      "longitude": 3.1215154,
+      "name": "CTS EHS Salim Z'mirli",
+      "structure": "CTS EHS Salim Z'mirli",
+      "telephone": "",
+      "fax": "023 97 12 09",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7676657,
+      "longitude": 2.9993135,
+      "name": "CTS EHS Dr Maouche",
+      "structure": "CTS EHS Dr Maouche",
+      "telephone": "021 93 90 66/70",
+      "fax": "021 93 90 72",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.6670616,
+      "longitude": 2.940485,
+      "name": "CTS CHU Douera",
+      "structure": "CTS CHU Douera",
+      "telephone": "021 41 79 76/79",
+      "fax": "023 12 46 35",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7874568,
+      "longitude": 3.055979,
+      "name": "PTS EHS Ait Idir",
+      "structure": "PTS EHS Ait Idir",
+      "telephone": "021 97 98 00",
+      "fax": "",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7731434,
+      "longitude": 3.0226477,
+      "name": "PTS EPH El Biar",
+      "structure": "PTS EPH El Biar",
+      "telephone": "021 90 00 10",
+      "fax": "",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7731434,
+      "longitude": 3.0226477,
+      "name": "CTS EPH Kouba",
+      "structure": "CTS EPH Kouba",
+      "telephone": "023 78 56 81",
+      "fax": "",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.8052793,
+      "longitude": 3.0328997,
+      "name": "CTS EPH Bouloghine",
+      "structure": "CTS EPH Bouloghine",
+      "telephone": "023 15 77 60",
+      "fax": "021 15 77 60",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7209772,
+      "longitude": 3.141938,
+      "name": "PTS EPH El Harrach",
+      "structure": "PTS EPH El Harrach",
+      "telephone": "021 83 43 13",
+      "fax": "021 83 43 13",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7893493,
+      "longitude": 3.2938998,
+      "name": "CTS EPH Ain Taya",
+      "structure": "CTS EPH Ain Taya",
+      "telephone": "023 95 43 28",
+      "fax": "",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7003797,
+      "longitude": 2.841266,
+      "name": "PTS EPH Zeralda",
+      "structure": "PTS EPH Zeralda",
+      "telephone": "",
+      "fax": "",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7350599,
+      "longitude": 3.2836015,
+      "name": "CTS EPH Rouiba",
+      "structure": "CTS EPH Rouiba",
+      "telephone": "023 86 04 45",
+      "fax": "023 86 04 40",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.7380953,
+      "longitude": 3.0442616,
+      "name": "BS EHS Abderahmani",
+      "structure": "BS EHS Abderahmani",
+      "telephone": "021 54 23 76",
+      "fax": "023 51 51 13",
+      "wilaya": "Alger"
+    },
+    {
+      "latitude": 36.0620874,
+      "longitude": 4.7688236,
+      "name": "CWTS EPH Bordj Bou Arreridj",
+      "structure": "CWTS EPH Bordj Bou Arreridj",
+      "telephone": "035 69 38 83",
+      "fax": "035 69 36 76",
+      "wilaya": "Bordj Bou Arreridj"
+    },
+    {
+      "latitude": 35.9407053,
+      "longitude": 5.0380415,
+      "name": "PTS EPH Ras El Oued",
+      "structure": "PTS EPH Ras El Oued",
+      "telephone": "035 63 35 50",
+      "fax": "0 35 63 35 57",
+      "wilaya": "Bordj Bou Arreridj"
+    },
+    {
+      "latitude": 36.0698794,
+      "longitude": 4.7640575,
+      "name": "BS EHS Belhocine Rachid BBA",
+      "structure": "BS EHS Belhocine Rachid BBA",
+      "telephone": "035 73 45 33",
+      "fax": "035 73 45 33",
+      "wilaya": "Bordj Bou Arreridj"
+    },
+    {
+      "latitude": 36.07106,
+      "longitude": 4.4716407,
+      "name": "BS EPH Mansoura",
+      "structure": "BS EPH Mansoura",
+      "telephone": "035 85 06 73",
+      "fax": "035 85 06 73",
+      "wilaya": "Bordj Bou Arreridj"
+    },
+    {
+      "latitude": 36.7541832,
+      "longitude": 5.0504169,
+      "name": "CWTS CHU Bejaia",
+      "structure": "CWTS CHU Bejaia",
+      "telephone": "034 12 83 79",
+      "fax": "034 12 83 79",
+      "wilaya": "Bejaia"
+    },
+    {
+      "latitude": 36.459059,
+      "longitude": 4.5236035,
+      "name": "PTS EPH Akbou",
+      "structure": "PTS EPH Akbou",
+      "telephone": "",
+      "fax": "",
+      "wilaya": "Bejaia"
+    },
+    {
+      "latitude": 36.6140036,
+      "longitude": 4.6913745,
+      "name": "PTS EPH Sidi Aich",
+      "structure": "PTS EPH Sidi Aich",
+      "telephone": "034 86 27 10",
+      "fax": "034 86 27 35",
+      "wilaya": "Bejaia"
+    },
+    {
+      "latitude": 36.4872656,
+      "longitude": 5.2613906,
+      "name": "PTS EPH Kharrata",
+      "structure": "PTS EPH Kharrata",
+      "telephone": "034 39 23 23",
+      "fax": "034 39 23 34",
+      "wilaya": "Bejaia"
+    },
+    {
+      "latitude": 36.5614797,
+      "longitude": 4.8924125,
+      "name": "BS EPH Oued Amizour",
+      "structure": "BS EPH Oued Amizour",
+      "telephone": "034 30 94 65",
+      "fax": "034 30 90 90",
+      "wilaya": "Bejaia"
+    },
+    {
+      "latitude": 36.6375461,
+      "longitude": 5.2383997,
+      "name": "BS EPH Aokas",
+      "structure": "BS EPH Aokas",
+      "telephone": "034 84 21 35",
+      "fax": "034 84 22 37",
+      "wilaya": "Bejaia"
+    },
+    {
+      "latitude": 36.4811114,
+      "longitude": 2.806373,
+      "name": "CWTS CHU Blida",
+      "structure": "CWTS CHU Blida",
+      "telephone": "025 30 96 11",
+      "fax": "025 30 96 11",
+      "wilaya": "Blida"
+    },
+    {
+      "latitude": 36.595713,
+      "longitude": 3.2107201,
+      "name": "PTS EPH Meftah",
+      "structure": "PTS EPH Meftah",
+      "telephone": "025 45 98 59",
+      "fax": "025 45 59 40",
+      "wilaya": "Blida"
+    },
+    {
+      "latitude": 36.5767928,
+      "longitude": 2.9071079,
+      "name": "BS EPH Boufarik",
+      "structure": "BS EPH Boufarik",
+      "telephone": "025 48 42 21",
+      "fax": "025 48 42 17",
+      "wilaya": "Blida"
+    },
+    {
+      "latitude": 36.4714977,
+      "longitude": 2.6261347,
+      "name": "PTS EPH El Affroun",
+      "structure": "PTS EPH El Affroun",
+      "telephone": "025 38 60 73",
+      "fax": "025 38 60 73",
+      "wilaya": "Blida"
+    },
+    {
+      "latitude": 36.3699833,
+      "longitude": 3.8810016,
+      "name": "CWTS EPH Bouira",
+      "structure": "CWTS EPH Bouira",
+      "telephone": "026 93 70 50",
+      "fax": "026 93 64 65",
+      "wilaya": "Bouira"
+    },
+    {
+      "latitude": 36.1454048,
+      "longitude": 3.680715,
+      "name": "PTS EPH Sour El Ghozlane",
+      "structure": "PTS EPH Sour El Ghozlane",
+      "telephone": "026 75 60 99",
+      "fax": "026 75 60 99",
+      "wilaya": "Bouira"
+    },
+    {
+      "latitude": 36.566942,
+      "longitude": 3.5941956,
+      "name": "PTS EPH Lakhdaria",
+      "structure": "PTS EPH Lakhdaria",
+      "telephone": "026 70 41 60",
+      "fax": "026 70 41 59",
+      "wilaya": "Bouira"
+    },
+    {
+      "latitude": 36.3624804,
+      "longitude": 4.2412234,
+      "name": "BS EPH Machdellah",
+      "structure": "BS EPH Machdellah",
+      "telephone": "026 79 40 35",
+      "fax": "026 79 40 44",
+      "wilaya": "Bouira"
+    },
+    {
+      "latitude": 36.2923728,
+      "longitude": 3.6706543,
+      "name": "BS EPH Ain Bessam",
+      "structure": "BS EPH Ain Bessam",
+      "telephone": "026 87 21 07",
+      "fax": "026 87 14 07",
+      "wilaya": "Bouira"
+    },
+    {
+      "latitude": 36.7545423,
+      "longitude": 3.4396621,
+      "name": "CSW Corso",
+      "structure": "CSW Corso",
+      "telephone": "024 95 17 38",
+      "fax": "024 95 17 38",
+      "wilaya": "Boumerdes"
+    },
+    {
+      "latitude": 36.7274312,
+      "longitude": 3.5534755,
+      "name": "PTS EPH Thenia",
+      "structure": "PTS EPH Thenia",
+      "telephone": "024 96 35 85",
+      "fax": "024 79 40 08",
+      "wilaya": "Boumerdes"
+    },
+    {
+      "latitude": 36.8663244,
+      "longitude": 3.8761618,
+      "name": "PTS EPH Dellys",
+      "structure": "PTS EPH Dellys",
+      "telephone": "024 76 29 57",
+      "fax": "024 76 29 54",
+      "wilaya": "Boumerdes"
+    },
+    {
+      "latitude": 36.7443,
+      "longitude": 3.7209511,
+      "name": "PTS EPH Bordj Menaiel",
+      "structure": "PTS EPH Bordj Menaiel",
+      "telephone": "024 95 17 38",
+      "fax": "024 95 17 38",
+      "wilaya": "Boumerdes"
+    },
+    {
+      "latitude": 34.6648092,
+      "longitude": 3.066999,
+      "name": "CWTS EPH Djelfa",
+      "structure": "CWTS EPH Djelfa",
+      "telephone": "027 87 20 48",
+      "fax": "027 87 20 48",
+      "wilaya": "Djelfa"
+    },
+    {
+      "latitude": 35.0838848,
+      "longitude": 3.0190086,
+      "name": "PTS EPH Hassi Bahbah",
+      "structure": "PTS EPH Hassi Bahbah",
+      "telephone": "027 96 53 04",
+      "fax": "027 96 53 04",
+      "wilaya": "Djelfa"
+    },
+    {
+      "latitude": 34.1563813,
+      "longitude": 3.4826874,
+      "name": "PTS EPH Messaad",
+      "structure": "PTS EPH Messaad",
+      "telephone": "027 98 71 38",
+      "fax": "027 98 64 36",
+      "wilaya": "Djelfa"
+    },
+    {
+      "latitude": 35.4494139,
+      "longitude": 2.8873627,
+      "name": "PTS EPH Ain Oussara",
+      "structure": "PTS EPH Ain Oussara",
+      "telephone": "027 80 14 61",
+      "fax": "027 80 14 61",
+      "wilaya": "Djelfa"
+    },
+    {
+      "latitude": 34.6622264,
+      "longitude": 3.2627785,
+      "name": "BS EHS Mere et Enfant Djelfa",
+      "structure": "BS EHS Mere et Enfant Djelfa",
+      "telephone": "027 93 64 18",
+      "fax": "027 93 64 18",
+      "wilaya": "Djelfa"
+    },
+    {
+      "latitude": 34.4561856,
+      "longitude": 2.5279626,
+      "name": "BS EPH El Idrissia",
+      "structure": "BS EPH El Idrissia",
+      "telephone": "027 88 90 80",
+      "fax": "027 88 90 80",
+      "wilaya": "Djelfa"
+    },
+    {
+      "latitude": 36.2595605,
+      "longitude": 2.7555107,
+      "name": "CWTS EPH Medea",
+      "structure": "CWTS EPH Medea",
+      "telephone": "025 79 35 17",
+      "fax": "025 79 35 01",
+      "wilaya": "Medea"
+    },
+    {
+      "latitude": 35.8827935,
+      "longitude": 2.7367302,
+      "name": "PTS EPH Ksar El Boukhari",
+      "structure": "PTS EPH Ksar El Boukhari",
+      "telephone": "025 69 20 03",
+      "fax": "025 69 12 84",
+      "wilaya": "Medea"
+    },
+    {
+      "latitude": 36.222159,
+      "longitude": 3.2935828,
+      "name": "PTS EPH Beni Slimane",
+      "structure": "PTS EPH Beni Slimane",
+      "telephone": "025 51 41 84",
+      "fax": "025 51 52 74",
+      "wilaya": "Medea"
+    },
+    {
+      "latitude": 36.1357004,
+      "longitude": 2.9108799,
+      "name": "PTS EPH Berouaghia",
+      "structure": "PTS EPH Berouaghia",
+      "telephone": "025 77 84 78",
+      "fax": "025 77 84 75",
+      "wilaya": "Medea"
+    },
+    {
+      "latitude": 36.4075498,
+      "longitude": 3.3067674,
+      "name": "BS EPH Tablat",
+      "structure": "BS EPH Tablat",
+      "telephone": "025 72 54 70",
+      "fax": "025 72 51 47",
+      "wilaya": "Medea"
+    },
+    {
+      "latitude": 35.891021,
+      "longitude": 3.1445568,
+      "name": "BS EPH Ain Boucif",
+      "structure": "BS EPH Ain Boucif",
+      "telephone": "025 70 14 35",
+      "fax": "025 70 14 35",
+      "wilaya": "Medea"
+    },
+    {
+      "latitude": 36.5874031,
+      "longitude": 2.4367647,
+      "name": "CSW Tipaza",
+      "structure": "CSW Tipaza",
+      "telephone": "024 37 79 84",
+      "fax": "024 37 79 84",
+      "wilaya": "Tipaza"
+    },
+    {
+      "latitude": 36.6362395,
+      "longitude": 2.7693637,
+      "name": "PTS EPH Kolea",
+      "structure": "PTS EPH Kolea",
+      "telephone": "024 38 10 54",
+      "fax": "024 38 10 52",
+      "wilaya": "Tipaza"
+    },
+    {
+      "latitude": 36.5837256,
+      "longitude": 2.1259976,
+      "name": "PTS EPH Sidi Ghiles",
+      "structure": "PTS EPH Sidi Ghiles",
+      "telephone": "024 33 12 38",
+      "fax": "024 33 19 82",
+      "wilaya": "Tipaza"
+    },
+    {
+      "latitude": 36.509966,
+      "longitude": 2.4100969,
+      "name": "PTS EPH Hadjout",
+      "structure": "PTS EPH Hadjout",
+      "telephone": "024 93 45 13",
+      "fax": "",
+      "wilaya": "Tipaza"
+    },
+    {
+      "latitude": 36.5732228,
+      "longitude": 1.9033015,
+      "name": "BS EPH Gouraya",
+      "structure": "BS EPH Gouraya",
+      "telephone": "024 34 20 64",
+      "fax": "024 34 20 17",
+      "wilaya": "Tipaza"
+    },
+    {
+      "latitude": 36.5910883,
+      "longitude": 2.4355496,
+      "name": "BS EHS Mere et enfant Tipaza",
+      "structure": "BS EHS Mere et enfant Tipaza",
+      "telephone": "",
+      "fax": "",
+      "wilaya": "Tipaza"
+    },
+    {
+      "latitude": 36.5873056,
+      "longitude": 2.437818,
+      "name": "BS EPH Tipaza",
+      "structure": "BS EPH Tipaza",
+      "telephone": "",
+      "fax": "024 37 64 31",
+      "wilaya": "Tipaza"
+    },
+    {
+      "latitude": 36.7121651,
+      "longitude": 4.0289904,
+      "name": "CSW CHU Tizi Ouzou",
+      "structure": "CSW CHU Tizi Ouzou",
+      "telephone": "026 19 75 00",
+      "fax": "026 21 12 16",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.5707821,
+      "longitude": 4.2872963,
+      "name": "PTS EPH Ain El Hammam",
+      "structure": "PTS EPH Ain El Hammam",
+      "telephone": "026 48 81 48/46",
+      "fax": "026 48 81 44/45",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.5315555,
+      "longitude": 3.8280398,
+      "name": "PTS EPH Draa El Mizen",
+      "structure": "PTS EPH Draa El Mizen",
+      "telephone": "026 23 36 66",
+      "fax": "026 23 36 66",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.7597316,
+      "longitude": 4.3849104,
+      "name": "PTS EPH Azzazga",
+      "structure": "PTS EPH Azzazga",
+      "telephone": "026 34 12 94",
+      "fax": "026 34 12 10",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.6373251,
+      "longitude": 4.143822,
+      "name": "BS EPH Larabaa Nath-Irathen",
+      "structure": "BS EPH Larabaa Nath-Irathen",
+      "telephone": "026 26 13 35",
+      "fax": "026 26 13 35",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.5375772,
+      "longitude": 3.9525085,
+      "name": "BS EPH Boghni",
+      "structure": "BS EPH Boghni",
+      "telephone": "026 28 31 88",
+      "fax": "026 28 46 62",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.8895311,
+      "longitude": 4.4218264,
+      "name": "BS EPH Azzefoun",
+      "structure": "BS EPH Azzefoun",
+      "telephone": "026 15 93 07",
+      "fax": "026 15 93 03",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.8921808,
+      "longitude": 4.1241204,
+      "name": "BS EPH Tigzirt",
+      "structure": "BS EPH Tigzirt",
+      "telephone": "026 15 84 45",
+      "fax": "026 15 84 11",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.7303983,
+      "longitude": 3.9731281,
+      "name": "BS EHS Draa Ben Khedda",
+      "structure": "BS EHS Draa Ben Khedda",
+      "telephone": "026 27 43 31",
+      "fax": "026 27 43 31",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.7210214,
+      "longitude": 4.0542162,
+      "name": "BS EHS Sbihi Tassadit",
+      "structure": "BS EHS Sbihi Tassadit",
+      "telephone": "026 12 25 21",
+      "fax": "026 12 19 00",
+      "wilaya": "Tizi Ouzou"
+    },
+    {
+      "latitude": 36.9090802,
+      "longitude": 7.7294734,
+      "name": "CWTS CHU Annaba",
+      "structure": "CWTS CHU Annaba",
+      "telephone": "",
+      "fax": "038 45 22 13",
+      "wilaya": "Annaba"
+    },
+    {
+      "latitude": 36.8040447,
+      "longitude": 7.7424431,
+      "name": "BS EPH El Hadjar",
+      "structure": "BS EPH El Hadjar",
+      "telephone": "038 59 16 01",
+      "fax": "038 59 19 87",
+      "wilaya": "Annaba"
+    },
+    {
+      "latitude": 36.7885496,
+      "longitude": 7.6036368,
+      "name": "BS EHS El Bouni",
+      "structure": "BS EHS El Bouni",
+      "telephone": "",
+      "fax": "038 45 25 93",
+      "wilaya": "Annaba"
+    },
+    {
+      "latitude": 35.5416655,
+      "longitude": 6.1214661,
+      "name": "CSW Hamla",
+      "structure": "CSW Hamla",
+      "telephone": "033 30 83 28",
+      "fax": "033 30 83 28",
+      "wilaya": "Batna"
+    },
+    {
+      "latitude": 35.5319206,
+      "longitude": 6.153878,
+      "name": "CTS CHU Batna",
+      "structure": "CTS CHU Batna",
+      "telephone": "033 30 83 28",
+      "fax": "033 30 83 28",
+      "wilaya": "Batna"
+    },
+    {
+      "latitude": 35.2574983,
+      "longitude": 6.3508027,
+      "name": "PTS EPH Arris 1",
+      "structure": "PTS EPH Arris 1",
+      "telephone": "033 34 50 21",
+      "fax": "033 34 50 21",
+      "wilaya": "Batna"
+    },
+    {
+      "latitude": 35.3811113,
+      "longitude": 5.34709,
+      "name": "PTS EPH Barika (Med Boudiaf)",
+      "structure": "PTS EPH Barika (Med Boudiaf)",
+      "telephone": "033 39 56 72",
+      "fax": "",
+      "wilaya": "Batna"
+    },
+    {
+      "latitude": 35.5692142,
+      "longitude": 5.6161628,
+      "name": "PTS EPH N'gaous",
+      "structure": "PTS EPH N'gaous",
+      "telephone": "033 37 84 40",
+      "fax": "033 37 84 40",
+      "wilaya": "Batna"
+    },
+    {
+      "latitude": 35.6454197,
+      "longitude": 5.9104697,
+      "name": "PTS EPH Merouana (Ziza Massika)",
+      "structure": "PTS EPH Merouana (Ziza Massika)",
+      "telephone": "033 33 21 90",
+      "fax": "033 33 25 33",
+      "wilaya": "Batna"
+    },
+    {
+      "latitude": 35.374295,
+      "longitude": 5.8930858,
+      "name": "PTS EPH Ain Touta",
+      "structure": "PTS EPH Ain Touta",
+      "telephone": "033 83 52 97",
+      "fax": "033 83 52 97",
+      "wilaya": "Batna"
+    },
+    {
+      "latitude": 35.5416377,
+      "longitude": 6.1637485,
+      "name": "BS EHS Mere et Enfant",
+      "structure": "BS EHS Mere et Enfant",
+      "telephone": "033 25 78 78",
+      "fax": "033 25 73 20",
+      "wilaya": "Batna"
+    },
+    {
+      "latitude": 36.3723634,
+      "longitude": 6.6159545,
+      "name": "CTS CHU Constantine",
+      "structure": "CTS CHU Constantine",
+      "telephone": "031 88 69 25",
+      "fax": "031 88 70 26",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.2754485,
+      "longitude": 6.5007821,
+      "name": "CSW Constantine annee 2018",
+      "structure": "CSW Constantine annee 2018",
+      "telephone": "",
+      "fax": "031 75 40 24",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.356759,
+      "longitude": 6.6371923,
+      "name": "CTS EHS Daksi nephro",
+      "structure": "CTS EHS Daksi nephro",
+      "telephone": "031 73 24 13",
+      "fax": "031 73 24 67",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.3558349,
+      "longitude": 6.6511324,
+      "name": "CTS EHS El Riadh cardio",
+      "structure": "CTS EHS El Riadh cardio",
+      "telephone": "031 64 32 48",
+      "fax": "031 64 32 60",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.3553395,
+      "longitude": 6.6192202,
+      "name": "PTS EHS Sidi Mebrouk",
+      "structure": "PTS EHS Sidi Mebrouk",
+      "telephone": "031 74 03 74",
+      "fax": "",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.2593314,
+      "longitude": 6.699265,
+      "name": "PTS EPH El Khroub (Med Boudiaf)",
+      "structure": "PTS EPH El Khroub (Med Boudiaf)",
+      "telephone": "031 95 10 03/05",
+      "fax": "031 95 10 06",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.5367012,
+      "longitude": 6.713273,
+      "name": "BS EPH Zighout Youcef",
+      "structure": "BS EPH Zighout Youcef",
+      "telephone": "031 91 91 21",
+      "fax": "031 91 91 32",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.2584428,
+      "longitude": 6.5774004,
+      "name": "BS EPH Ali Mendjli",
+      "structure": "BS EPH Ali Mendjli",
+      "telephone": "031 78 02 38",
+      "fax": "031 78 05 08",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.3516024,
+      "longitude": 6.5926043,
+      "name": "BS EPH El Bir",
+      "structure": "BS EPH El Bir",
+      "telephone": "031 83 13 66",
+      "fax": "031 83 13 29",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.4430515,
+      "longitude": 6.4949423,
+      "name": "BS EH Didouch Morad",
+      "structure": "BS EH Didouch Morad",
+      "telephone": "",
+      "fax": "",
+      "wilaya": "Constantine"
+    },
+    {
+      "latitude": 36.7635444,
+      "longitude": 8.3217084,
+      "name": "CWTS EPH El Taref",
+      "structure": "CWTS EPH El Taref",
+      "telephone": "038 30 00 12",
+      "fax": "038 30 00 12",
+      "wilaya": "El Tarf"
+    },
+    {
+      "latitude": 36.7043966,
+      "longitude": 7.8301098,
+      "name": "CTS EPH El Besbes",
+      "structure": "CTS EPH El Besbes",
+      "telephone": "038 39 82 20",
+      "fax": "038 39 82 22",
+      "wilaya": "El Tarf"
+    },
+    {
+      "latitude": 36.8955085,
+      "longitude": 8.4410029,
+      "name": "PTS EPH El Kala",
+      "structure": "PTS EPH El Kala",
+      "telephone": "038 36 24 34",
+      "fax": "038 36 24 02",
+      "wilaya": "El Tarf"
+    },
+    {
+      "latitude": 36.6106694,
+      "longitude": 7.7405521,
+      "name": "BS EPH Bouhadjar",
+      "structure": "BS EPH Bouhadjar",
+      "telephone": "038 32 63 85",
+      "fax": "038 32 63 85",
+      "wilaya": "El Tarf"
+    },
+    {
+      "latitude": 36.4561432,
+      "longitude": 7.433223,
+      "name": "CWTS EPH Guelma (Hakim El Oukbi)",
+      "structure": "CWTS EPH Guelma (Hakim El Oukbi)",
+      "telephone": "037 11 15 44/45/39",
+      "fax": "037 11 15 44",
+      "wilaya": "Guelma"
+    },
+    {
+      "latitude": 36.3150698,
+      "longitude": 7.1603777,
+      "name": "PTS EPH Oued Zenati",
+      "structure": "PTS EPH Oued Zenati",
+      "telephone": "037 18 03 00",
+      "fax": "037 18 02 32",
+      "wilaya": "Guelma"
+    },
+    {
+      "latitude": 36.4378065,
+      "longitude": 7.2775831,
+      "name": "BS EPH Bouchegouf",
+      "structure": "BS EPH Bouchegouf",
+      "telephone": "037 12 64 73",
+      "fax": "037 12 64 68",
+      "wilaya": "Guelma"
+    },
+    {
+      "latitude": 36.8021673,
+      "longitude": 5.8009572,
+      "name": "CWTS EPH Jijel",
+      "structure": "CWTS EPH Jijel",
+      "telephone": "034 47 23 00",
+      "fax": "034 47 16 80",
+      "wilaya": "Jijel"
+    },
+    {
+      "latitude": 36.7893192,
+      "longitude": 5.9050226,
+      "name": "PTS EPH Taher",
+      "structure": "PTS EPH Taher",
+      "telephone": "034 55 83 63",
+      "fax": "034 55 83 66",
+      "wilaya": "Jijel"
+    },
+    {
+      "latitude": 36.7588444,
+      "longitude": 6.2833273,
+      "name": "PTS EPH El Milia",
+      "structure": "PTS EPH El Milia",
+      "telephone": "034 52 01 18",
+      "fax": "034 52 01 47",
+      "wilaya": "Jijel"
+    },
+    {
+      "latitude": 35.4492099,
+      "longitude": 7.118236,
+      "name": "CWTS EPH Khenchla (Nouvel Hopital)",
+      "structure": "CWTS EPH Khenchla (Nouvel Hopital)",
+      "telephone": "032 31 68 45",
+      "fax": "032 31 64 54",
+      "wilaya": "Khenchela"
+    },
+    {
+      "latitude": 35.037937,
+      "longitude": 7.0044829,
+      "name": "PTS EPH Chechar",
+      "structure": "PTS EPH Chechar",
+      "telephone": "032 75 33 55",
+      "fax": "032 75 33 53",
+      "wilaya": "Khenchela"
+    },
+    {
+      "latitude": 35.5049677,
+      "longitude": 6.8830587,
+      "name": "PTS EPH Kais",
+      "structure": "PTS EPH Kais",
+      "telephone": "032 77 01 01",
+      "fax": "032 77 01 82",
+      "wilaya": "Khenchela"
+    },
+    {
+      "latitude": 35.4326537,
+      "longitude": 7.1480122,
+      "name": "BS EPH Ali Boushaba",
+      "structure": "BS EPH Ali Boushaba",
+      "telephone": "032 70 11 45",
+      "fax": "032 31 64 54",
+      "wilaya": "Khenchela"
+    },
+    {
+      "latitude": 35.4291547,
+      "longitude": 7.140888,
+      "name": "BS EHS Salhi Belkacem",
+      "structure": "BS EHS Salhi Belkacem",
+      "telephone": "032 72 21 55",
+      "fax": "",
+      "wilaya": "Khenchela"
+    },
+    {
+      "latitude": 36.4439825,
+      "longitude": 6.2602454,
+      "name": "CWTS EPH Mila",
+      "structure": "CWTS EPH Mila",
+      "telephone": "031 47 39 11",
+      "fax": "031 47 39 15",
+      "wilaya": "Mila"
+    },
+    {
+      "latitude": 36.243955,
+      "longitude": 6.2913461,
+      "name": "PTS EPH Oued Athmania",
+      "structure": "PTS EPH Oued Athmania",
+      "telephone": "031 43 52 75",
+      "fax": "031 43 52 76",
+      "wilaya": "Mila"
+    },
+    {
+      "latitude": 36.4096177,
+      "longitude": 5.9479421,
+      "name": "PTS EPH Ferdjioua",
+      "structure": "PTS EPH Ferdjioua",
+      "telephone": "031 49 50 69",
+      "fax": "031 49 50 70",
+      "wilaya": "Mila"
+    },
+    {
+      "latitude": 36.1464769,
+      "longitude": 6.1863773,
+      "name": "PTS EPH Chelghoum Laid",
+      "structure": "PTS EPH Chelghoum Laid",
+      "telephone": "030 26 44 48",
+      "fax": "030 26 44 48",
+      "wilaya": "Mila"
+    },
+    {
+      "latitude": 36.2950897,
+      "longitude": 6.0884399,
+      "name": "BS EPH Frere Meghlaoui",
+      "structure": "BS EPH Frere Meghlaoui",
+      "telephone": "031 46 39 37",
+      "fax": "031 46 39 42",
+      "wilaya": "Mila"
+    },
+    {
+      "latitude": 35.7133301,
+      "longitude": 4.5109455,
+      "name": "CWTS EPH M'sila",
+      "structure": "CWTS EPH M'sila",
+      "telephone": "035 55 10 62",
+      "fax": "035 55 16 29",
+      "wilaya": "M'Sila"
+    },
+    {
+      "latitude": 35.1968233,
+      "longitude": 4.130325,
+      "name": "PTS EPH Boussaada",
+      "structure": "PTS EPH Boussaada",
+      "telephone": "035 45 32 34",
+      "fax": "035 45 32 34",
+      "wilaya": "M'Sila"
+    },
+    {
+      "latitude": 34.8385848,
+      "longitude": 4.1551993,
+      "name": "PTS EPH Ain El Melh",
+      "structure": "PTS EPH Ain El Melh",
+      "telephone": "035 47 90 36/37",
+      "fax": "035 47 90 51/48",
+      "wilaya": "M'Sila"
+    },
+    {
+      "latitude": 35.4221632,
+      "longitude": 3.8409589,
+      "name": "PTS EPH Sidi Aissa",
+      "structure": "PTS EPH Sidi Aissa",
+      "telephone": "035 40 97 05",
+      "fax": "035 40 97 05",
+      "wilaya": "M'Sila"
+    },
+    {
+      "latitude": 34.991097,
+      "longitude": 4.4236865,
+      "name": "CTS EPH Ben Srour annee 2018",
+      "structure": "CTS EPH Ben Srour annee 2018",
+      "telephone": "035 46 82 43",
+      "fax": "035 56 82 43",
+      "wilaya": "M'Sila"
+    },
+    {
+      "latitude": 35.6123873,
+      "longitude": 4.642584,
+      "name": "CTS EPH Magra",
+      "structure": "CTS EPH Magra",
+      "telephone": "035 59 35 35",
+      "fax": "035 59 23 00",
+      "wilaya": "M'Sila"
+    },
+    {
+      "latitude": 35.8706785,
+      "longitude": 7.1111275,
+      "name": "CWTS EPH Oum El Bouaghi",
+      "structure": "CWTS EPH Oum El Bouaghi",
+      "telephone": "032 54 52 37",
+      "fax": "032 54 54 52",
+      "wilaya": "Oum El Bouaghi"
+    },
+    {
+      "latitude": 36.0175097,
+      "longitude": 6.4304617,
+      "name": "PTS EPH Ain Mlila",
+      "structure": "PTS EPH Ain Mlila",
+      "telephone": "032 52 75 03",
+      "fax": "032 52 75 32",
+      "wilaya": "Oum El Bouaghi"
+    },
+    {
+      "latitude": 35.6312358,
+      "longitude": 7.6612902,
+      "name": "PTS EPH Meskiana",
+      "structure": "PTS EPH Meskiana",
+      "telephone": "032 47 10 02",
+      "fax": "032 47 15 36",
+      "wilaya": "Oum El Bouaghi"
+    },
+    {
+      "latitude": 35.7900089,
+      "longitude": 7.3804189,
+      "name": "BS EPH Ain Beida",
+      "structure": "BS EPH Ain Beida",
+      "telephone": "032 68 15 73",
+      "fax": "",
+      "wilaya": "Oum El Bouaghi"
+    },
+    {
+      "latitude": 35.9727103,
+      "longitude": 6.8785391,
+      "name": "BS EPH Ain El Fekroun",
+      "structure": "BS EPH Ain El Fekroun",
+      "telephone": "032 40 25 43",
+      "fax": "032 40 22 98",
+      "wilaya": "Oum El Bouaghi"
+    },
+    {
+      "latitude": 35.8784772,
+      "longitude": 7.1065889,
+      "name": "BS EPH Ibn Sina",
+      "structure": "BS EPH Ibn Sina",
+      "telephone": "032 56 53 44",
+      "fax": "",
+      "wilaya": "Oum El Bouaghi"
+    },
+    {
+      "latitude": 36.1913518,
+      "longitude": 5.4008907,
+      "name": "CSW CHU Setif",
+      "structure": "CSW CHU Setif",
+      "telephone": "036 44 89 17",
+      "fax": "036 44 89 17",
+      "wilaya": "Setif"
+    },
+    {
+      "latitude": 35.9232335,
+      "longitude": 5.2422121,
+      "name": "PTS EPH Ain Oulmene",
+      "structure": "PTS EPH Ain Oulmene",
+      "telephone": "036 67 31 51",
+      "fax": "036 67 30 72",
+      "wilaya": "Setif"
+    },
+    {
+      "latitude": 35.9222367,
+      "longitude": 5.0320606,
+      "name": "PTS EPH El Eulma",
+      "structure": "PTS EPH El Eulma",
+      "telephone": "036 47 74 52",
+      "fax": "036 47 74 50",
+      "wilaya": "Setif"
+    },
+    {
+      "latitude": 36.3386536,
+      "longitude": 5.0434471,
+      "name": "PTS EPH Bougaa",
+      "structure": "PTS EPH Bougaa",
+      "telephone": "036 40 37 69",
+      "fax": "036 40 37 69",
+      "wilaya": "Setif"
+    },
+    {
+      "latitude": 36.3503388,
+      "longitude": 5.474969,
+      "name": "PTS EPH Ain Kebira",
+      "structure": "PTS EPH Ain Kebira",
+      "telephone": "036 59 27 27",
+      "fax": "036 59 27 04",
+      "wilaya": "Setif"
+    },
+    {
+      "latitude": 35.815802,
+      "longitude": 5.4619391,
+      "name": "BS EH Ain Azel",
+      "structure": "BS EH Ain Azel",
+      "telephone": "036 55 08 08",
+      "fax": "036 55 08 13",
+      "wilaya": "Setif"
+    },
+    {
+      "latitude": 36.4311902,
+      "longitude": 4.7735938,
+      "name": "BS EPH Beni Ourthilene",
+      "structure": "BS EPH Beni Ourthilene",
+      "telephone": "036 60 17 03",
+      "fax": "036 60 17 02",
+      "wilaya": "Setif"
+    },
+    {
+      "latitude": 36.4154608,
+      "longitude": 3.6873719,
+      "name": "CWTS EPH Skikda (Ancien Hopital)",
+      "structure": "CWTS EPH Skikda (Ancien Hopital)",
+      "telephone": "030 92 61 13",
+      "fax": "038 75 58 70",
+      "wilaya": "Skikda"
+    },
+    {
+      "latitude": 36.6554405,
+      "longitude": 6.6981143,
+      "name": "PTS EPH El Harrouch",
+      "structure": "PTS EPH El Harrouch",
+      "telephone": "038 95 10 12",
+      "fax": "",
+      "wilaya": "Skikda"
+    },
+    {
+      "latitude": 36.6540456,
+      "longitude": 6.2777457,
+      "name": "PTS EPH Collo",
+      "structure": "PTS EPH Collo",
+      "telephone": "038 71 61 88",
+      "fax": "038 71 80 20",
+      "wilaya": "Skikda"
+    },
+    {
+      "latitude": 36.7188545,
+      "longitude": 7.0242281,
+      "name": "PTS EPH Azzaba",
+      "structure": "PTS EPH Azzaba",
+      "telephone": "038 77 81 67",
+      "fax": "038 95 95 50",
+      "wilaya": "Skikda"
+    },
+    {
+      "latitude": 36.8369685,
+      "longitude": 6.6399426,
+      "name": "PTS EPH Tamalous",
+      "structure": "PTS EPH Tamalous",
+      "telephone": "038 93 89 45",
+      "fax": "038 93 89 45",
+      "wilaya": "Skikda"
+    },
+    {
+      "latitude": 36.862738,
+      "longitude": 6.8953963,
+      "name": "PTS EH Skikda Abderezak Bouhara",
+      "structure": "PTS EH Skikda Abderezak Bouhara",
+      "telephone": "038 74 72 13",
+      "fax": "",
+      "wilaya": "Skikda"
+    },
+    {
+      "latitude": 36.8629699,
+      "longitude": 6.8953984,
+      "name": "BS EH Skikda",
+      "structure": "BS EH Skikda",
+      "telephone": "038 75 58 70",
+      "fax": "038 75 58 70",
+      "wilaya": "Skikda"
+    },
+    {
+      "latitude": 36.2766613,
+      "longitude": 7.9347461,
+      "name": "CWTS EPH Souk Ahras (Ancien Hopital)",
+      "structure": "CWTS EPH Souk Ahras (Ancien Hopital)",
+      "telephone": "037 72 43 89",
+      "fax": "037 72 43 14",
+      "wilaya": "Souk Ahras"
+    },
+    {
+      "latitude": 36.1322256,
+      "longitude": 7.5316744,
+      "name": "PTS EPH Sedrata",
+      "structure": "PTS EPH Sedrata",
+      "telephone": "037 77 67 22",
+      "fax": "037 37 75 51",
+      "wilaya": "Souk Ahras"
+    },
+    {
+      "latitude": 36.262299,
+      "longitude": 7.9495368,
+      "name": "BS EPH Ibn Rochd",
+      "structure": "BS EPH Ibn Rochd",
+      "telephone": "037 81 12 87",
+      "fax": "037 81 10 62",
+      "wilaya": "Souk Ahras"
+    },
+    {
+      "latitude": 35.4014218,
+      "longitude": 8.1020505,
+      "name": "CWTS EPH Tebessa (Alia Salah)",
+      "structure": "CWTS EPH Tebessa (Alia Salah)",
+      "telephone": "037 50 04 50",
+      "fax": "037 50 07 40",
+      "wilaya": "Tebessa"
+    },
+    {
+      "latitude": 34.7574292,
+      "longitude": 8.0497689,
+      "name": "PTS EPH Bir El Ater",
+      "structure": "PTS EPH Bir El Ater",
+      "telephone": "037 64 87 05/11",
+      "fax": "037 64 87 08/07",
+      "wilaya": "Tebessa"
+    },
+    {
+      "latitude": 35.8614968,
+      "longitude": 7.8893731,
+      "name": "BS EPH El Aouinet",
+      "structure": "BS EPH El Aouinet",
+      "telephone": "037 65 56 09",
+      "fax": "037 65 56 09",
+      "wilaya": "Tebessa"
+    },
+    {
+      "latitude": 35.3068389,
+      "longitude": 7.3718828,
+      "name": "BS EPH Cheria",
+      "structure": "BS EPH Cheria",
+      "telephone": "037 62 91 19",
+      "fax": "037 62 91 19",
+      "wilaya": "Tebessa"
+    },
+    {
+      "latitude": 35.9397669,
+      "longitude": 8.1259105,
+      "name": "BS EPH Ouenza",
+      "structure": "BS EPH Ouenza",
+      "telephone": "037 46 97 02",
+      "fax": "037 46 97 02",
+      "wilaya": "Tebessa"
+    },
+    {
+      "latitude": 35.2772018,
+      "longitude": 7.7744261,
+      "name": "BS EPH Bouguerra Boulares",
+      "structure": "BS EPH Bouguerra Boulares",
+      "telephone": "037 40 85 77",
+      "fax": "037 52 71 93",
+      "wilaya": "Tebessa"
+    },
+    {
+      "latitude": 35.6734518,
+      "longitude": 7.7311375,
+      "name": "BS EPH Morsot",
+      "structure": "BS EPH Morsot",
+      "telephone": "037 65 72 24",
+      "fax": "037 65 72 48",
+      "wilaya": "Tebessa"
+    },
+    {
+      "latitude": 35.309175,
+      "longitude": -1.0975216,
+      "name": "CWTS EPH Ain Temouchent",
+      "structure": "CWTS EPH Ain Temouchent",
+      "telephone": "043 79 22 11/12",
+      "fax": "043 79 43 64",
+      "wilaya": "ain Temouchent"
+    },
+    {
+      "latitude": 35.3053063,
+      "longitude": -1.3859752,
+      "name": "PTS EPH Beni Saf",
+      "structure": "PTS EPH Beni Saf",
+      "telephone": "043 69 45 65",
+      "fax": "043 69 41 56",
+      "wilaya": "ain Temouchent"
+    },
+    {
+      "latitude": 35.3726415,
+      "longitude": -0.9801455,
+      "name": "PTS EPH Hammam Bouhdjar",
+      "structure": "PTS EPH Hammam Bouhdjar",
+      "telephone": "043 71 32 26",
+      "fax": "043 71 32 26",
+      "wilaya": "ain Temouchent"
+    },
+    {
+      "latitude": 35.2888316,
+      "longitude": -1.1318119,
+      "name": "BS EH Benzerdjeb",
+      "structure": "BS EH Benzerdjeb",
+      "telephone": "043 79 85 09/10",
+      "fax": "043 79 85 12",
+      "wilaya": "ain Temouchent"
+    },
+    {
+      "latitude": 36.1464129,
+      "longitude": 1.3109661,
+      "name": "CWTS EPH Chlef Chorfa",
+      "structure": "CWTS EPH Chlef Chorfa",
+      "telephone": "027 79 49 73",
+      "fax": "027 79 49 76",
+      "wilaya": "Chlef"
+    },
+    {
+      "latitude": 36.5032626,
+      "longitude": 1.2917056,
+      "name": "BS EPH Tenes Zighoud Youcef",
+      "structure": "BS EPH Tenes Zighoud Youcef",
+      "telephone": "027 45 31 61/63",
+      "fax": "027 45 31 58",
+      "wilaya": "Chlef"
+    },
+    {
+      "latitude": 36.1592555,
+      "longitude": 1.3195,
+      "name": "CTS EPH Les Sœurs Badji",
+      "structure": "CTS EPH Les Sœurs Badji",
+      "telephone": "027 79 84 04",
+      "fax": "027 79 84 02",
+      "wilaya": "Chlef"
+    },
+    {
+      "latitude": 35.9946089,
+      "longitude": -0.2287784,
+      "name": "BS EPH Sobha boukadir",
+      "structure": "BS EPH Sobha boukadir",
+      "telephone": "027 71 91 76",
+      "fax": "",
+      "wilaya": "Chlef"
+    },
+    {
+      "latitude": 36.2044815,
+      "longitude": 1.2586588,
+      "name": "BS EPH Chettia Ouled Fares",
+      "structure": "BS EPH Chettia Ouled Fares",
+      "telephone": "027 73 84 16",
+      "fax": "027 73 16 55",
+      "wilaya": "Chlef"
+    },
+    {
+      "latitude": 35.3987581,
+      "longitude": 0.138756,
+      "name": "CSW EPH Mascara Issad Khaled",
+      "structure": "CSW EPH Mascara Issad Khaled",
+      "telephone": "045 72 24 58",
+      "fax": "045 72 24 58",
+      "wilaya": "Mascara"
+    },
+    {
+      "latitude": 35.4221052,
+      "longitude": 0.320996,
+      "name": "PTS EPH Tighenif",
+      "structure": "PTS EPH Tighenif",
+      "telephone": "045 97 56 36",
+      "fax": "045 97 56 42",
+      "wilaya": "Mascara"
+    },
+    {
+      "latitude": 35.247372,
+      "longitude": 0.1505284,
+      "name": "PTS EPH Ghriss",
+      "structure": "PTS EPH Ghriss",
+      "telephone": "045 74 93 96",
+      "fax": "045 74 81 89",
+      "wilaya": "Mascara"
+    },
+    {
+      "latitude": 35.5834001,
+      "longitude": 0.0625182,
+      "name": "PTS EPH Mohammadia",
+      "structure": "PTS EPH Mohammadia",
+      "telephone": "045 89 00 12",
+      "fax": "",
+      "wilaya": "Mascara"
+    },
+    {
+      "latitude": 35.5295138,
+      "longitude": -0.1941942,
+      "name": "PTS EPH Sig",
+      "structure": "PTS EPH Sig",
+      "telephone": "045 64 75 19",
+      "fax": "041 18 71 74",
+      "wilaya": "Mascara"
+    },
+    {
+      "latitude": 35.4000201,
+      "longitude": 0.1562916,
+      "name": "BS EPH Meslem Tayab",
+      "structure": "BS EPH Meslem Tayab",
+      "telephone": "045 71 40 40",
+      "fax": "045 71 41 38",
+      "wilaya": "Mascara"
+    },
+    {
+      "latitude": 35.9345757,
+      "longitude": 0.0920563,
+      "name": "CWTS EPH Mostaganem",
+      "structure": "CWTS EPH Mostaganem",
+      "telephone": "045 41 09 49",
+      "fax": "045 41 00 63",
+      "wilaya": "Mostaganem"
+    },
+    {
+      "latitude": 36.0006983,
+      "longitude": 0.2189541,
+      "name": "PTS EPH Ain Tedles",
+      "structure": "PTS EPH Ain Tedles",
+      "telephone": "045 47 92 53",
+      "fax": "045 47 92 54",
+      "wilaya": "Mostaganem"
+    },
+    {
+      "latitude": 36.0003522,
+      "longitude": 0.0088048,
+      "name": "PTS EPH Sidi Ali",
+      "structure": "PTS EPH Sidi Ali",
+      "telephone": "045 24 12 20",
+      "fax": "045 24 11 82",
+      "wilaya": "Mostaganem"
+    },
+    {
+      "latitude": 35.9251419,
+      "longitude": 0.087721,
+      "name": "BS EHS Mere et Enfant Lala Kheira",
+      "structure": "BS EHS Mere et Enfant Lala Kheira",
+      "telephone": "045 42 30 71",
+      "fax": "045 42 30 70",
+      "wilaya": "Mostaganem"
+    },
+    {
+      "latitude": 35.696904,
+      "longitude": -0.6300967,
+      "name": "CTS CHU Oran",
+      "structure": "CTS CHU Oran",
+      "telephone": "041 41 34 14",
+      "fax": "041 41 22 22",
+      "wilaya": "Oran"
+    },
+    {
+      "latitude": 35.696904,
+      "longitude": -0.6300967,
+      "name": "CSW EHU Oran",
+      "structure": "CSW EHU Oran",
+      "telephone": "040 23 38 05",
+      "fax": "",
+      "wilaya": "Oran"
+    },
+    {
+      "latitude": 35.8252181,
+      "longitude": -0.3706845,
+      "name": "PTS EPH Arzew (Mouhgoun)",
+      "structure": "PTS EPH Arzew (Mouhgoun)",
+      "telephone": "041 76 80 02",
+      "fax": "041 76 80 06",
+      "wilaya": "Oran"
+    },
+    {
+      "latitude": 35.7384312,
+      "longitude": -0.575745,
+      "name": "PTS EHS Canastel",
+      "structure": "PTS EHS Canastel",
+      "telephone": "041 73 48 98",
+      "fax": "",
+      "wilaya": "Oran"
+    },
+    {
+      "latitude": 35.7366214,
+      "longitude": -0.7575491,
+      "name": "BS EPH Ain Turck Dr Medjbar Tami",
+      "structure": "BS EPH Ain Turck Dr Medjbar Tami",
+      "telephone": "",
+      "fax": "041 44 76 69",
+      "wilaya": "Oran"
+    },
+    {
+      "latitude": 35.6583129,
+      "longitude": -0.700135,
+      "name": "BS EHS Emir Abd El Kader",
+      "structure": "BS EHS Emir Abd El Kader",
+      "telephone": "041 13 40 05",
+      "fax": "041 13 40 15",
+      "wilaya": "Oran"
+    },
+    {
+      "latitude": 35.7328207,
+      "longitude": 0.5490735,
+      "name": "CWTS EPH Relizane",
+      "structure": "CWTS EPH Relizane",
+      "telephone": "046 76 07 92",
+      "fax": "046 76 01 97",
+      "wilaya": "Relizane"
+    },
+    {
+      "latitude": 36.0181081,
+      "longitude": 0.8360711,
+      "name": "PTS EPH Oued R'hiou",
+      "structure": "PTS EPH Oued R'hiou",
+      "telephone": "046 97 89 66",
+      "fax": "046 77 21 89",
+      "wilaya": "Relizane"
+    },
+    {
+      "latitude": 36.1191393,
+      "longitude": 0.8650404,
+      "name": "PTS EPH Mazouna",
+      "structure": "PTS EPH Mazouna",
+      "telephone": "046 94 81 45",
+      "fax": "046 94 81 45",
+      "wilaya": "Relizane"
+    },
+    {
+      "latitude": 34.8338518,
+      "longitude": 0.1494789,
+      "name": "CWTS EPH Saida",
+      "structure": "CWTS EPH Saida",
+      "telephone": "048 38 26 56",
+      "fax": "048 38 22 79",
+      "wilaya": "Saida"
+    },
+    {
+      "latitude": 34.8399325,
+      "longitude": 0.1544085,
+      "name": "BS EHS Hamdane Bakhta",
+      "structure": "BS EHS Hamdane Bakhta",
+      "telephone": "048 37 10 07",
+      "fax": "048 37 10 02",
+      "wilaya": "Saida"
+    },
+    {
+      "latitude": 35.1836044,
+      "longitude": -0.6496364,
+      "name": "CSW CHU Sidi Bel Abbes",
+      "structure": "CSW CHU Sidi Bel Abbes",
+      "telephone": "048 54 42 89",
+      "fax": "048 54 49 92",
+      "wilaya": "Sidi Bel Abbes"
+    },
+    {
+      "latitude": 34.7787662,
+      "longitude": -0.5671355,
+      "name": "PTS EPH Telagh",
+      "structure": "PTS EPH Telagh",
+      "telephone": "048 78 08 98",
+      "fax": "048 78 08 98",
+      "wilaya": "Sidi Bel Abbes"
+    },
+    {
+      "latitude": 35.2329599,
+      "longitude": -0.2467155,
+      "name": "BS EPH Sfisef",
+      "structure": "BS EPH Sfisef",
+      "telephone": "",
+      "fax": "",
+      "wilaya": "Sidi Bel Abbes"
+    },
+    {
+      "latitude": 35.3839068,
+      "longitude": 1.31248,
+      "name": "CWTS EPH Tiaret",
+      "structure": "CWTS EPH Tiaret",
+      "telephone": "046 20 61 67",
+      "fax": "046 20 61 66",
+      "wilaya": "Tiaret"
+    },
+    {
+      "latitude": 35.1866003,
+      "longitude": 1.4893073,
+      "name": "PTS EPH Sougueur",
+      "structure": "PTS EPH Sougueur",
+      "telephone": "046 28 98 74",
+      "fax": "046 28 98 72",
+      "wilaya": "Tiaret"
+    },
+    {
+      "latitude": 35.62769,
+      "longitude": 1.0930914,
+      "name": "PTS EPH Mahdia",
+      "structure": "PTS EPH Mahdia",
+      "telephone": "046 46 36 66",
+      "fax": "046 46 36 66",
+      "wilaya": "Tiaret"
+    },
+    {
+      "latitude": 35.2202319,
+      "longitude": 2.3150437,
+      "name": "PTS EPH Ksar Chellala",
+      "structure": "PTS EPH Ksar Chellala",
+      "telephone": "046 36 31 42",
+      "fax": "046 36 31 42",
+      "wilaya": "Tiaret"
+    },
+    {
+      "latitude": 35.0611464,
+      "longitude": 1.0471249,
+      "name": "PTS EPH Frenda",
+      "structure": "PTS EPH Frenda",
+      "telephone": "046 30 68 72",
+      "fax": "046 20 25 51",
+      "wilaya": "Tiaret"
+    },
+    {
+      "latitude": 35.3476012,
+      "longitude": 1.3405577,
+      "name": "BS EHS Mere et Enfent Tiaret",
+      "structure": "BS EHS Mere et Enfent Tiaret",
+      "telephone": "046 21 77 75/78",
+      "fax": "",
+      "wilaya": "Tiaret"
+    },
+    {
+      "latitude": 35.5325138,
+      "longitude": 1.0155368,
+      "name": "BS EPSP Rahouia",
+      "structure": "BS EPSP Rahouia",
+      "telephone": "046 35 63 65",
+      "fax": "046 35 63 68",
+      "wilaya": "Tiaret"
+    },
+    {
+      "latitude": 35.6009867,
+      "longitude": 1.8190239,
+      "name": "CWTS EPH Tissemsilt",
+      "structure": "CWTS EPH Tissemsilt",
+      "telephone": "046 57 06 12",
+      "fax": "046 57 06 12",
+      "wilaya": "Tissemsilt"
+    },
+    {
+      "latitude": 35.8787382,
+      "longitude": 2.0182399,
+      "name": "PTS EPH Theniet El Had",
+      "structure": "PTS EPH Theniet El Had",
+      "telephone": "046 58 41 60/82",
+      "fax": "046 58 42 25",
+      "wilaya": "Tissemsilt"
+    },
+    {
+      "latitude": 35.8700433,
+      "longitude": 1.6159062,
+      "name": "PTS EPH Bordj Bounaama",
+      "structure": "PTS EPH Bordj Bounaama",
+      "telephone": "046 50 39 04",
+      "fax": "046 50 39 04",
+      "wilaya": "Tissemsilt"
+    },
+    {
+      "latitude": 34.8804885,
+      "longitude": -1.3282327,
+      "name": "CWTS CHU Tlemcen",
+      "structure": "CWTS CHU Tlemcen",
+      "telephone": "043 41 72 32",
+      "fax": "043 41 72 14",
+      "wilaya": "Tlemcen"
+    },
+    {
+      "latitude": 34.8609735,
+      "longitude": -1.6664766,
+      "name": "PTS EPH Maghnia",
+      "structure": "PTS EPH Maghnia",
+      "telephone": "043 51 65 69",
+      "fax": "043 51 70 81",
+      "wilaya": "Tlemcen"
+    },
+    {
+      "latitude": 34.8596075,
+      "longitude": -2.0868492,
+      "name": "PTS EPH Sebdou",
+      "structure": "PTS EPH Sebdou",
+      "telephone": "043 54 67 67",
+      "fax": "043 54 65 11",
+      "wilaya": "Tlemcen"
+    },
+    {
+      "latitude": 35.0886004,
+      "longitude": -1.8633956,
+      "name": "PTS EPH Ghazaouet",
+      "structure": "PTS EPH Ghazaouet",
+      "telephone": "043 46 56 00",
+      "fax": "043 46 57 93",
+      "wilaya": "Tlemcen"
+    },
+    {
+      "latitude": 35.0469904,
+      "longitude": -1.5565899,
+      "name": "CTS EPH Remchi",
+      "structure": "CTS EPH Remchi",
+      "telephone": "043 43 30 08/09",
+      "fax": "043 43 30 07",
+      "wilaya": "Tlemcen"
+    },
+    {
+      "latitude": 35.0177824,
+      "longitude": -1.7608622,
+      "name": "BS EPH Nedrouma",
+      "structure": "BS EPH Nedrouma",
+      "telephone": "043 35 60 14",
+      "fax": "043 35 60 14",
+      "wilaya": "Tlemcen"
+    },
+    {
+      "latitude": 34.849527,
+      "longitude": 5.741318,
+      "name": "CWTS EPH Biskra Bachir Bennacer",
+      "structure": "CWTS EPH Biskra Bachir Bennacer",
+      "telephone": "033 52 23 91",
+      "fax": "033 52 23 99",
+      "wilaya": "Biskra"
+    },
+    {
+      "latitude": 34.4287819,
+      "longitude": 5.0622622,
+      "name": "PTS EPH Ouled Djellal",
+      "structure": "PTS EPH Ouled Djellal",
+      "telephone": "",
+      "fax": "",
+      "wilaya": "Ouled Djellal"
+    },
+    {
+      "latitude": 34.7203006,
+      "longitude": 5.3752863,
+      "name": "BS EPH Tolga",
+      "structure": "BS EPH Tolga",
+      "telephone": "033 57 93 57",
+      "fax": "033 57 93 61",
+      "wilaya": "Biskra"
+    },
+    {
+      "latitude": 34.681509,
+      "longitude": 6.5005578,
+      "name": "CTS EPSP Zeribet El Oued",
+      "structure": "CTS EPSP Zeribet El Oued",
+      "telephone": "033 55 32 93",
+      "fax": "033 55 32 93",
+      "wilaya": "Biskra"
+    },
+    {
+      "latitude": 34.8441381,
+      "longitude": 5.7252865,
+      "name": "CTS EHS Biskra",
+      "structure": "CTS EHS Biskra",
+      "telephone": "",
+      "fax": "033 74 19 63",
+      "wilaya": "Biskra"
+    },
+    {
+      "latitude": 33.3939988,
+      "longitude": 6.8691322,
+      "name": "CWTS EPH El Oued",
+      "structure": "CWTS EPH El Oued",
+      "telephone": "032 12 32 32",
+      "fax": "032 12 32 21",
+      "wilaya": "El Oued"
+    },
+    {
+      "latitude": 33.9542151,
+      "longitude": 5.9080351,
+      "name": "PTS EPH M'ghair",
+      "structure": "PTS EPH M'ghair",
+      "telephone": "032 19 75 44",
+      "fax": "032 19 75 43",
+      "wilaya": "El M'ghair"
+    },
+    {
+      "latitude": 33.5266774,
+      "longitude": 5.9849698,
+      "name": "PTS EPH Djamaa",
+      "structure": "PTS EPH Djamaa",
+      "telephone": "032 16 23 86",
+      "fax": "032 16 23 71",
+      "wilaya": "El M'ghair"
+    },
+    {
+      "latitude": 33.3652488,
+      "longitude": 6.852285,
+      "name": "BS EHS Bachir Benacer",
+      "structure": "BS EHS Bachir Benacer",
+      "telephone": "032 11 22 19",
+      "fax": "032 11 22 44",
+      "wilaya": "El Oued"
+    },
+    {
+      "latitude": 32.4898296,
+      "longitude": 3.6929409,
+      "name": "CWTS EPH Ghardaia",
+      "structure": "CWTS EPH Ghardaia",
+      "telephone": "029 25 85 85",
+      "fax": "029 25 85 85",
+      "wilaya": "Ghardaia"
+    },
+    {
+      "latitude": 30.6003552,
+      "longitude": 1.7643881,
+      "name": "PTS EPH El Meniaa",
+      "structure": "PTS EPH El Meniaa",
+      "telephone": "029 21 97 02",
+      "fax": "029 21 97 01",
+      "wilaya": "El Meniaa"
+    },
+    {
+      "latitude": 32.2886275,
+      "longitude": 3.6037473,
+      "name": "PTS EPH Metlili",
+      "structure": "PTS EPH Metlili",
+      "telephone": "029 82 44 92",
+      "fax": "029 82 44 91",
+      "wilaya": "Ghardaia"
+    },
+    {
+      "latitude": 32.4863727,
+      "longitude": 3.6777706,
+      "name": "BS EHS Gueddi Bakir",
+      "structure": "BS EHS Gueddi Bakir",
+      "telephone": "029 28 54 01",
+      "fax": "029 28 54 01",
+      "wilaya": "Ghardaia"
+    },
+    {
+      "latitude": 32.7926016,
+      "longitude": 4.5033414,
+      "name": "PTS EPH Guerrara",
+      "structure": "PTS EPH Guerrara",
+      "telephone": "029 26 91 91",
+      "fax": "029 26 91 20",
+      "wilaya": "Ghardaia"
+    },
+    {
+      "latitude": 26.4085794,
+      "longitude": 3.591849,
+      "name": "CWTS EPH Illizi",
+      "structure": "CWTS EPH Illizi",
+      "telephone": "029 41 18 13",
+      "fax": "029 41 18 13",
+      "wilaya": "Illizi"
+    },
+    {
+      "latitude": 24.4781643,
+      "longitude": 9.507341,
+      "name": "CTS EPH Djanet",
+      "structure": "CTS EPH Djanet",
+      "telephone": "",
+      "fax": "029 47 06 72",
+      "wilaya": "Timimoun"
+    },
+    {
+      "latitude": 24.4201917,
+      "longitude": 5.0008934,
+      "name": "CTS EPSP In Amenas",
+      "structure": "CTS EPSP In Amenas",
+      "telephone": "029 45 98 02",
+      "fax": "029 45 98 03",
+      "wilaya": "Illizi"
+    },
+    {
+      "latitude": 33.8058315,
+      "longitude": 2.8559061,
+      "name": "CWTS EPH Laghouat",
+      "structure": "CWTS EPH Laghouat",
+      "telephone": "029 10 72 41",
+      "fax": "",
+      "wilaya": "Laghouat"
+    },
+    {
+      "latitude": 34.117566,
+      "longitude": 2.0927103,
+      "name": "CTS EPH Aflou",
+      "structure": "CTS EPH Aflou",
+      "telephone": "029 16 64 65",
+      "fax": "029 16 64 65",
+      "wilaya": "Laghouat"
+    },
+    {
+      "latitude": 31.9619717,
+      "longitude": 5.0504349,
+      "name": "CWTS EPH Ouargla",
+      "structure": "CWTS EPH Ouargla",
+      "telephone": "029 70 37 46",
+      "fax": "029 70 90 54",
+      "wilaya": "Ouargla"
+    },
+    {
+      "latitude": 31.6903513,
+      "longitude": 6.0556216,
+      "name": "PTS EPH Hassi Messoud",
+      "structure": "PTS EPH Hassi Messoud",
+      "telephone": "029 74 46 30",
+      "fax": "029 74 46 28",
+      "wilaya": "Ouargla"
+    },
+    {
+      "latitude": 33.1008535,
+      "longitude": 6.0589539,
+      "name": "CTS EPH Touggourt",
+      "structure": "CTS EPH Touggourt",
+      "telephone": "029 66 30 78",
+      "fax": "029 66 30 80",
+      "wilaya": "Touggourt"
+    },
+    {
+      "latitude": 32.6173245,
+      "longitude": 5.5099455,
+      "name": "PTS EPSP El Hadjira",
+      "structure": "PTS EPSP El Hadjira",
+      "telephone": "029 61 30 27",
+      "fax": "029 61 30 27",
+      "wilaya": "Ouargla"
+    },
+    {
+      "latitude": 33.0838897,
+      "longitude": 6.3968939,
+      "name": "PTS EPH Taibet",
+      "structure": "PTS EPH Taibet",
+      "telephone": "029 61 10 29",
+      "fax": "029 61 11 29",
+      "wilaya": "Touggourt"
+    },
+    {
+      "latitude": 22.7749536,
+      "longitude": 5.5270551,
+      "name": "CWTS EPH Tamanrasset",
+      "structure": "CWTS EPH Tamanrasset",
+      "telephone": "029 32 66 20",
+      "fax": "",
+      "wilaya": "Tamanrasset"
+    },
+    {
+      "latitude": 27.2015073,
+      "longitude": 0.7253295,
+      "name": "PTS EPH Ain Salah",
+      "structure": "PTS EPH Ain Salah",
+      "telephone": "029 38 61 47",
+      "fax": "029 38 62 74",
+      "wilaya": "Ain Salah"
+    },
+    {
+      "latitude": 22.7904761,
+      "longitude": 5.4982705,
+      "name": "CTS EHS Mere et Enfant",
+      "structure": "CTS EHS Mere et Enfant",
+      "telephone": "029 32 00 72",
+      "fax": "029 32 00 77",
+      "wilaya": "Tamanrasset"
+    },
+    {
+      "latitude": 27.871005,
+      "longitude": -0.2838957,
+      "name": "CWTS EPH Adrar",
+      "structure": "CWTS EPH Adrar",
+      "telephone": "049 36 84 15",
+      "fax": "049 36 84 15",
+      "wilaya": "Adrar"
+    },
+    {
+      "latitude": 29.2558819,
+      "longitude": 0.2316568,
+      "name": "CTS EPH Timimoun",
+      "structure": "CTS EPH Timimoun",
+      "telephone": "049 30 11 49",
+      "fax": "049 30 11 47",
+      "wilaya": "Timimoun"
+    },
+    {
+      "latitude": 26.7215556,
+      "longitude": -2.0712118,
+      "name": "CTS EPH Reggane",
+      "structure": "CTS EPH Reggane",
+      "telephone": "049 97 06 61",
+      "fax": "049 97 06 61",
+      "wilaya": "Adrar"
+    },
+    {
+      "latitude": 26.6681291,
+      "longitude": 0.623941,
+      "name": "CTS EPH Aoulef",
+      "structure": "CTS EPH Aoulef",
+      "telephone": "049 32 73 46",
+      "fax": "049 32 73 44",
+      "wilaya": "Adrar"
+    },
+    {
+      "latitude": 31.6020866,
+      "longitude": -2.2388613,
+      "name": "CSW EPH Bechar",
+      "structure": "CSW EPH Bechar",
+      "telephone": "049 23 83 74",
+      "fax": "049 23 58 01",
+      "wilaya": "Bechar"
+    },
+    {
+      "latitude": 30.1290025,
+      "longitude": -2.1724538,
+      "name": "CTS EPH Beni Abbes",
+      "structure": "CTS EPH Beni Abbes",
+      "telephone": "049 28 60 15",
+      "fax": "049 28 60 15",
+      "wilaya": "Beni Abbes"
+    },
+    {
+      "latitude": 31.0015533,
+      "longitude": -2.7487046,
+      "name": "PTS EPH Abadla",
+      "structure": "PTS EPH Abadla",
+      "telephone": "049 25 50 01/04/05/07",
+      "fax": "049 25 50 01/04/07",
+      "wilaya": "Bechar"
+    },
+    {
+      "latitude": 33.6727283,
+      "longitude": 1.0144842,
+      "name": "CWTS EPH El Bayadh",
+      "structure": "CWTS EPH El Bayadh",
+      "telephone": "049 61 17 99",
+      "fax": "049 61 17 73",
+      "wilaya": "El Bayadh"
+    },
+    {
+      "latitude": 32.8952593,
+      "longitude": 0.5461878,
+      "name": "PTS EPH El Abiodh Sidi Chikh",
+      "structure": "PTS EPH El Abiodh Sidi Chikh",
+      "telephone": "049 63 65 46",
+      "fax": "049 63 65 44",
+      "wilaya": "El Bayadh"
+    },
+    {
+      "latitude": 34.0424279,
+      "longitude": 0.0870163,
+      "name": "PTS EPH Bougtob",
+      "structure": "PTS EPH Bougtob",
+      "telephone": "049 62 43 52",
+      "fax": "049 62 43 52",
+      "wilaya": "El Bayadh"
+    },
+    {
+      "latitude": 33.5271924,
+      "longitude": -0.2843278,
+      "name": "CWTS EPH Mechria",
+      "structure": "CWTS EPH Mechria",
+      "telephone": "049 51 07 99",
+      "fax": "049 51 07 09",
+      "wilaya": "Naama"
+    },
+    {
+      "latitude": 32.758814,
+      "longitude": -0.5951469,
+      "name": "CTS EPH Ain Sefra",
+      "structure": "CTS EPH Ain Sefra",
+      "telephone": "049 56 61 90",
+      "fax": "049 56 61 90",
+      "wilaya": "Naama"
+    },
+    {
+      "latitude": 33.2760894,
+      "longitude": -0.3087058,
+      "name": "BS EPH Naama",
+      "structure": "BS EPH Naama",
+      "telephone": "049 59 31 33",
+      "fax": "049 59 36 39",
+      "wilaya": "Naama"
+    },
+    {
+      "latitude": 27.6752928,
+      "longitude": -8.1422823,
+      "name": "CSW EPH Tindouf",
+      "structure": "CSW EPH Tindouf",
+      "telephone": "049 37 62 81",
+      "fax": "049 37 63 73",
+      "wilaya": "Tindouf"
+    },
+    {
+      "latitude": 33.3412363,
+      "longitude": 6.8503514,
+      "name": "CTS CAC EL Oued",
+      "structure": "CTS CAC EL Oued",
+      "telephone": "032 13 91 84",
+      "fax": "032 13 91 85",
+      "wilaya": "El Oued"
+    }
+  ]
+}

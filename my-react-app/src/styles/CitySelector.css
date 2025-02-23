@@ -1,0 +1,87 @@
+/* CitySelector.css */
+
+/* General styles */
+.wilaya-selector {
+  font-family: 'Arial', sans-serif;
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 130px;
+  transition: background-color 0.3s, color 0.3s;
+  transition: 0.5s;
+}
+
+
+
+/* Dark mode styles */
+.dark-theme .wilaya-selector {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Label styling */
+.wilaya-selector label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Dark mode label */
+.dark-theme .wilaya-selector label {
+  color: #fff;
+}
+
+/* Select dropdown styling */
+.wilaya-selector select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  appearance: none;
+  cursor: pointer;
+}
+
+/* Dark mode dropdown */
+.dark-theme .wilaya-selector select {
+  background-color: #555;
+  color: #fff;
+  border-color: #888;
+}
+
+/* Loading message styling */
+.loading {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  padding: 20px;
+}
+
+/* Dark mode loading */
+.dark-theme .loading {
+  color: #bbb;
+}
+
+/* Error message styling */
+.error {
+  text-align: center;
+  font-size: 16px;
+  color: #ff4d4d;
+  padding: 20px;
+  background-color: #ffe6e6;
+  border-radius: 4px;
+  border: 1px solid #ff4d4d;
+}
+
+/* Dark mode error */
+.dark-theme .error {
+  background-color: #660000;
+  color: #ff9999;
+  border-color: #ff9999;
+}

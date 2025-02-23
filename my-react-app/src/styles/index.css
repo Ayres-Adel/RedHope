@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+        
+    }
+}
+
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgb(255, 71, 71);
+    border-radius: 5px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(233, 41, 41);
+  }
+  
+
+:root {
+    --Primary_blue: hsl(0, 0%, 3%);
+    --light-coral: #F08080;
+    --dark-red: #8B0000;
+    --forest-green: #228B22;
+    --NeutralVery_brown: hsl(0, 0%, 3%);
+    --NeutralDark_grayish_blue: hsl(219, 9%, 45%);
+    --NeutralGrayish_blue: hsl(220, 14%, 75%);
+    --NeutralLight_grayish_red: #ff4747;
+    --NeutralWhite: hsl(0, 0%, 100%);
+    --NeutralBlack : hsl(0, 0%, 0%);
+
+    --Font_size: 16px;
+
+    --Weights_01: 400;
+    --Weights_02: 700;
+
+    --dark-background: #121212; /* Dark background */
+    --dark-card: #1e1e1e; /* Card background */
+    --dark-border: #333333; /* Border color */
+    --dark-text: #ffffff; /* Light text color */
+    --dark-placeholder: #888888; /* Placeholder color */
+    --dark-accent: rgb(255, 71, 71); /* Accent color */
+
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    font-size: var(--Font_size);
+    font-weight: var(--Weights_01);
+    animation: fadeIn 1s ease-in-out;
+    overflow-x: hidden;
+    cursor: url("./RedCursorHope.cur") , auto;
+    
+}
+
+
+
+a, button {
+    cursor: url("./RedSelectLinkHope.cur"), auto;
+  }
+
+  input, textarea {
+    cursor: url("./RedTextSelectHope.cur"), text;
+  }  
+
+
+  
+
+

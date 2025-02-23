@@ -1,0 +1,30 @@
+
+#nprogress .bar {
+    background: rgb(255, 71, 71);    
+    height: 4px;       
+    position: fixed;   
+    top: 0px;          
+    left: 0px;      
+    width: 100%;        
+    z-index: 1031;      
+  }
+  
+  #nprogress .peg {
+    box-shadow: 0 0 10px rgb(255, 71, 71), 0 0 5px rgb(255, 71, 71); /* Red shadow effect */
+  }
+  
+  
+  #nprogress .spinner {
+    display: none;
+  }
+
+  #nprogress {
+    height: 5px;
+    background: linear-gradient(to right, #ff4747, #ff8a8a);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: width 0.3s ease;
+}
+  
