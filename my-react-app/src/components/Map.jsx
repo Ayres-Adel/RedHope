@@ -1,4 +1,4 @@
-import '../styles/map.css';
+import "../styles/map.css";
 import React, { useState, useRef } from "react";
 import {
   APIProvider,
@@ -40,72 +40,33 @@ export default function MapComponent() {
   const mapRef = useRef(null);
 
   const searchIconStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     opacity: showSearch ? 0 : 1,
-    transition: 'opacity 0.2s ease',
-    position: 'absolute',
-    left: showSearch ? '10px' : '50%',
-    top: '50%',
-    transform: showSearch ? 'translateY(-50%)' : 'translate(-50%, -50%)',
+    transition: "opacity 0.2s ease",
+    position: "absolute",
+    left: showSearch ? "10px" : "50%",
+    top: "50%",
+    transform: showSearch ? "translateY(-50%)" : "translate(-50%, -50%)",
   };
 
   const searchContainerStyle = {
-    position: 'absolute',
-    top: '-10px',
-    left: '-180px',
+    position: "absolute",
+    top: "-10px",
+    left: "-180px",
     zIndex: 1000,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'white',
-    borderRadius: showSearch ? '25px' : '50%',
-    padding: showSearch ? '10px 15px' : '12px',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-    width: showSearch ? '300px' : '45px',
-    height: showSearch ? '45px' : '45px',
-    transition: 'all 0.3s ease',
-    cursor: 'pointer',
-  };
-
-  const searchInputStyle = {
-    border: 'none',
-    outline: 'none',
-    width: '100%',
-    padding: '0 8px',
-    fontSize: '14px',
-    opacity: showSearch ? 1 : 0,
-    transition: 'opacity 0.2s ease 0.2s',
-  };
-
-  const suggestionsStyle = {
-    position: 'absolute',
-    top: 'calc(100% + 5px)',
-    left: 0,
-    width: '100%',
-    background: 'white',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-    zIndex: 1001,
-    maxHeight: '200px',
-    overflowY: 'auto',
-  };
-
-  const suggestionItemStyle = {
-    padding: '10px 15px',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease',
-    '&:hover': {
-      backgroundColor: '#f5f5f5',
-    },
-  };
-
-  const suggestionItemHoverStyle = {
-    ...suggestionItemStyle,
-    backgroundColor: "#fff0f0",
-    transform: "translateX(5px)",
-    borderLeft: "3px solid #ff4747",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "white",
+    borderRadius: showSearch ? "25px" : "50%",
+    padding: showSearch ? "10px 15px" : "12px",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+    width: showSearch ? "300px" : "45px",
+    height: showSearch ? "45px" : "45px",
+    transition: "all 0.3s ease",
+    cursor: "pointer",
   };
 
   const handleLocationChange = (newLocation) => {
@@ -190,6 +151,7 @@ export default function MapComponent() {
                 type: "blood",
               });
               setOpen(true);
+              handleCloseSearch();
             }}
           >
             <img
@@ -215,6 +177,7 @@ export default function MapComponent() {
                 type: "hospital",
               });
               setOpen(true);
+              handleCloseSearch();
             }}
           >
             <img
@@ -240,7 +203,11 @@ export default function MapComponent() {
             defaultCenter={mapCenter}
             center={isControlled ? controlledCenter : undefined}
             defaultZoom={12}
-            onClick={handleCloseSearch}
+            onClick={() => {
+              handleCloseSearch();
+              setOpen(false);
+              setSelectedMarker(null);
+            }}
             onDragStart={() => {
               setIsControlled(false);
               handleCloseSearch();
@@ -253,16 +220,18 @@ export default function MapComponent() {
               gestureHandling: "cooperative",
             }}
           >
-            <button 
+            <button
               style={{
                 ...searchContainerStyle,
-                appearance: 'none',
-                border: 'none',
-                outline: 'none',
+                appearance: "none",
+                border: "none",
+                outline: "none",
               }}
               onClick={() => {
                 if (!showSearch) {
                   setShowSearch(true);
+                  setOpen(false); // Close any open InfoWindow
+                  setSelectedMarker(null);
                   setTimeout(() => searchInputRef.current?.focus(), 300);
                 }
               }}
@@ -276,10 +245,10 @@ export default function MapComponent() {
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
                   style={{
-                    border: 'none',
-                    outline: 'none',
-                    width: '100%',
-                    background: 'transparent'
+                    border: "none",
+                    outline: "none",
+                    width: "100%",
+                    background: "transparent",
                   }}
                 />
               ) : (
@@ -299,75 +268,87 @@ export default function MapComponent() {
                 </svg>
               )}
               {showSuggestions && suggestions.length > 0 && (
-                <div 
+                <div
                   className="suggestions-container"
                   style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 8px)',
+                    position: "absolute",
+                    top: "calc(100% + 8px)",
                     left: 0,
-                    width: '100%',
-                    background: 'white',
-                    borderRadius: '10px',
-                    boxShadow: '0 6px 16px rgba(0,0,0,0.08)',
+                    width: "100%",
+                    background: "white",
+                    borderRadius: "10px",
+                    boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
                     zIndex: 1001,
-                    maxHeight: '180px',
-                    overflowY: 'auto',
-                    overflowX: 'hidden',
-                    padding: '4px 0',
-                    border: '1px solid rgba(0,0,0,0.06)',
+                    maxHeight: "180px",
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    padding: "4px 0",
+                    border: "1px solid rgba(0,0,0,0.06)",
                   }}
                 >
                   {suggestions.map((suggestion, index) => (
-                    <div 
+                    <div
                       key={index}
                       style={{
-                        padding: '8px 10px',
-                        cursor: 'pointer',
-                        backgroundColor: 'white',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        textAlign: 'left',
-                        borderLeft: '2px solid transparent'
+                        padding: "8px 10px",
+                        cursor: "pointer",
+                        backgroundColor: "white",
+                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        textAlign: "left",
+                        borderLeft: "2px solid transparent",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#ff474715';
-                        e.currentTarget.style.transform = 'translateX(4px)';
-                        e.currentTarget.style.borderLeft = '2px solid #ff4747';
+                        e.currentTarget.style.backgroundColor = "#ff474715";
+                        e.currentTarget.style.transform = "translateX(4px)";
+                        e.currentTarget.style.borderLeft = "2px solid #ff4747";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'white';
-                        e.currentTarget.style.transform = 'translateX(0)';
-                        e.currentTarget.style.borderLeft = '2px solid transparent';
+                        e.currentTarget.style.backgroundColor = "white";
+                        e.currentTarget.style.transform = "translateX(0)";
+                        e.currentTarget.style.borderLeft =
+                          "2px solid transparent";
                       }}
                       onClick={() => handleSuggestionClick(suggestion)}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path 
-                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" 
-                          stroke="#ff4747" 
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+                          stroke="#ff4747"
                           strokeWidth="1.5"
-                          fill="#ff474710" 
+                          fill="#ff474710"
                         />
                       </svg>
-                      <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column',
-                        gap: '2px'
-                      }}>
-                        <span style={{ 
-                          fontSize: '13px',
-                          fontWeight: '500',
-                          color: '#2c3e50'
-                        }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "2px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: "500",
+                            color: "#2c3e50",
+                          }}
+                        >
                           {suggestion.name}
                         </span>
-                        <span style={{
-                          fontSize: '11px',
-                          color: '#666',
-                          fontWeight: '400'
-                        }}>
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            color: "#666",
+                            fontWeight: "400",
+                          }}
+                        >
                           {suggestion.wilaya}
                         </span>
                       </div>

@@ -58,12 +58,10 @@ export default function Navbar() {
     <header>
       <nav>
       <Link to="/">
-      <a href="#">
           <div className="RedHope">
             <img src="/src/assets/images/RedHope_Logo.png" alt="RedHope Logo" />
-            <a href="/"><h1><span>Red</span>Hope</h1></a>
+            <h1><span>Red</span>Hope</h1>
           </div>
-        </a>
         </Link>
 
         <div className='nav-links'>
@@ -97,10 +95,14 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <div className='language-switcher'>
-          <select value={language} onChange={(e) => changeLanguage(e.target.value)}>
-            <option value='en'>English</option>
-            <option value='fr'>Français</option>
+        <div className="language-switcher" data-value={language}>
+          <select 
+            value={language} 
+            onChange={(e) => changeLanguage(e.target.value)}
+            aria-label="Change language"
+          >
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
           </select>
         </div>
 
