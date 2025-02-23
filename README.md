@@ -54,14 +54,14 @@ RedHope is a life-saving platform that connects blood donors with those in urgen
 - View the interactive map for nearby hospitals.
 - Connect with donors and schedule a donation.
 
-##Contributing
+## Contributing
 - Contributions are welcome! Please fork the repository and submit a pull request.
 
-##License
+## License
 - This project is licensed under the MIT License.
 
-##Contact
+## Contact
 - For questions or suggestions, contact us at support@redhope.com.
 
-##Saving lives, one donation at a time!  
+## Saving lives, one donation at a time!  
 
