@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.imgur.com/enXcioL.gif" alt="Diamond GIF" width="900px">
+  <img src="https://i.imgur.com/enXcioL.gif" alt="Diamond GIF" width="1000px">
 </div>
 
 # RedHope - Blood Donation Platform
