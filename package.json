@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-chat-widget": "^3.1.4",
+    "three": "^0.173.0"
+  }
+}
