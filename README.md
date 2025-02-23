@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://i.imgur.com/aH2X0cE.gif" alt="Diamond GIF" width="900px">
+</div>
+
 # RedHope - Blood Donation Platform
 
 RedHope is a life-saving platform that connects blood donors with those in urgent need. The website uses real-time location tracking to show nearby donors and provides a map displaying hospital locations.
