@@ -1,0 +1,29 @@
+
+.ErrorHandling {
+    display: grid;
+    justify-content: center;
+    text-align: center;
+    margin-top: 50px;
+}
+
+
+
+.ErrorHandling > p {
+    font-weight: var(--Weights_02);
+    font-size: 20px;
+}
+
+.Home {
+    font-weight: var(--Weights_02);
+    color: var(--Primary_blue);
+    border: 2px solid ;
+    border-radius: 20px; 
+    display: inline-block; 
+    padding: 10px 20px; 
+    text-decoration: none; 
+    transition: 0.5s;
+}
+
+.Home:hover {
+    background-color: hsl(19, 59%, 71%); 
+}

@@ -1,0 +1,776 @@
+[
+    {
+      "code": "01",
+      "name": "Adrar",
+      "latitude": 27.87405451,
+      "longitude": -0.29451324,
+      "blood_centers": [
+        {
+          "name": "CTS Adrar",
+          "latitude": 27.87392130,
+          "longitude": -0.29328951
+        }
+      ]
+    },
+    {
+      "code": "02",
+      "name": "Chlef",
+      "latitude": 36.17005452,
+      "longitude": 1.33167844,
+      "blood_centers": [
+        {
+          "name": "CTS Chlef",
+          "latitude": 36.17095328,
+          "longitude": 1.33512287
+        }
+      ]
+    },
+    {
+      "code": "03",
+      "name": "Laghouat",
+      "latitude": 33.80515172,
+      "longitude": 2.88299819,
+      "blood_centers": [
+        {
+          "name": "CTS Laghouat",
+          "latitude": 33.80447211,
+          "longitude": 2.87965833
+        }
+      ]
+    },
+    {
+      "code": "04",
+      "name": "Oum El Bouaghi",
+      "latitude": 35.87711304,
+      "longitude": 7.11303676,
+      "blood_centers": [
+        {
+          "name": "CTS Oum El Bouaghi",
+          "latitude": 35.87570290,
+          "longitude": 7.11174932
+        }
+      ]
+    },
+    {
+      "code": "05",
+      "name": "Batna",
+      "latitude": 35.55574931,
+      "longitude": 6.17693948,
+      "blood_centers": [
+        {
+          "name": "CTS Batna",
+          "latitude": 35.55784012,
+          "longitude": 6.17832091
+        },
+        {
+          "name": "CHU Batna Blood Center",
+          "latitude": 35.55587460,
+          "longitude": 6.17921234
+        }
+      ]
+    },
+    {
+      "code": "06",
+      "name": "Béjaïa",
+      "latitude": 36.75087902,
+      "longitude": 5.05532186,
+      "blood_centers": [
+        {
+          "name": "CTS Béjaïa",
+          "latitude": 36.75161287,
+          "longitude": 5.05874862
+        }
+      ]
+    },
+    {
+      "code": "07",
+      "name": "Biskra",
+      "latitude": 34.85317948,
+      "longitude": 5.72778314,
+      "blood_centers": [
+        {
+          "name": "CTS Biskra",
+          "latitude": 34.85398611,
+          "longitude": 5.72992083
+        }
+      ]
+    },
+    {
+      "code": "08",
+      "name": "Béchar",
+      "latitude": 31.61372295,
+      "longitude": -2.20631328,
+      "blood_centers": [
+        {
+          "name": "CTS Béchar",
+          "latitude": 31.61512520,
+          "longitude": -2.21021045
+        }
+      ]
+    },
+    {
+      "code": "09",
+      "name": "Blida",
+      "latitude": 36.47003938,
+      "longitude": 2.83152764,
+      "blood_centers": [
+        {
+          "name": "CTS Blida",
+          "latitude": 36.46954273,
+          "longitude": 2.83418426
+        }
+      ]
+    },
+    {
+      "code": "10",
+      "name": "Bouira",
+      "latitude": 36.37488927,
+      "longitude": 3.90250384,
+      "blood_centers": [
+        {
+          "name": "CTS Bouira",
+          "latitude": 36.37620014,
+          "longitude": 3.90540097
+        }
+      ]
+    },
+    {
+      "code": "11",
+      "name": "Tamanrasset",
+      "latitude": 22.78538514,
+      "longitude": 5.52283973,
+      "blood_centers": [
+        {
+          "name": "CTS Tamanrasset",
+          "latitude": 22.78490025,
+          "longitude": 5.52610037
+        }
+      ]
+    },
+    {
+      "code": "12",
+      "name": "Tébessa",
+      "latitude": 35.40172411,
+      "longitude": 8.11948853,
+      "blood_centers": [
+        {
+          "name": "CTS Tébessa",
+          "latitude": 35.40128082,
+          "longitude": 8.12250294
+        }
+      ]
+    },
+    {
+      "code": "13",
+      "name": "Tlemcen",
+      "latitude": 34.88283995,
+      "longitude": -1.31645373,
+      "blood_centers": [
+        {
+          "name": "CTS Tlemcen",
+          "latitude": 34.88320244,
+          "longitude": -1.31874965
+        }
+      ]
+    },
+    {
+      "code": "14",
+      "name": "Tiaret",
+      "latitude": 35.36618576,
+      "longitude": 1.31633612,
+      "blood_centers": [
+        {
+          "name": "CTS Tiaret",
+          "latitude": 35.36778006,
+          "longitude": 1.31804739
+        }
+      ]
+    },
+    {
+      "code": "15",
+      "name": "Tizi Ouzou",
+      "latitude": 36.71190182,
+      "longitude": 4.04597239,
+      "blood_centers": [
+        {
+          "name": "CTS Tizi Ouzou",
+          "latitude": 36.71093384,
+          "longitude": 4.04902368
+        }
+      ]
+    },
+    {
+      "code": "16",
+      "name": "Alger",
+      "latitude": 36.75380044,
+      "longitude": 3.05880095,
+      "blood_centers": [
+        {
+          "name": "CTS Mustapha Pacha",
+          "latitude": 36.75218528,
+          "longitude": 3.05968831
+        },
+        {
+          "name": "CTS Alger-Centre",
+          "latitude": 36.75548290,
+          "longitude": 3.05828844
+        },
+        {
+          "name": "Hôpital Parnet Blood Center",
+          "latitude": 36.73484556,
+          "longitude": 3.07949027
+        }
+      ]
+    },
+    {
+      "code": "17",
+      "name": "Djelfa",
+      "latitude": 34.67065831,
+      "longitude": 3.25003248,
+      "blood_centers": [
+        {
+          "name": "CTS Djelfa",
+          "latitude": 34.67140371,
+          "longitude": 3.25310285
+        }
+      ]
+    },
+    {
+      "code": "18",
+      "name": "Jijel",
+      "latitude": 36.82074993,
+      "longitude": 5.76634532,
+      "blood_centers": [
+        {
+          "name": "CTS Jijel",
+          "latitude": 36.82150471,
+          "longitude": 5.76942261
+        }
+      ]
+    },
+    {
+      "code": "19",
+      "name": "Sétif",
+      "latitude": 36.18993142,
+      "longitude": 5.41376028,
+      "blood_centers": [
+        {
+          "name": "CTS Sétif",
+          "latitude": 36.18895070,
+          "longitude": 5.41731162
+        }
+      ]
+    },
+    {
+      "code": "20",
+      "name": "Saïda",
+      "latitude": 34.83038576,
+      "longitude": 0.15167234,
+      "blood_centers": [
+        {
+          "name": "CTS Saïda",
+          "latitude": 34.82962418,
+          "longitude": 0.15540672
+        }
+      ]
+    },
+    {
+      "code": "21",
+      "name": "Skikda",
+      "latitude": 36.86666901,
+      "longitude": 6.90000042,
+      "blood_centers": [
+        {
+          "name": "CTS Skikda",
+          "latitude": 36.86714511,
+          "longitude": 6.90372285
+        }
+      ]
+    },
+    {
+      "code": "22",
+      "name": "Sidi Bel Abbès",
+      "latitude": 35.19065724,
+      "longitude": -0.63057729,
+      "blood_centers": [
+        {
+          "name": "CTS Sidi Bel Abbès",
+          "latitude": 35.18885182,
+          "longitude": -0.63190042
+        }
+      ]
+    },
+    {
+      "code": "23",
+      "name": "Annaba",
+      "latitude": 36.89812196,
+      "longitude": 7.76610743,
+      "blood_centers": [
+        {
+          "name": "CTS Annaba",
+          "latitude": 36.89724458,
+          "longitude": 7.76901247
+        }
+      ]
+    },
+    {
+      "code": "24",
+      "name": "Guelma",
+      "latitude": 36.46557111,
+      "longitude": 7.43271782,
+      "blood_centers": [
+        {
+          "name": "CTS Guelma",
+          "latitude": 36.46470217,
+          "longitude": 7.43609875
+        }
+      ]
+    },
+    {
+      "code": "25",
+      "name": "Constantine",
+      "latitude": 36.36000012,
+      "longitude": 6.61471849,
+      "blood_centers": [
+        {
+          "name": "CTS Constantine",
+          "latitude": 36.36178954,
+          "longitude": 6.61740039
+        }
+      ]
+    },
+    {
+      "code": "26",
+      "name": "Médéa",
+      "latitude": 36.26214651,
+      "longitude": 2.75110683,
+      "blood_centers": [
+        {
+          "name": "CTS Médéa",
+          "latitude": 36.26499872,
+          "longitude": 2.75452341
+        }
+      ]
+    },
+    {
+      "code": "27",
+      "name": "Mostaganem",
+      "latitude": 35.93739285,
+      "longitude": 0.08969431,
+      "blood_centers": [
+        {
+          "name": "CTS Mostaganem",
+          "latitude": 35.93590852,
+          "longitude": 0.09324591
+        }
+      ]
+    },
+    {
+      "code": "28",
+      "name": "M’Sila",
+      "latitude": 35.70574218,
+      "longitude": 4.54192109,
+      "blood_centers": [
+        {
+          "name": "CTS M’Sila",
+          "latitude": 35.70684567,
+          "longitude": 4.54509816
+        }
+      ]
+    },
+    {
+      "code": "29",
+      "name": "Mascara",
+      "latitude": 35.39656473,
+      "longitude": 0.14031792,
+      "blood_centers": [
+        {
+          "name": "CTS Mascara",
+          "latitude": 35.39562159,
+          "longitude": 0.14250431
+        }
+      ]
+    },
+    {
+      "code": "30",
+      "name": "Ouargla",
+      "latitude": 31.95801015,
+      "longitude": 5.33993024,
+      "blood_centers": [
+        {
+          "name": "CTS Ouargla",
+          "latitude": 31.95710836,
+          "longitude": 5.34380721
+        }
+      ]
+    },
+    {
+      "code": "31",
+      "name": "Oran",
+      "latitude": 35.69707082,
+      "longitude": -0.63437447,
+      "blood_centers": [
+        {
+          "name": "CTS Oran",
+          "latitude": 35.69590273,
+          "longitude": -0.63750102
+        },
+        {
+          "name": "EHU 1er Novembre Blood Center",
+          "latitude": 35.69650012,
+          "longitude": -0.63500047
+        }
+      ]
+    },
+    {
+      "code": "32",
+      "name": "El Bayadh",
+      "latitude": 33.68179328,
+      "longitude": 1.02474685,
+      "blood_centers": [
+        {
+          "name": "CTS El Bayadh",
+          "latitude": 33.68062541,
+          "longitude": 1.02851294
+        }
+      ]
+    },
+    {
+      "code": "33",
+      "name": "Illizi",
+      "latitude": 26.48328094,
+      "longitude": 8.46944612,
+      "blood_centers": [
+        {
+          "name": "CTS Illizi",
+          "latitude": 26.48291258,
+          "longitude": 8.47284519
+        }
+      ]
+    },
+    {
+      "code": "34",
+      "name": "Bordj Bou Arreridj",
+      "latitude": 36.07015411,
+      "longitude": 4.76445085,
+      "blood_centers": [
+        {
+          "name": "CTS Bordj Bou Arréridj",
+          "latitude": 36.07105831,
+          "longitude": 4.76781304
+        }
+      ]
+    },
+    {
+      "code": "35",
+      "name": "Boumerdès",
+      "latitude": 36.76665182,
+      "longitude": 3.48214318,
+      "blood_centers": [
+        {
+          "name": "CTS Boumerdès",
+          "latitude": 36.76589123,
+          "longitude": 3.48513456
+        }
+      ]
+    },
+    {
+      "code": "36",
+      "name": "El Tarf",
+      "latitude": 36.76739275,
+      "longitude": 8.30859672,
+      "blood_centers": [
+        {
+          "name": "CTS El Tarf",
+          "latitude": 36.76611851,
+          "longitude": 8.31250190
+        }
+      ]
+    },
+    {
+      "code": "37",
+      "name": "Tindouf",
+      "latitude": 27.67110444,
+      "longitude": -8.14775126,
+      "blood_centers": [
+        {
+          "name": "CTS Tindouf",
+          "latitude": 27.67085378,
+          "longitude": -8.15009873
+        }
+      ]
+    },
+    {
+      "code": "38",
+      "name": "Tissemsilt",
+      "latitude": 35.60718219,
+      "longitude": 1.81051800,
+      "blood_centers": [
+        {
+          "name": "CTS Tissemsilt",
+          "latitude": 35.60670160,
+          "longitude": 1.81379561
+        }
+      ]
+    },
+    {
+      "code": "39",
+      "name": "El Oued",
+      "latitude": 33.35614824,
+      "longitude": 6.86318152,
+      "blood_centers": [
+        {
+          "name": "CTS El Oued",
+          "latitude": 33.35523191,
+          "longitude": 6.86665347
+        }
+      ]
+    },
+    {
+      "code": "40",
+      "name": "Khenchela",
+      "latitude": 35.43584691,
+      "longitude": 7.14681638,
+      "blood_centers": [
+        {
+          "name": "CTS Khenchela",
+          "latitude": 35.43471150,
+          "longitude": 7.15092942
+        }
+      ]
+    },
+    {
+      "code": "41",
+      "name": "Souk Ahras",
+      "latitude": 36.28544935,
+      "longitude": 7.95191083,
+      "blood_centers": [
+        {
+          "name": "CTS Souk Ahras",
+          "latitude": 36.28430994,
+          "longitude": 7.95563251
+        }
+      ]
+    },
+    {
+      "code": "42",
+      "name": "Tipaza",
+      "latitude": 36.59869182,
+      "longitude": 2.44770035,
+      "blood_centers": [
+        {
+          "name": "CTS Tipaza",
+          "latitude": 36.59743562,
+          "longitude": 2.44982110
+        }
+      ]
+    },
+    {
+      "code": "43",
+      "name": "Mila",
+      "latitude": 36.45000000,
+      "longitude": 6.26666667,
+      "blood_centers": [
+        {
+          "name": "CTS Mila",
+          "latitude": 36.44989012,
+          "longitude": 6.26923456
+        }
+      ]
+    },
+    {
+      "code": "44",
+      "name": "Aïn Defla",
+      "latitude": 36.2552,
+      "longitude": 1.9563,
+      "blood_centers": [
+        {
+          "name": "CTS Aïn Defla",
+          "latitude": 36.26345871,
+          "longitude": 1.97058849
+        }
+      ]
+    },
+    {
+      "code": "45",
+      "name": "Naâma",
+      "latitude": 33.26666667,
+      "longitude": -0.31666667,
+      "blood_centers": [
+        {
+          "name": "CTS Naâma",
+          "latitude": 33.26532201,
+          "longitude": -0.31931032
+        }
+      ]
+    },
+    {
+      "code": "46",
+      "name": "Aïn Témouchent",
+      "latitude": 35.29753621,
+      "longitude": -1.14024078,
+      "blood_centers": [
+        {
+          "name": "CTS Aïn Témouchent",
+          "latitude": 35.29650189,
+          "longitude": -1.14282164
+        }
+      ]
+    },
+    {
+      "code": "47",
+      "name": "Ghardaïa",
+      "latitude": 32.48906447,
+      "longitude": 3.67350455,
+      "blood_centers": [
+        {
+          "name": "CTS Ghardaïa",
+          "latitude": 32.48853562,
+          "longitude": 3.67663421
+        }
+      ]
+    },
+    {
+      "code": "48",
+      "name": "Relizane",
+      "latitude": 35.73817632,
+      "longitude": 0.55593641,
+      "blood_centers": [
+        {
+          "name": "CTS Relizane",
+          "latitude": 35.73756281,
+          "longitude": 0.55842392
+        }
+      ]
+    },
+    {
+      "code": "49",
+      "name": "Timimoun",
+      "latitude": 29.26385619,
+      "longitude": 0.23757756,
+      "blood_centers": [
+        {
+          "name": "CTS Timimoun",
+          "latitude": 29.26280221,
+          "longitude": 0.24060579
+        }
+      ]
+    },
+    {
+      "code": "50",
+      "name": "Bordj Badji Mokhtar",
+      "latitude": 21.33333333,
+      "longitude": 0.90000000,
+      "blood_centers": [
+        {
+          "name": "CTS Bordj Badji Mokhtar",
+          "latitude": 21.33286026,
+          "longitude": 0.90291573
+        }
+      ]
+    },
+    {
+      "code": "51",
+      "name": "Ouled Djellal",
+      "latitude": 34.41666667,
+      "longitude": 5.06666667,
+      "blood_centers": [
+        {
+          "name": "CTS Ouled Djellal",
+          "latitude": 34.41542307,
+          "longitude": 5.06928885
+        }
+      ]
+    },
+    {
+      "code": "52",
+      "name": "Béni Abbès",
+      "latitude": 30.13333333,
+      "longitude": -2.16666667,
+      "blood_centers": [
+        {
+          "name": "CTS Béni Abbès",
+          "latitude": 30.13280065,
+          "longitude": -2.16873254
+        }
+      ]
+    },
+    {
+      "code": "53",
+      "name": "In Salah",
+      "latitude": 27.19800000,
+      "longitude": 2.46660000,
+      "blood_centers": [
+        {
+          "name": "CTS In Salah",
+          "latitude": 27.19723742,
+          "longitude": 2.46982901
+        }
+      ]
+    },
+    {
+      "code": "54",
+      "name": "In Guezzam",
+      "latitude": 19.56666667,
+      "longitude": 5.76666667,
+      "blood_centers": [
+        {
+          "name": "CTS In Guezzam",
+          "latitude": 19.56592134,
+          "longitude": 5.76884519
+        }
+      ]
+    },
+    {
+      "code": "55",
+      "name": "Touggourt",
+      "latitude": 33.10000000,
+      "longitude": 5.96666667,
+      "blood_centers": [
+        {
+          "name": "CTS Touggourt",
+          "latitude": 33.09932418,
+          "longitude": 5.96941287
+        }
+      ]
+    },
+    {
+      "code": "56",
+      "name": "Djanet",
+      "latitude": 24.55490000,
+      "longitude": 9.48300000,
+      "blood_centers": [
+        {
+          "name": "CTS Djanet",
+          "latitude": 24.55438943,
+          "longitude": 9.48651982
+        }
+      ]
+    },
+    {
+      "code": "57",
+      "name": "El M’Ghair",
+      "latitude": 33.95000000,
+      "longitude": 5.92000000,
+      "blood_centers": [
+        {
+          "name": "CTS El M’Ghair",
+          "latitude": 33.94940178,
+          "longitude": 5.92334571
+        }
+      ]
+    },
+    {
+      "code": "58",
+      "name": "El Meniaa",
+      "latitude": 30.58000000,
+      "longitude": 2.88330000,
+      "blood_centers": [
+        {
+          "name": "CTS El Meniaa",
+          "latitude": 30.57921341,
+          "longitude": 2.88633409
+        }
+      ]
+    }
+  ]

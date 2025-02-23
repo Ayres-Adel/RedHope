@@ -1,0 +1,39 @@
+.suggestions-container {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  padding: 4px 2px 4px 0;  /* Adjusted padding */
+  border: 1px solid rgba(0,0,0,0.06);
+  overflow: hidden;  /* Contains the scrollbar */
+}
+
+.suggestions-container::-webkit-scrollbar {
+  width: 9px;
+  margin-right: 0;
+}
+
+.suggestions-container::-webkit-scrollbar-track {
+  background: #ebebeb;
+  border-radius: 10px;
+  margin: 4px 2px;  /* Add margin to keep track inside container */
+  border: 1px solid rgba(0,0,0,0.09);
+}
+
+.suggestions-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(to right, #ff4747, #e00d27);
+  border-radius: 10px;
+  border: 2px solid #ebebeb;
+  background-clip: padding-box;
+  margin-right: 2px;  /* Keep thumb inside container */
+  transition: all 0.2s ease;
+}
+
+.suggestions-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to right, #e00d27, #cc0000);
+  border: 1.5px solid #ffffff;
+}
+

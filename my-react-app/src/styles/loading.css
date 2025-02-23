@@ -1,0 +1,29 @@
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 95vh;
+    margin-left: 120px;
+}
+
+.logo_loading img {
+    width: 40%;
+    height: 40%;
+    margin-top: -75px;
+}
+
+.logo_loading   {
+    display: flex;
+
+}
+
+span {
+    color: rgb(255, 71, 71); 
+}
+
+
+.logo_loading > a  {
+    color: var(--Primary_blue);
+    margin-left: -10px;
+    font-size: 30px;
+}

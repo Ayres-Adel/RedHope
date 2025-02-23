@@ -1,0 +1,450 @@
+form {
+  width: 600px;
+  margin: 0 auto;
+  margin-top: 110px;
+  padding: 40px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Blur effect for glass morphism */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Light border for depth */
+  transition: all 0.3s ease;
+}
+
+
+  
+.balloon {
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 100px;
+  height: auto;
+  animation: float 4s ease-in-out infinite;
+}
+
+form:hover {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+form h2 {
+  text-align: center;
+  font-size: 2.5em; 
+  font-weight: 900;
+  margin-bottom: 30px;
+  color: var(--NeutralVery_brown);
+}
+
+.form-row {
+  display: flex;
+  gap: 30px;
+  justify-content: space-between; 
+  margin-bottom: 20px; 
+}
+
+.form-group {
+  flex: 1; 
+  margin-right: 25px; 
+}
+
+.form-group:last-child {
+  margin-right: 0; 
+}
+
+.sign-container {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+}
+
+.form-container {
+  flex: 1; 
+  max-width: 400px; 
+}
+
+.image-container {
+  flex: 1; 
+  display: flex;
+  justify-content: center; 
+}
+
+.image-container img {
+  max-width: 50%; 
+  height: auto; 
+}
+
+
+.logo img {
+  width: 100px;
+  height: 100px;
+  margin-top: -13px;
+}
+
+.logo   {
+  display: flex;
+  margin-left: 170px;
+}
+
+span {
+  color: rgb(255, 71, 71); 
+}
+
+.logo > a  {
+  color: var(--Primary_blue);
+  margin-left: -10px;
+}
+
+input, select {
+  display: block;
+  padding: 12px 10px; 
+  border-radius: 5px; 
+  border: 1px solid #ddd;
+  font-size: 1em;
+  width: 100%; /* Full width */
+  transition: border-color 0.3s ease; 
+}
+
+input:focus, select:focus {
+  border-color: rgb(255, 71, 71);
+  outline: none;
+  box-shadow: 0 0 8px rgba(255, 71, 71, 0.3); /* Glow effect on focus */
+}
+
+input::placeholder {
+  color: rgb(182, 178, 178);
+  font-weight: var(--Weights_01);
+}
+
+label {
+  display: block; 
+  margin: 10px 0 5px; 
+  color: var(--NeutralVery_brown);
+  font-weight: var(--Weights_02);
+}
+
+.btn_loc {
+  margin-left: 1px;
+  font-size: 16px;
+  color: #fff;
+  background-color: rgb(255, 71, 71); 
+  border: none; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+}
+
+.log_in {
+  position: relative;
+  left: 55px;
+}
+
+.btn_loc:hover {
+  background-color: darkred; 
+}
+
+button {
+  margin-top: 20px; 
+  margin-left: 190px;
+  border-radius: 5px; 
+  border: 0;
+  color: #fff; 
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.9em; 
+  display: block; 
+  padding: 12px 20px; 
+  letter-spacing: 1px; 
+  transition: background-color 0.3s ease; 
+}
+
+button:hover {
+  cursor: pointer; 
+}
+
+.error {
+  color: tomato;
+  font-size: 0.9em; 
+  font-weight: bold;
+  margin: 5px 0; 
+}
+
+.input-icon {
+  position: relative;
+}
+
+.input-icon .icon {
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  transform: translateY(-50%);
+  color: #999999;
+  transition: color 0.3s ease;
+}
+
+.input-icon:hover .icon {
+  color: rgb(255, 71, 71); /* Change color on hover */
+}
+
+.password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: rgb(255, 71, 71);
+  cursor: url("./RedSelectLinkHope.cur") , auto;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.blood-donor-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.blood-donor-label input[type="checkbox"] {
+  margin-left: -244px;
+}
+
+/* Donor Group Styling */
+.form-row {
+  margin-bottom: 20px; /* Spacing between rows */
+}
+
+.form-group {
+  margin-bottom: -5px; /* Space below each form group */
+}
+
+.input-icon {
+
+  display: flex;
+  align-items: center;
+  gap: 1px; /* Space between radio buttons */
+  cursor: url("./RedSelectLinkHope.cur"), auto;
+}
+
+/* Radio Button Styling */
+.input-icon input[type="radio"] {
+  margin-right: 5px; /* Space between radio button and label */
+  accent-color: rgb(255, 71, 71); /* Custom color for the radio buttons */
+  cursor: url("./RedSelectLinkHope.cur"), auto;
+}
+
+.input-icon label {
+  margin-right: 85px; /* Space between labels */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.dark-theme form  {
+  width: 600px;
+  margin: 0 auto;
+  margin-top: 3rem;
+  padding: 40px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  border-radius: 15px;
+  background: var(--dark-card);
+  color: var(--dark-text);
+  margin-top: 110px;
+  transition: all 0.3s ease;
+}
+
+.dark-theme form:hover {
+  box-shadow: 0 12px 48px rgba(190, 27, 27, 0.2); /* Enhanced shadow on hover */
+}
+
+.dark-theme form h2  {
+  text-align: center;
+  font-size: 2.5em;
+  font-weight: 900;
+  margin-bottom: 30px;
+  color: var(--dark-text);
+
+
+}
+
+.dark-theme .form-row {
+  display: flex;
+  gap: 30px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.dark-theme .form-group {
+  flex: 1;
+  margin-right: 25px;
+}
+
+.dark-theme .form-group:last-child {
+  margin-right: 0;
+}
+
+.dark-theme .sign-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dark-theme .form-container {
+  flex: 1;
+  max-width: 400px;
+}
+
+.dark-theme .image-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.dark-theme .image-container img {
+  max-width: 50%;
+  height: auto;
+}
+
+.dark-theme .logo img {
+  width: 100px;
+  height: 100px;
+  margin-top: -13px;
+}
+
+.dark-theme .logo {
+  display: flex;
+  margin-left: 170px;
+}
+
+.dark-theme span {
+  color: var(--dark-accent);
+}
+
+.dark-theme .logo > a {
+  color: var(--dark-accent);
+  margin-left: -10px;
+}
+
+.dark-theme input,
+.dark-theme select {
+  display: block;
+  padding: 12px 10px;
+  border-radius: 5px;
+  border: 1px solid var(--dark-border);
+  background-color: var(--dark-card);
+  color: var(--dark-text);
+  font-size: 1em;
+  width: 100%;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+input[type="checkbox"] {
+  display: none;
+}
+
+
+.dark-theme input:focus,
+.dark-theme select:focus {
+  border-color: var(--dark-accent);
+  outline: none;
+}
+
+.dark-theme input::placeholder {
+  color: var(--dark-placeholder);
+  font-weight: var(--Weights_01);
+}
+
+.dark-theme label {
+  display: block;
+  margin: 10px 0 5px;
+  color: var(--dark-text);
+  font-weight: var(--Weights_02);
+}
+
+.dark-theme .btn_loc {
+  margin-left: 1px;
+  font-size: 16px;
+  color: #fff;
+  background-color: var(--dark-accent);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dark-theme .btn_loc:hover {
+  background-color: darkred;
+}
+
+.dark-theme button {
+  margin-top: 20px;
+  margin-left: 190px;
+  border-radius: 5px;
+  border: 0;
+  color: #fff;
+  background-color: var(--dark-accent);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.9em;
+  display: block;
+  padding: 12px 20px;
+  letter-spacing: 1px;
+  transition: background-color 0.3s ease;
+}
+
+.dark-theme .input-icon:hover .icon {
+  color: rgb(255, 71, 71); /* Change color on hover */
+}
+
+.dark-theme button:hover {
+  cursor: pointer;
+  background-color: #8b0000;
+}
+
+.dark-theme .error {
+  color: tomato;
+  font-size: 0.9em;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.dark-theme .input-icon {
+  position: relative;
+}
+
+.dark-theme .input-icon .icon {
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  transform: translateY(-50%);
+  color: var(--dark-placeholder);
+}
+
+.dark-theme .password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--dark-accent);
+}
+
+.dark-theme .blood-donor-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dark-theme .blood-donor-label input[type="checkbox"] {
+  margin-left: -244px;
+}
+
+.dark-theme .input-icon input[type="radio"] {
+  margin-right: 5px;
+  accent-color: var(--dark-accent);
+  cursor: pointer;
+}
+
+.dark-theme .input-icon label {
+  margin-right: 85px;
+  cursor: pointer;
+}
+
+

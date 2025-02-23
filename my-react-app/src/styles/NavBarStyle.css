@@ -1,0 +1,293 @@
+/*NavBarStyle.css*/
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+body{
+    animation: fadeIn 1s ease-in-out;
+}
+
+header {
+    margin-top: 15px;
+}
+
+.HSA > a {
+  color: black;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    gap: 50rem;
+    align-items: center;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    animation: fadeIn 2s forwards;
+    z-index: 1000; /* Ensure it's above other content */
+
+    backdrop-filter: blur(10px); /* Apply blur effect */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 2s forwards;
+}
+
+.RedHope img {
+    width: 100px;
+    height: 100px;
+    margin-top: -8px;
+}
+
+.RedHope   {
+    display: flex;
+
+}
+
+span {
+    color: #ff4747; 
+}
+
+
+.RedHope > a  {
+    color: var(--Primary_blue);
+    margin-left: -10px;
+    margin-top: 8px;
+}
+
+nav > a > h1 {
+    color: var(--Primary_blue);
+}
+
+ul {
+    display: flex;
+    gap: 30px;
+    padding-right: 250px;
+}
+
+li {
+    list-style-type: none;
+    position: relative; 
+    transition: 0.3s; 
+    color: var(--NeutralBlack);
+    font-weight: var(--Weights_02);
+    color: var(--Primary_blue);
+}
+
+a {
+    text-decoration: none;
+    color: var(--NeutralDark_grayish_blue);
+}
+
+hr {
+    border: 1px solid var(--NeutralDark_grayish_blue) ;
+    width: 95%;
+    opacity: 17%;
+    margin: -10px 2.3rem;
+}
+
+.auth {
+   position: relative;
+    right: 230px;  
+    top:3px ;
+    display: flex;
+    gap: 40px;
+    margin-left: -550px;
+}
+
+.nav-links {
+  position: relative;
+    display: flex;
+    margin-left: -500px;
+    right: 60px;
+}
+
+.HSA {
+    font-weight: var(--Weights_02);
+    font-size: 18px;
+    color: var(--Primary_blue);
+    border-radius: 20px; 
+    display: inline-block; 
+    padding: 10px 20px; 
+    position: relative; 
+    text-decoration: none; 
+    cursor: pointer;
+    cursor: url("./RedSelectLinkHope.cur"), auto;
+}
+
+.HSA::after {
+    content: ''; 
+    position: absolute; 
+    left: 50%; 
+    bottom: 0; 
+    height: 2px; 
+    background: linear-gradient(90deg, rgb(255, 182, 193), rgb(255, 0, 0), rgb(139, 0, 0)); 
+    transform: translateX(-50%) scaleX(0); 
+    transition: transform 0.3s ease; 
+    width: 70%; 
+}
+
+.HSA:hover::after {
+    transform: translateX(-50%) scaleX(1); 
+    height: 2.5px; 
+}
+
+.Sign-up {
+    font-weight: var(--Weights_02);
+    color: var(--Primary_blue);
+    border: 3px solid var(--light-coral); 
+    border-radius: 20px; 
+    display: inline-block; 
+    padding: 10px 20px; 
+    text-decoration: none; 
+    transition: 0.5s;
+}
+
+.Sign-up:hover {
+    background-color: #f1c7c7; 
+}
+
+.Login {
+    font-weight: var(--Weights_02);
+    color: var(--Primary_blue);
+    border: 3px solid var(--light-coral); 
+    background-color: #f1c7c7;
+    border-radius: 20px; 
+    display: inline-block; 
+    padding: 10px 27px; 
+    text-decoration: none; 
+    transition: 0.5s;
+}
+
+.Login:hover {
+    background-color: #f7b8b8; 
+}
+
+
+
+
+
+
+/* General Container */
+.toggle-container {
+    position: absolute;
+    top: 20px;
+    right: 150px;
+  }
+  
+  input[type="checkbox"] {
+    display: none;
+  }
+  
+  label.display {
+    width: 80px;
+    height: 40px;
+    border-radius: 999px;
+    background: #f3f3f3;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.05) inset;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.3s ease-in-out;
+  }
+  
+  /* Circle inside the toggle */
+  .circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.05),
+      -3px -3px 10px rgba(0, 0, 0, 0.05) inset;
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .sun {
+    width: 15px;
+    color: #ffd600;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .moon {
+    width: 15px;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  /* Checked state */
+  input[type="checkbox"]:checked + label.display {
+    background: #2c2c2f;
+  }
+  
+  input[type="checkbox"]:checked + label.display .circle {
+    left: calc(100% - 35px);
+    background: #2c2c2f;
+    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.5),
+      -3px -3px 10px rgba(0, 0, 0, 0.5) inset;
+  }
+  
+  input[type="checkbox"]:checked + label.display .circle .sun {
+    opacity: 0;
+  }
+  
+  input[type="checkbox"]:checked + label.display .circle .moon {
+    opacity: 1;
+  }
+
+  .dark-theme .Sign-up  {
+
+    color: #e0e0e0;
+  }
+
+  .dark-theme .Sign-up:hover  {
+
+    color: rgb(77, 50, 50);
+  }
+
+  .dark-theme .HSA  {
+
+    color: #e0e0e0;
+  }
+
+.dark-theme .HSA > a {
+  color: #e0e0e0;
+}
+
+  .dark-theme .RedHope h1  {
+
+    color: #e0e0e0;
+  }
+
+
+  .language-switcher {
+    position: absolute;
+    top: 28px;
+    right: 20px;
+ }
+
+
+
+ 
+
+
+  
+
+
+
+
+
