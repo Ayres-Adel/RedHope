@@ -18,9 +18,9 @@ $ yarn add @fortawesome/free-solid-svg-icons
 
 ## Documentation
 
-Get started [here](https://fontawesome.com/how-to-use/on-the-web/setup/getting-started). Continue your journey [here](https://fontawesome.com/how-to-use/on-the-web/advanced).
+Get started [here](https://docs.fontawesome.com/web/setup/get-started). Continue your journey [here](https://docs.fontawesome.com/web/setup/packages).
 
-Or go straight to the [API documentation](https://fontawesome.com/how-to-use/with-the-api).
+Or go straight to the [API documentation](https://docs.fontawesome.com/apis/javascript/get-started).
 
 ## Issues and support
 

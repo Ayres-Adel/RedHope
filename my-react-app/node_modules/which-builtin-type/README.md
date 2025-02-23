@@ -1,13 +1,11 @@
-# which-builtin-type <sup>[![Version Badge][2]][1]</sup>
+# which-builtin-type <sup>[![Version Badge][npm-version-svg]][package-url]</sup>
 
 [![github actions][actions-image]][actions-url]
 [![coverage][codecov-image]][codecov-url]
-[![dependency status][5]][6]
-[![dev dependency status][7]][8]
 [![License][license-image]][license-url]
 [![Downloads][downloads-image]][downloads-url]
 
-[![npm badge][11]][1]
+[![npm badge][npm-badge-png]][package-url]
 
 What is the type of this builtin JavaScript value? Works cross-realm, without `instanceof`, and can not be fooled by a `constructor` property.
 
@@ -52,13 +50,13 @@ assert.equal('BigUint64Array', whichBuiltinType(new BigUint64Array()));
 ## Tests
 Simply clone the repo, `npm install`, and run `npm test`
 
-[1]: https://npmjs.org/package/which-builtin-type
-[2]: https://versionbadg.es/inspect-js/which-builtin-type.svg
-[5]: https://david-dm.org/inspect-js/which-builtin-type.svg
-[6]: https://david-dm.org/inspect-js/which-builtin-type
-[7]: https://david-dm.org/inspect-js/which-builtin-type/dev-status.svg
-[8]: https://david-dm.org/inspect-js/which-builtin-type#info=devDependencies
-[11]: https://nodei.co/npm/which-builtin-type.png?downloads=true&stars=true
+[package-url]: https://npmjs.org/package/which-builtin-type
+[npm-version-svg]: https://versionbadg.es/inspect-js/which-builtin-type.svg
+[deps-svg]: https://david-dm.org/inspect-js/which-builtin-type.svg
+[deps-url]: https://david-dm.org/inspect-js/which-builtin-type
+[dev-deps-svg]: https://david-dm.org/inspect-js/which-builtin-type/dev-status.svg
+[dev-deps-url]: https://david-dm.org/inspect-js/which-builtin-type#info=devDependencies
+[npm-badge-png]: https://which-builtin-type/which-builtin-type.png?downloads=true&stars=true
 [license-image]: https://img.shields.io/npm/l/which-builtin-type.svg
 [license-url]: LICENSE
 [downloads-image]: https://img.shields.io/npm/dm/which-builtin-type.svg

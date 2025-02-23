@@ -1,6 +1,6 @@
 const { createMacro, MacroError } = require('babel-plugin-macros')
 const { addNamed } = require('@babel/helper-module-imports')
-const { FAFamilyIds } = require('@fortawesome-internal-tools/fontawesome-icons/canonical')
+const { FAFamilyIds, FAFamilyClassicId, FAFamilyDuotoneId } = require('@fortawesome-internal-tools/fontawesome-icons/canonical')
 const { FALegacyStyleIds } = require('@fortawesome-internal-tools/fontawesome-icons/legacy')
 
 module.exports = createMacro(importer, {
@@ -149,11 +149,11 @@ function resolveReplacementIcon({ nodePath, babel, state, macroName }) {
     throw parentPath.buildCodeFrameError(`Invalid family name: ${family}. It must be one of the following: ${families.join(', ')}`, MacroError)
   }
 
-  if ('duotone' === style && family && 'classic' !== family) {
+  if (FAFamilyDuotoneId === style && family && FAFamilyClassicId !== family) {
     throw parentPath.buildCodeFrameError(`duotone cannot be used as a style name with any family other than classic`, MacroError)
   }
 
-  if ('brands' === style && family && 'classic' !== family) {
+  if ('brands' === style && family && FAFamilyClassicId !== family) {
     throw parentPath.buildCodeFrameError(`brands cannot be used as a style name with any family other than classic`, MacroError)
   }
 
@@ -161,9 +161,9 @@ function resolveReplacementIcon({ nodePath, babel, state, macroName }) {
     throw parentPath.buildCodeFrameError(`When a family is specified, a style must also be specified`, MacroError)
   }
 
-  if ('duotone' === style || 'duotone' === family) {
+  if (FAFamilyDuotoneId === style || FAFamilyDuotoneId === family) {
     family = undefined
-    style = 'duotone'
+    style = FAFamilyDuotoneId
   }
 
   if ('brands' === style) {
@@ -175,7 +175,7 @@ function resolveReplacementIcon({ nodePath, babel, state, macroName }) {
     style = 'solid'
   }
 
-  if ('classic' === family) {
+  if (FAFamilyClassicId === family) {
     family = undefined
   }
 

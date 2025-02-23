@@ -22,4 +22,12 @@ module.exports = function (getPrototypeOf, t) {
 	t.equal(getPrototypeOf(function () {}), Function.prototype);
 	t.equal(getPrototypeOf([]), Array.prototype);
 	t.equal(getPrototypeOf({}), Object.prototype);
+
+	var obj = { __proto__: null };
+	if ('toString' in obj) {
+		t.comment('no null objects in this engine');
+		t.equal(getPrototypeOf(obj), Object.prototype, '"null" object has Object.prototype as [[Prototype]]');
+	} else {
+		t.equal(getPrototypeOf(obj), null, 'null object has null [[Prototype]]');
+	}
 };

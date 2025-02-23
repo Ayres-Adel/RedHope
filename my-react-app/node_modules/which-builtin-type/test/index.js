@@ -21,12 +21,14 @@ if (typeof process !== 'undefined') {
 test('nullish', function (t) {
 	t.equal(which(null), null, 'null is null');
 	t.equal(which(undefined), undefined, 'undefined is undefined');
+	// @ts-expect-error
 	t.equal(which(), undefined, 'absent is undefined');
 
 	t.end();
 });
 
 test('non-nullish', function (t) {
+	/** @constructor */
 	var F = function Foo() {};
 
 	var tests = {
@@ -69,11 +71,12 @@ test('non-nullish', function (t) {
 		].concat(arrows),
 		GeneratorFunction: generators,
 		AsyncFunction: asyncs,
-		Object: [
+		// eslint-disable-next-line no-extra-parens
+		Object: /** @type {object[]} */ ([
 			{},
 			{ constructor: null },
 			Math
-		],
+		]),
 		Symbol: hasSymbols ? [
 			Symbol.iterator,
 			Symbol(),
@@ -120,6 +123,7 @@ test('non-nullish', function (t) {
 		] : []
 	};
 	forEach(availableTypedArrays(), function (TypedArray) {
+		// @ts-expect-error not sure how to infer this as being spreaded into the above object literal
 		tests[TypedArray] = [
 			new global[TypedArray](0),
 			new global[TypedArray](2)
@@ -137,6 +141,7 @@ test('non-nullish', function (t) {
 				&& expected !== 'Foo' // not a builtin
 			) {
 				if (hasToStringTag) {
+					/** @type {{ [k in typeof Symbol.toStringTag]?: string }} */
 					var fakerTag = {};
 					fakerTag[Symbol.toStringTag] = expected;
 					t.equal(
@@ -146,7 +151,12 @@ test('non-nullish', function (t) {
 					);
 				}
 
-				var fakerConstructor = { constructor: global[expected] };
+				/** @typedef {Exclude<typeof expected, 'GeneratorFunction' | 'AsyncFunction' | 'Foo'>} GlobalKey */
+
+				var fakerConstructor = {
+					// eslint-disable-next-line no-extra-parens
+					constructor: global[/** @type {GlobalKey} */ (expected)] || tests[expected]
+				};
 				t.equal(
 					which(fakerConstructor),
 					'Object',
@@ -154,7 +164,11 @@ test('non-nullish', function (t) {
 				);
 
 				if (hasToStringTag) {
-					var fakerConstructorTag = { constructor: global[expected] };
+					/** @type {{ constructor: Function } & { [k in typeof Symbol.toStringTag]?: string }} */
+					var fakerConstructorTag = {
+						// eslint-disable-next-line no-extra-parens
+						constructor: global[/** @type {GlobalKey} */ (expected)] || tests[expected]
+					};
 					fakerConstructorTag[Symbol.toStringTag] = expected;
 					t.equal(
 						which(fakerConstructorTag),
