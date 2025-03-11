@@ -1,0 +1,124 @@
+.infinite-scroll-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20vh; /* Half viewport height */
+    background-color: #ffffff; /* White background */
+    width: 100%; /* Full width */
+    overflow: hidden; /* Prevent horizontal overflow */
+    margin-top: 100px;
+    margin-bottom: 50px;
+    
+}
+
+.tag-list {
+    width: 100%; /* Full width of the container */
+    max-width: 80rem; /* Increased maximum width for larger screens */
+    font-family: "Montserrat";
+    position: relative;
+    overflow: hidden;
+}
+
+.inner {
+    width: fit-content;
+    display: flex;
+    gap: 2rem; /* Increased gap between tags */
+    animation: loop 10s linear infinite; /* Slower animation for better readability */
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem; /* Increased gap between icon, hashtag, and text */
+    color: #ffffff; /* White text color for contrast */
+    font-size: 1.5rem; /* Larger base font size */
+    background-color: #dc2626; /* Red background for tags */
+    padding: 1rem 1.5rem; /* Increased padding for tags */
+    border-radius: 1rem; /* More rounded corners */
+    border: 1px solid #b91c1c; /* Darker red border for definition */
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+.tag i {
+    font-size: 1.5rem; /* Larger icon size */
+    color: #ffffff; /* White color for icons */
+}
+
+.tag span {
+    font-size: 1.8rem; /* Larger hashtag symbol */
+    color: #fca5a5; /* Light red color for hashtag */
+}
+
+.fade {
+    position: absolute;
+    background: linear-gradient(90deg, #ffffff, transparent 30%, #ffffff); /* White fade effect */
+    inset: 0;
+    pointer-events: none;
+}
+
+.dark-theme .infinite-scroll-container  {
+    background-color: #1E201E;
+    color: #e0e0e0;
+}
+
+.dark-theme .tag   {
+    background-color: #1E201E;
+    color: #ffffff;
+}
+
+.dark-theme .fade   {
+    background: linear-gradient(90deg, #1E201E, transparent 30%, #1E201E);
+}
+
+.dark-theme .tag i {
+    font-size: 1.5rem; /* Larger icon size */
+    color: #dc2626; /* Red color for icons */
+}
+
+@keyframes loop {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .tag {
+        font-size: 1.2rem; /* Slightly smaller font size for tablets */
+        padding: 0.8rem 1.2rem; /* Slightly smaller padding */
+    }
+
+    .tag i {
+        font-size: 1.2rem; /* Slightly smaller icon size */
+    }
+
+    .tag span {
+        font-size: 1.5rem; /* Slightly smaller hashtag size */
+    }
+
+    .inner {
+        gap: 1.5rem; /* Slightly smaller gap between tags */
+    }
+}
+
+@media (max-width: 480px) {
+    .tag {
+        font-size: 1rem; /* Smaller font size for mobile */
+        padding: 0.6rem 1rem; /* Smaller padding */
+    }
+
+    .tag i {
+        font-size: 1rem; /* Smaller icon size */
+    }
+
+    .tag span {
+        font-size: 1.2rem; /* Smaller hashtag size */
+    }
+
+    .inner {
+        gap: 1rem; /* Smaller gap between tags */
+    }
+}

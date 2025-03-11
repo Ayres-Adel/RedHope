@@ -3,27 +3,54 @@
     justify-content: center;
     align-items: center;
     height: 95vh;
-    margin-left: 120px;
+    margin-left: 0; /* Remove fixed margin for responsiveness */
+    padding: 0 20px; /* Add padding for smaller screens */
 }
 
 .logo_loading img {
-    width: 40%;
-    height: 40%;
-    margin-top: -75px;
+    width: 100%; /* Make image responsive */
+    max-width: 200px; /* Limit maximum size */
+    height: auto; /* Maintain aspect ratio */
+    margin-top: 0; /* Remove fixed margin */
 }
 
-.logo_loading   {
+.logo_loading {
     display: flex;
-
+    flex-direction: column; /* Stack logo and text vertically on smaller screens */
+    align-items: center; /* Center items horizontally */
+    text-align: center; /* Center text */
 }
 
 span {
-    color: rgb(255, 71, 71); 
+    color: rgb(255, 71, 71);
 }
 
-
-.logo_loading > a  {
+.logo_loading > a {
     color: var(--Primary_blue);
-    margin-left: -10px;
-    font-size: 30px;
+    margin-left: 0; /* Remove fixed margin */
+    margin-top: -45px;
+    font-size: 24px; /* Reduce font size for smaller screens */
+    text-decoration: none; /* Remove underline from link */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .logo_loading img {
+        max-width: 150px; /* Adjust image size for tablets */
+    }
+
+    .logo_loading > a {
+        font-size: 20px; /* Adjust font size for tablets */
+    }
+}
+
+@media (max-width: 480px) {
+    .logo_loading img {
+        max-width: 100px; /* Adjust image size for mobile */
+    }
+
+    .logo_loading > a {
+        font-size: 18px; /* Adjust font size for mobile */
+        margin-top: -30px;
+    }
 }

@@ -5,6 +5,7 @@ import ErrorHandling from "./components/ErrorHandling.jsx";
 import Sign from "./components/Sign.jsx";
 import Login from "./components/Login.jsx";
 import Search from "./components/Search.jsx";
+import FlipCard from "./components/FlipCard.jsx";
 import PrivateRoute from './components/PrivateRoute';
 import Map from './components/Map.jsx'
 import Loading from "./components/Loading.jsx"; 
@@ -32,6 +33,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/sign" element={<Sign />} />
+      <Route path="/aa" element={<FlipCard />} />
       <Route path="/login" element={<Login />} />
       <Route path="map"  element={<Map />}/>
 

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar.jsx';
+import InfiniteScroll from './InfiniteScroll.jsx';
 import ScrollProgress from './ScrollProgress.jsx';
 import FadeInSection from './FadeInSection.jsx';
 import '../styles/LandingPageStyle.css';
@@ -24,10 +25,9 @@ import heartbeatGif from '../assets/images/heartlines.png';
 import heartbroken from '../assets/images/heartbroken-removebg-preview.png';
 
 export default function LandingPage() {
+  
   // Language state: reads from localStorage
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
-
-  // Optional: Poll localStorage for language changes (since localStorage isn’t reactive in the same tab)
   useEffect(() => {
     const interval = setInterval(() => {
       const currentLang = localStorage.getItem('language') || 'en';
@@ -37,6 +37,11 @@ export default function LandingPage() {
     }, 100);
     return () => clearInterval(interval);
   }, [language]);
+ 
+  
+
+  // Optional: Poll localStorage for language changes (since localStorage isn’t reactive in the same tab)
+
 
   useEffect(() => {
     const toggle = document.getElementById('toggle');
@@ -52,11 +57,14 @@ export default function LandingPage() {
     };
   }, []);
 
+
+
   return (
     <>
       <ScrollProgress />
       <Navbar />
-      <section className="homepage" id="home">
+      
+      <section className="homepage"  id="home">
         {/* Container 01 : home*/}
         {/* home */}
         <FadeInSection className="Container_01">
@@ -77,7 +85,7 @@ export default function LandingPage() {
 
         {/* Heartbeat Gif */}
         <FadeInSection className="heartbeat">
-          <img src={heartbeatGif} className="img_heartbeat" alt="Heartbeat" />
+          <InfiniteScroll/>
         </FadeInSection>
 
         {/* Statistics */}
@@ -170,7 +178,7 @@ export default function LandingPage() {
         {/* Services */}
         <FadeInSection className="Container_04">
           <h1 id="services">
-            {language === 'fr' ? 'Nos Services' : 'Our Services'}
+            {language === 'fr' ? 'Nos Services' : 'Our Services'} 
           </h1>
           <div className="grid_Container_04">
             <div>
@@ -255,8 +263,8 @@ export default function LandingPage() {
         {/* Rights */}
         <FadeInSection className="rights">
           {language === 'fr'
-            ? '-- @ 2025 Insove - Tous droits réservés --'
-            : '-- @ 2025 Insove - All rights reserved --'}
+              ? `-- @ ${new Date().getFullYear()} Insove - Tous droits réservés --`
+              : `-- @ ${new Date().getFullYear()} Insove - All rights reserved --`}
         </FadeInSection>
       </section>
     </>

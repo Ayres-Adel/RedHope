@@ -133,8 +133,8 @@ export default function Login() {
           ...errors,
           ...serverErrors,
           general: data.message || (language === 'fr'
-            ? 'Une erreur est survenue. Veuillez réessayer.'
-            : 'An error occurred. Please try again.')
+            ? 'Email ou mot de passe incorrect.'
+            : 'Incorrect email or password.')
         });
       }
     } catch (error) {

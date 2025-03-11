@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import '../styles/NavBarStyle.css';
 import '../components/Map.jsx';
 
@@ -10,13 +12,115 @@ export default function Navbar() {
   const isSignPage = location.pathname === '/sign';
   const isLoginPage = location.pathname === '/login';
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
+  const [activeSection, setActiveSection] = useState(isMapPage ? 'map' : 'home'); // Set initial active section
+  const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 }); // State to control the line's position and width
+
+  // Refs for navigation links
+  const homeRef = useRef(null);
+  const servicesRef = useRef(null);
+  const aboutRef = useRef(null);
+  const mapRef = useRef(null);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const changeLanguage = () => {
+    const newLanguage = language === 'en' ? 'fr' : 'en';
+    setLanguage(newLanguage);
+    localStorage.setItem('language', newLanguage);
+  };
+
+  // Function to handle smooth scrolling and update the active section
+  const handleScroll = (id) => {
+    if (isMapPage || isSignPage || isLoginPage) {
+      navigate('/');
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    setActiveSection(id); // Update the active section
+  };
+
+  // Update the line position and width based on the active section
+  useEffect(() => {
+    const updateLinePosition = () => {
+      let ref;
+      switch (activeSection) {
+        case 'home':
+          ref = homeRef;
+          break;
+        case 'services':
+          ref = servicesRef;
+          break;
+        case 'about':
+          ref = aboutRef;
+          break;
+        case 'map':
+          ref = mapRef;
+          break;
+        default:
+          ref = null;
+      }
+
+      if (ref && ref.current) {
+        const { offsetWidth, offsetLeft } = ref.current;
+        setLineStyle({ width: offsetWidth, left: offsetLeft });
+      }
+    };
+
+    updateLinePosition();
+    window.addEventListener('resize', updateLinePosition); // Update on window resize
+    return () => window.removeEventListener('resize', updateLinePosition);
+  }, [activeSection]);
+
+  // Set active section to 'map' when on the map page
+  useEffect(() => {
+    if (isMapPage) {
+      setActiveSection('map');
+    }
+  }, [isMapPage]);
+
+  // Use IntersectionObserver to detect the active section (for home, services, about)
+  useEffect(() => {
+    const sections = ['home', 'services', 'about'];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.5 } // Adjust the threshold as needed
+    );
+
+    sections.forEach((sectionId) => {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        observer.observe(section);
+      }
+    });
+
+    // Cleanup observer
+    return () => observer.disconnect();
+  }, []);
+
+  // Dark mode toggle logic (unchanged)
   useEffect(() => {
     const toggle = document.getElementById('toggle');
-
-    // Check localStorage for saved dark mode preference
     const savedMode = localStorage.getItem('darkMode');
 
-    // Apply the saved mode (if any) when the page is loaded
     if (savedMode === 'true') {
       document.body.classList.add('dark-theme');
       toggle.checked = true;
@@ -25,16 +129,11 @@ export default function Navbar() {
       toggle.checked = false;
     }
 
-    // Add event listener for the toggle button to save mode
     toggle.addEventListener('change', () => {
-      // Toggle dark theme on body
       document.body.classList.toggle('dark-theme', toggle.checked);
-
-      // Save the dark mode preference in localStorage
       localStorage.setItem('darkMode', toggle.checked);
     });
 
-    // Cleanup event listener
     return () => {
       toggle.removeEventListener('change', () => {
         document.body.classList.toggle('dark-theme', toggle.checked);
@@ -43,78 +142,80 @@ export default function Navbar() {
     };
   }, []);
 
-  const handleScroll = (id) => {
-    // Check if the user is on the map, sign-up, or login page
-    if (isMapPage || isSignPage || isLoginPage) {
-      // Navigate to the home page first
-      navigate('/');
-      // Wait for the home page to load and then scroll to the section
-      setTimeout(() => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100); // Adjust the timeout as needed
-    } else {
-      // If already on the home page, scroll directly to the section
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
-
-  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
-  const changeLanguage = (lang) => {
-    setLanguage(lang);
-    localStorage.setItem('language', lang);
-  };
-
   return (
     <header>
       <nav>
-        <Link to="/">
-          <a href="#">
-            <div className="RedHope">
-              <img src="/src/assets/images/RedHope_Logo.png" alt="RedHope Logo" />
-              <a href="/"><h1><span>Red</span>Hope</h1></a>
-            </div>
-          </a>
-        </Link>
+        <div className="RedHope">
+          <img src="./src/assets/images/RedHope_Logo.png" alt="RedHope Logo" />
+          <a href="/"><h1><span>Red</span>Hope</h1></a>
+        </div>
 
-        <div className='nav-links'>
-          <div className='HSA' onClick={() => handleScroll('home')}>
+        {/* Hamburger Menu */}
+        <div className="hamburger" onClick={toggleMenu}>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+
+        {/* Navigation Links */}
+        <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+          <div
+            ref={homeRef}
+            className="HSA"
+            onClick={() => handleScroll('home')}
+          >
             {language === 'en' ? 'Home' : 'Accueil'}
           </div>
-          <div className='HSA' onClick={() => handleScroll('services')}>
+          <div
+            ref={servicesRef}
+            className="HSA"
+            onClick={() => handleScroll('services')}
+          >
             {language === 'en' ? 'Services' : 'Services'}
           </div>
-          <div className='HSA' onClick={() => handleScroll('about')}>
+          <div
+            ref={aboutRef}
+            className="HSA"
+            onClick={() => handleScroll('about')}
+          >
             {language === 'en' ? 'About Us' : 'À Propos'}
           </div>
-          <div className='HSA'>
+          <div
+            ref={mapRef}
+            className="HSA"
+          >
             <Link to="/map">{language === 'en' ? 'Map' : 'Carte'}</Link>
           </div>
+
+          {/* Dynamic Line */}
+          <div
+            className="active-line"
+            style={{
+              width: `${lineStyle.width}px`,
+              left: `${lineStyle.left}px`,
+            }}
+          />
         </div>
 
-        <div className='auth'>
-          <Link to="/sign">
-            <div className='Sign-up'>{language === 'en' ? 'Sign up' : 'S\'inscrire'}</div>
-          </Link>
+        {/* Login Icon */}
+        <div className={`auth ${isMenuOpen ? 'active' : ''}`}>
           <Link to="/login">
-            <div className='Login'>{language === 'en' ? 'Login' : 'Connexion'}</div>
+            <FontAwesomeIcon icon={faUser} className="login-icon" />
           </Link>
         </div>
 
-        <div className='language-switcher'>
-          <select value={language} onChange={(e) => changeLanguage(e.target.value)}>
-            <option value='en'>English</option>
-            <option value='fr'>Français</option>
-          </select>
+        {/* Language Switcher Icon */}
+        <div className={`language-switcher ${isMenuOpen ? 'active' : ''}`}>
+          <FontAwesomeIcon
+            icon={faGlobe}
+            className="language-icon"
+            onClick={changeLanguage}
+            title={language === 'en' ? 'Switch to French' : 'Switch to English'}
+          />
         </div>
 
-        {/* Dark Mode Toggle Button */}
-        <div className="toggle-container">
+        {/* Dark Mode Toggle */}
+        <div className={`toggle-container ${isMenuOpen ? 'active' : ''}`}>
           <input type="checkbox" id="toggle" />
           <label htmlFor="toggle" className="display">
             <div className="circle">

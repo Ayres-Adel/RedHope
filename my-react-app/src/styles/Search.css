@@ -1,4 +1,102 @@
 
+
+
+
+/* Filters Section */
+.filters {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+  margin-top: 30px;
+}
+
+.filter-select,
+.filter-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+
+.filter-select:hover,
+.filter-input:hover {
+  border-color: #ff4747;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  outline: none;
+  border-color: #ff1a1a;
+  box-shadow: 0 0 5px rgba(255, 26, 26, 0.5);
+}
+
+/* Dark Mode Styles for Filters */
+.dark-theme .filter-select,
+.dark-theme .filter-input {
+  background-color: var(--dark-card);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+.dark-theme .filter-select:hover,
+.dark-theme .filter-input:hover {
+  border-color: var(--dark-hover);
+}
+
+.dark-theme .filter-select:focus,
+.dark-theme .filter-input:focus {
+  border-color: var(--dark-accent);
+  box-shadow: 0 0 5px rgba(255, 26, 26, 0.5);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1); /* Light gray border */
+  border-top: 4px solid #ff1a1a; /* Red border for the spinner */
+  border-radius: 50%; /* Makes it a circle */
+  width: 40px; /* Size of the spinner */
+  height: 40px; /* Size of the spinner */
+  animation: spin 1s linear infinite; /* Spinning animation */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg); /* Start rotation at 0 degrees */
+  }
+  100% {
+    transform: rotate(360deg); /* End rotation at 360 degrees */
+  }
+}
+
+.loading-spinner p {
+  margin-top: 10px;
+  font-size: 16px;
+  color: var(--NeutralVery_brown);
+}
+
+/* Dark Mode Styles for Loading Spinner */
+.dark-theme .loading-spinner p {
+  color: var(--dark-text);
+}
+
+.dark-theme .spinner {
+  border-top-color: var(--dark-accent); /* Red color for dark mode */
+}
+
+
+
 .Lean-More {
     display: grid;
     justify-content: center;
@@ -30,29 +128,53 @@
 
 .User-Profile {
     position: relative;
-    right: 40px;
-    font-weight: var(--Weights_02);
-    color: var(--Primary_blue);
-    border: 3px solid var(--light-coral); 
+    right: 89px;
+
+
     border-radius: 10px; 
     display: inline-block; 
     padding: 10px 20px; 
-    text-decoration: none; 
+    
+
     transition: 0.5s;
 }
 
-.User-Profile:hover {
-    background-color: #f1c7c7; 
+
+
+.login-icon {
+  font-size: 20px; /* Adjust size as needed */
+  margin-top: 4px;
+  position: relative;
+  left: 180px;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
+
+.login-icon:hover {
+  color: #ff4747; /* Change color on hover */
+  transform: scale(1.2); /* Slightly enlarge on hover */
+}
+
+
+
+
+
+
+
+
+
+
 
 .User_Profile {
     font-weight: var(--Weights_02);
     color: var(--Primary_blue);
     font-size: 18px;
     display: inline-block; 
-    padding: 10px 20px; 
+    padding: 10px 100px; 
     text-decoration: none; 
     transition: 0.5s;
+    position: relative;
+    left: 100px;
 
 }
 
@@ -210,29 +332,14 @@ tbody tr:hover {
   margin-left: -550px;
 }
 
-.dark-theme .User-Profile {
-  position: relative;
-  right: 40px;
-  font-weight: var(--Weights_02);
-  color: var(--dark-accent);
-  border: 3px solid var(--dark-accent);
-  border-radius: 10px;
-  display: inline-block;
-  padding: 10px 20px;
-  text-decoration: none;
-  transition: 0.5s;
-}
 
-.dark-theme .User-Profile:hover {
-  background-color: #333333;
-}
 
 .dark-theme .User_Profile {
   font-weight: var(--Weights_02);
   color: var(--dark-accent);
   font-size: 18px;
   display: inline-block;
-  padding: 10px 20px;
+  padding: 10px 100px;
   text-decoration: none;
   transition: 0.5s;
 }
@@ -242,8 +349,8 @@ tbody tr:hover {
 }
 
 .dark-theme .button-container {
-  margin-top: 10px;
-  margin-left: -10px;
+  margin-top: -10px;
+  margin-left: -20.9px;
 }
 
 .dark-theme .find-donors-button {
@@ -255,12 +362,9 @@ tbody tr:hover {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
-.dark-theme .find-donors-button:hover {
-  background-color: var(--dark-hover);
-}
+
 
 .dark-theme .Donor-Table-Container {
   margin: 20px auto;
@@ -310,7 +414,7 @@ tbody tr:hover {
 }
 
 .dark-theme .find-donors-button:hover {
-  background-color: var(--dark-hover);
+  background-color: rgb(150, 38, 38) ;
 }
 
 .dark-theme .donor-table-wrapper {
@@ -328,9 +432,10 @@ tbody tr:hover {
 .dark-theme table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
   font-size: 18px;
   text-align: left;
+  margin-top: 40px;
+  margin-left: 5px;
 }
 
 /* Add padding and a border to each cell */
@@ -365,6 +470,431 @@ tbody tr:hover {
   position: absolute;
   top: -2px;
   right: 2px;
+}
+
+.hamburger {
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  position: absolute;
+  left: 20px; /* Position on the left */
+  top: 42px;
+  margin-left: 25px; 
+}
+
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background-color: var(--Primary_blue);
+  transition: all 0.3s ease;
+}
+
+.RedHope {
+  position: relative;
+  left: 10px;
+  top: -5px;
+}
+
+
+
+@media (max-width: 1200px) {
+  .hamburger {
+    display: flex; /* Show hamburger menu */
+  }
+
+  .User_Profile,
+  .toggle-container,
+  .language-switcher {
+    display: none; /* Hide nav links and other elements by default */
+  }
+
+  .dark-theme .User_Profile
+ {
+  display: none; /* Hide these elements when dark mode is active */
+}
+
+
+
+  .toggle-container {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+  }
+
+  .language-switcher {
+    position: absolute;
+    top: -28px;
+    right: 20px;
+  }
+
+  .User_Profile {
+    margin-left: 510px;
+    top: -60px;
+    position: relative;
+  }
+
+  .User-Profile {
+    margin-left: -320px;
+    top: 90px;
+    position: relative;
+  }
+
+  .User_Profile.active,
+  .User-Profile.active,
+  .toggle-container.active,
+  .language-switcher.active {
+    display: flex; /* Show when active */
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 60px; /* Add margin top when menu is open */
+    align-items: flex-start; /* Align items to the left */
+    padding-left: 110px; /* Add padding to the left */
+  }
+
+  
+
+  .RedHope {
+    margin: 0 auto; /* Center the logo */
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the left */
+  }
+
+  /* Dark Mode Styles */
+  .dark-theme .hamburger div {
+    background-color: var(--dark-text); /* Adjust hamburger menu color for dark mode */
+  }
+
+  .dark-theme .User_Profile,
+  .dark-theme .User-Profile {
+    color: var(--dark-text); /* Adjust text color for dark mode */
+  }
+
+  .dark-theme .toggle-container label {
+    color: var(--dark-text); /* Adjust toggle label color for dark mode */
+  }
+
+  .dark-theme .language-switcher select {
+    background-color: var(--dark-card);
+    color: var(--dark-text); /* Adjust language switcher color for dark mode */
+  }
+}
+
+@media (max-width: 944px) {
+  .toggle-container {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+  }
+
+  .language-switcher {
+    position: absolute;
+    top: -28px;
+    right: 20px;
+  }
+
+  /* Dark Mode Styles */
+  .dark-theme .toggle-container {
+    top: 30px;
+    right: 30px;
+  }
+
+  .dark-theme .language-switcher {
+    top: -28px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 521px) {
+  .toggle-container {
+    position: absolute;
+    top: 75px;
+    right: 30px;
+  }
+
+  .language-switcher {
+    position: absolute;
+    top: 28px;
+    right: 20px;
+  }
+
+  /* Dark Mode Styles */
+  .dark-theme .toggle-container {
+    top: 75px;
+    right: 30px;
+  }
+
+  .dark-theme .language-switcher {
+    top: 28px;
+    right: 20px;
+  }
+}
+
+
+
+
+
+/* Media Queries for Lean-More Section */
+
+@media (max-width: 1200px) {
+  .Lean-More {
+    margin-top: 150px;
+  }
+
+  .Lean-More > h1 {
+    font-size: 36px;
+  }
+
+  .Lean-More > p {
+    font-size: 16px;
+  }
+
+  .find-donors-button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+
+  /* Dark Mode Styles */
+  .dark-theme .Lean-More > h1 {
+    background: linear-gradient(to right, #FF6F61 0%, #FF3333 100%);
+    background-clip: text;
+    color: transparent;
+    font-size: 36px;
+  }
+
+  .dark-theme .Lean-More > p {
+    color: var(--dark-secondary-text);
+    font-size: 16px;
+  }
+
+  .dark-theme .find-donors-button {
+    background-color: var(--dark-accent);
+    color: var(--dark-text);
+  }
+
+  .dark-theme table {
+    background-color: var(--dark-card);
+    font-size: 12.5px;
+  }
+
+  .dark-theme th {
+    background-color: var(--dark-accent);
+    color: var(--dark-text);
+  }
+
+  .dark-theme td {
+    color: var(--dark-text);
+  }
+}
+
+@media (max-width: 950px) {
+  .Lean-More {
+    margin-top: 150px;
+  }
+
+  .Lean-More > h1 {
+    font-size: 28px;
+  }
+
+  .Lean-More > p {
+    font-size: 14px;
+  }
+
+  .find-donors-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  table {
+    font-size: 12px;
+    width: 100%; /* Ensure table takes full width */
+  }
+
+  th, td {
+    padding: 8px;
+  }
+
+  /* Dark Mode Styles */
+  .dark-theme .Lean-More > h1 {
+    font-size: 28px;
+  }
+
+  .dark-theme .Lean-More > p {
+    font-size: 14px;
+  }
+
+  .dark-theme .find-donors-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .dark-theme table {
+    font-size: 12px;
+  }
+
+  .dark-theme th, .dark-theme td {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .Lean-More {
+    margin-top: 150px;
+  }
+
+  .Lean-More > h1 {
+    font-size: 24px;
+  }
+
+  .Lean-More > p {
+    font-size: 12px;
+  }
+
+  .find-donors-button {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  table {
+    font-size: 10px;
+  }
+
+  th, td {
+    padding: 6px;
+  }
+
+  /* Dark Mode Styles */
+  .dark-theme .Lean-More > h1 {
+    font-size: 24px;
+  }
+
+  .dark-theme .Lean-More > p {
+    font-size: 12px;
+  }
+
+  .dark-theme .find-donors-button {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  .dark-theme table {
+    font-size: 10px;
+  }
+
+  .dark-theme th, .dark-theme td {
+    padding: 6px;
+  }
+}
+
+@media (max-width: 590px) {
+  .Lean-More {
+    margin-top: 150px;
+  }
+
+  .Lean-More > h1 {
+    font-size: 20px;
+  }
+
+  .Lean-More > p {
+    font-size: 10px;
+  }
+
+  .find-donors-button {
+    font-size: 8px;
+    padding: 4px 8px;
+  }
+
+  table {
+    width: 100px;
+    font-size: 9.5px;
+  }
+
+  th, td {
+    padding: 4px;
+  }
+
+  /* Dark Mode Styles */
+  .dark-theme .Lean-More > h1 {
+    font-size: 20px;
+  }
+
+  .dark-theme .Lean-More > p {
+    font-size: 10px;
+  }
+
+  .dark-theme .find-donors-button {
+    font-size: 8px;
+    padding: 4px 8px;
+  }
+
+  .dark-theme table {
+    width: 100px;
+    font-size: 9.5px;
+  }
+
+  .dark-theme th, .dark-theme td {
+    padding: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .Lean-More {
+    margin-top: 150px;
+  }
+
+  .Lean-More > h1 {
+    font-size: 20px;
+  }
+
+  .Lean-More > p {
+    font-size: 10px;
+  }
+
+  .find-donors-button {
+    font-size: 8px;
+    padding: 4px 8px;
+  }
+
+  table {
+    font-size: 7px;
+  }
+
+  th, td {
+    padding: 4px;
+  }
+
+  /* Dark Mode Styles */
+  .dark-theme .Lean-More > h1 {
+    font-size: 20px;
+  }
+
+  .dark-theme .Lean-More > p {
+    font-size: 10px;
+  }
+
+  .dark-theme .find-donors-button {
+    font-size: 8px;
+    padding: 4px 8px;
+  }
+
+  .dark-theme table {
+    font-size: 7px;
+  }
+
+  .dark-theme th, .dark-theme td {
+    padding: 4px;
+  }
 }
 
 

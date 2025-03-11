@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -61,12 +61,13 @@
 }
 
 body {
-    font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', sans-serif;
     font-size: var(--Font_size);
     font-weight: var(--Weights_01);
     animation: fadeIn 1s ease-in-out;
     overflow-x: hidden;
     cursor: url("./RedCursorHope.cur") , auto;
+    transition: 0.5s;
     
 }
 
