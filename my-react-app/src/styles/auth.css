@@ -73,14 +73,21 @@ form h2 {
   margin-left: 170px;
 }
 
+.dark-theme .logo {
+  mix-blend-mode:hard-light
+}
+
 span {
   color: rgb(255, 71, 71);
 }
+
 
 .logo > a {
   color: var(--Primary_blue);
   margin-left: -10px;
 }
+
+
 
 input,
 select {
@@ -297,11 +304,11 @@ button:hover {
 }
 
 .dark-theme span {
-  color: var(--dark-accent);
+  color: white
 }
 
-.dark-theme .logo > a {
-  color: var(--dark-accent);
+.dark-theme .logo > a { 
+  color: rgb(252, 158, 158);
   margin-left: -10px;
 }
 

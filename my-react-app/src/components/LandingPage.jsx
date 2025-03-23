@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar.jsx';
+import FlipCard from './FlipCard.jsx';
 import InfiniteScroll from './InfiniteScroll.jsx';
 import ScrollProgress from './ScrollProgress.jsx';
 import FadeInSection from './FadeInSection.jsx';
@@ -233,7 +234,12 @@ export default function LandingPage() {
                   : "At RedHope we are dedicated to bridging the gap between blood donors and those in need. Our mission is to save lives by making blood donation easier and more accessible for everyone. We believe that every drop counts, and together, we can make a difference."}
               </p>
             </div>
-            <img src={heartbroken} className="img_heartbroken" alt="Heartbroken" />
+
+            <div className="flip-card-container">
+            <FlipCard />
+          </div>
+
+
           </div>
         </FadeInSection>
 

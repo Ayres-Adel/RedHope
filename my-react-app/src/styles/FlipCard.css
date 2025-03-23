@@ -1,3 +1,4 @@
+/* Base Flip Card Styles */
 .flip-card {
     background-color: transparent;
     width: 350px;
@@ -6,6 +7,24 @@
     margin: 50px auto;
     transform: rotate(-5deg); /* Tilt the card */
     transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.flip-card-front img {
+    width: 150px;
+    height: 150px;
+    margin-top: 20px;
+    border-radius: 50%;
+    border: 3px solid white; /* White border for the image */
+    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.flip-card-back h2 {
+    position: relative;
+    top: -40px;
+}
+
+.flip-card-front img:hover {
+    transform: scale(1.1); /* Slightly scale up the image on hover */
 }
 
 .flip-card:hover {
@@ -42,25 +61,113 @@
 }
 
 .flip-card-front {
-    background: linear-gradient(135deg, #f0f0f0, #d0d0d0);
-    color: #333;
+    background: linear-gradient(135deg, #f16a6a, #ffffff, #f16a6a);
+    background-size: 200% 200%;
+    animation: gradientAnimation 5s ease infinite;
+    color: #df3c3c;
 }
 
 .flip-card-back {
-    background: linear-gradient(135deg, #f0f0f0, #d0d0d0);
-    color: #333;
+    background: linear-gradient(135deg, #f16a6a, #ffffff, #f16a6a);
+    background-size: 200% 200%;
+    animation: gradientAnimation 5s ease infinite;
+    color: #df3c3c;
     transform: rotateY(180deg);
+    font-weight: 500;
 }
 
-.flip-card-front img {
+
+.learn-more-btn, .donate-now-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    width: 50%;
+    border: none;
+    border-radius: 25px;
+    background-color: white;
+    color: #ff1a1a;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.donate-now-btn {
+    position: relative;
+    top: 35px;
+}
+
+.learn-more-btn:hover {
+    background-color: #ff1a1a;
+    color: white;
+}
+
+.donate-now-btn:hover {
+    background-color: #ff1a1a;
+    color: white;
+}
+
+/* Dark Theme Styles */
+.dark-theme .flip-card {
+    background-color: transparent;
+    width: 350px;
+    height: 450px;
+    perspective: 1000px;
+    margin: -90px auto; /* Match the light mode margin */
+    transform: rotate(-5deg);
+    transition: transform 0.3s ease;
+}
+
+.dark-theme .flip-card-front, .dark-theme .flip-card-back {
+    background: linear-gradient(135deg, #572626ce, #333333, #572626ce);
+    background-size: 200% 200%;
+    animation: gradientAnimation 5s ease infinite;
+    color: #ff4d4d;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    padding: 30px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dark-theme .flip-card-front img {
     width: 150px;
     height: 150px;
     margin-top: 20px;
     border-radius: 50%;
-    border: 3px solid #333;
+    border: 3px solid #444;
+    transition: transform 0.3s ease;
+    background-color: white;
 }
 
-.grid-container {
+.dark-theme .flip-card-front img:hover {
+    transform: scale(1.1);
+}
+
+.dark-theme .flip-card:hover {
+    transform: rotate(-5deg) scale(1.05);
+}
+
+.dark-theme .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+    box-shadow: 0 8px 16px 0 rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+}
+
+.dark-theme .flip-card-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.dark-theme .grid-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -69,48 +176,358 @@
     gap: 10px;
 }
 
-.grid-container h2 {
-    margin: 0;
-    font-size: 24px;
-    text-align: center;
+.dark-theme .flip-card h3 {
+    color: white;
 }
 
-.grid-container hr {
-    width: 80%; /* Adjust the width of the line */
-    border: 0.5px solid #333; /* Make the line thinner */
-    margin: 10px 0; /* Add some spacing around the line */
-}
 
-.grid-container p {
-    display: flex;
-    align-items: center;
-    font-size: 17px;
-    text-align: center;
-}
 
-.learn-more-btn, .donate-now-btn {
+
+
+
+.dark-theme .learn-more-btn, .dark-theme .donate-now-btn {
     margin-top: 20px;
     padding: 10px 20px;
     border: none;
     border-radius: 25px;
-    background-color: #333;
-    color: white;
-    font-size: 16px;
+    background-color: #ffffff;
+    color: #ff1a1a;
+    font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
 }
 
-.learn-more-btn:hover {
-    background-color: #555;
+.dark-theme .learn-more-btn:hover {
+    background-color: #ff1a1a;
     color: white;
 }
 
-.donate-now-btn {
-    background-color: #333;
+.dark-theme .donate-now-btn:hover {
+    background-color: #ff1a1a;
     color: white;
 }
 
-.donate-now-btn:hover {
-    background-color: #555;
-    color: white;
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .flip-card {
+        width: 300px;
+        height: 400px;
+    }
+
+    .dark-theme .flip-card {
+        width: 300px;
+        height: 400px;
+    }
+
+    .flip-card-front img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .dark-theme .flip-card-front img {
+        width: 120px;
+        height: 120px;
+    }
+
+
+
+    .dark-theme .grid-container h2 {
+        font-size: 20px;
+    }
+
+
+
+    
+
+    .learn-more-btn, .donate-now-btn {
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .dark-theme .learn-more-btn, .donate-now-btn {
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .learn-more-btn {
+        position: relative;
+        top: -10px;
+    }
+
+    .dark-theme .learn-more-btn {
+        position: relative;
+        top: -10px;
+    }
+
+    .donate-now-btn {
+        position: relative;
+        top: -20px;
+    }
+
+
+
+    .dark-theme .grid-container hr {
+        width: 80%;
+        
+    }
+
+
+    .flip-card-front > span > h2  {
+        position: relative;
+        top: -20px;
+    }
+
+
+
+    .donate-now-btn {
+        position: relative;
+        top: -15px;
+    }
+
+
+
+    .social-media-links  span {
+        position: relative;
+        top: -15px;
+
+
+    }
+
+    .social-icon {
+        position: relative;
+        top: -14px;
+    }
+
+
+
+    
 }
+
+@media (max-width: 480px) {
+    .flip-card {
+        width: 250px;
+        height: 450px;
+    }
+
+    .dark-theme     .flip-card {
+        width: 250px;
+        height: 450px;
+    }
+
+
+    .flip-card-front h2 {
+        position: relative;
+        top: -50px;
+    }
+
+    .dark-theme     .flip-card-front h2 {
+        position: relative;
+        top: -50px;
+    }
+
+    .flip-card-front h3 {
+        position: relative;
+        top: -30px;
+    }
+
+    .dark-theme     .flip-card-front h3 {
+        position: relative;
+        top: -30px;
+    }
+
+    .flip-card-front img {
+        width: 100px;
+        height: 100px;
+        position: relative;
+        top: -20px;
+    }
+
+    .dark-theme     .flip-card-front img {
+        width: 100px;
+        height: 100px;
+        position: relative;
+        top: -20px;
+    }
+
+    .grid-container h2 {
+        font-size: 15px;
+    }
+
+    .dark-theme     .grid-container h2 {
+        font-size: 15px;
+    }
+
+    .dark-theme     .grid-container p {
+        font-size: 15px;
+    }
+
+    .learn-more-btn, .donate-now-btn {
+        font-size: 12px;
+        padding: 12px 24px;
+    }
+
+    .dark-theme     .learn-more-btn, .donate-now-btn {
+        font-size: 12px;
+        padding: 12px 24px;
+    }
+
+    .flip-card-front h3 {
+        font-size: 15px;
+    }
+
+    .dark-theme     .flip-card-front h3 {
+        font-size: 15px;
+    }
+
+    .flip-card-front h2 {
+        font-size: 16px;
+    }
+
+    .dark-theme     .flip-card-front h2 {
+        font-size: 16px;
+    }
+
+
+    .dark-theme     .grid-container {
+        margin-top: 10px;
+    }
+
+    .donate-now-btn {
+        margin-top: -2px;
+    }
+
+    .dark-theme     .donate-now-btn {
+        margin-top: -2px;
+    }
+
+
+
+
+
+    .learn-more-btn {
+        position: relative;
+        top: 10px;
+    }
+
+    .dark-theme     .learn-more-btn {
+        position: relative;
+        top: 10px;
+    }
+
+    .donate-now-btn {
+        position: relative;
+        top: 10px;
+    }
+
+    .dark-theme     .donate-now-btn {
+        position: relative;
+        top: 10px;
+    }
+
+    .donate-now-btn {
+        position: relative;
+        top: 35px;
+    }
+
+
+}
+
+@media (max-width: 320px) {
+    .flip-card {
+        width: 220px;
+        height: 320px;
+    }
+
+    .flip-card-front img {
+        width: 70px;
+        height: 70px;
+    }
+
+
+
+    .learn-more-btn, .donate-now-btn {
+        font-size: 10px;
+    }
+
+
+    .donate-now-btn {
+        position: relative;
+        top: 5px;
+    }
+
+    .flip-card-front h2 {
+        position: relative;
+        top: -10px;
+    }
+
+    .social-media-links  span {
+        font-size: 15px;
+
+    }
+
+    .social-icon {
+        width: 17px;
+    }
+
+    
+}
+
+/* Gradient Animation */
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+  
+
+  
+  /* Social Media Links */
+  .social-media-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    position: relative;
+    top: -10px;
+  }
+  
+  .social-media-links a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #ff1a1a;
+    font-size: 18px;
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .social-media-links a:hover {
+    color: #ffffff;
+    transform: translateX(5px);
+  }
+  
+  .social-icon {
+    font-size: 24px;
+  }
+  
+  .dark-theme .social-media-links a {
+    color: #ff4d4d;
+  }
+  
+  .dark-theme .social-media-links a:hover {
+    color: #ffffff;
+  }
+  
+
+  

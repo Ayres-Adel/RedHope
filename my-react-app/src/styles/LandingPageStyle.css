@@ -283,6 +283,7 @@
     font-weight: bolder;
     width: 1501px;
     height: 200px;
+
     
   }
 
@@ -297,9 +298,17 @@
     font-weight: bolder;
     display: flex;
     justify-content: center;
-    margin: 150px 120px;
+    margin: 150px 170px;
     gap: 150px;
-    margin-top: 80px;
+    margin-top: 100px;
+}
+
+.flip-card {
+    margin-top: -90px;
+}
+
+#about > p {
+   margin-top: 50px;
 }
 
 
@@ -313,6 +322,7 @@
     width: 1454px;
     height: 200px;
     padding-left: 100px;
+    margin-top: 370px;
 }
 
 .grid_footer {
@@ -372,6 +382,9 @@
     color: black;
 }
 
+
+
+
 /* Media Queries for Responsiveness */
 @media (max-width: 1200px) {
     .Container_01, .Container_05 > div {
@@ -395,6 +408,13 @@
     .footer {
         width: 100%;
         margin-left: 0;
+    }
+
+    .img_heartbroken {
+        display: block;
+        width: 50%;
+        max-width: 300px;
+        margin: 20px auto;
     }
 
 
@@ -533,21 +553,33 @@
         flex-direction: column;
         align-items: center; /* Ensures center alignment */
         gap: 30px;
-        padding: 20px 0;
+        margin-top: 300px;
+
+    }
+
+
+    .dark-theme .Container_05 h1 {
+        position: relative;
+        top: -80px;
     }
 
     .Container_05 > div {
 
         align-items: center; /* Ensures everything is centered */
         justify-content: center;
-        gap: 20px;
+        gap: 120px;
         width: 100%;
-        margin-top: 10px;
+        margin-top: -30px;
+        
     }
 
     #about {
         width: 100%;
         max-width: 700px; /* Keeps text area balanced */
+
+        
+
+    
 
     }
 
@@ -555,13 +587,15 @@
         max-width: 500px; /* Keeps text readable */
         line-height: 1.6;
         text-align: center;
+        
+
     }
 
-    .img_heartbroken {
-        width: 70%;
-        max-width: 280px; /* Prevents image from becoming too large */
+    .flip-card{
+        position: relative;
+        left: 20px;
         margin-top: 15px;
-        margin-right: -50px;
+
     }
 
     .footer {
@@ -588,6 +622,17 @@
         margin-top: -15px;
     }
 
+}
+
+@media (max-width: 985px){
+    .Container_04 {
+
+    }
+
+    .grid_Container_04 {
+        position: relative;
+        top: -55px;
+    }
 }
 
 @media (max-width: 955px) {
@@ -631,6 +676,17 @@
         gap: 50px;
         flex-direction: column;
         text-align: center;
+    }
+
+    .dark-theme .Container_05 h1 {
+        position: relative;
+        top: -144px;
+    }
+
+    .dark-theme .Container_05  p {
+        position: relative;
+        top: -150px;
+        margin-bottom: -20px;
     }
 
     .Container_01 {
@@ -804,7 +860,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin: 30px auto;
+        margin: 430px auto;
         text-align: center;
         width: 90%;
         font-size: 24px;
@@ -870,6 +926,8 @@
         justify-content: center;
         align-items: center;
       }
+
+
 }
 
 @media (max-width: 480px) {
@@ -877,6 +935,13 @@
     .img_undraw_medicine {
         width: 300px;
     }
+
+    .dark-theme .Container_05 h1 {
+        position: relative;
+        top: -100px;
+    }
+
+
 
     .img_heartbeat {
         width: 400px;
@@ -888,6 +953,10 @@
         text-align: center;
         width: 90%; /* Adjust width to fit small screens */
         font-size: 24px;
+        margin-bottom: 400px;
+        position: relative;
+        top: 150px;
+        
 
     }
 
@@ -902,6 +971,8 @@
     .Container_05 h1 {
         font-size: 22px; /* Adjust font size */
         margin-top: 60px;
+        position: relative;
+        top: 40px;
     }
 
 
@@ -968,8 +1039,18 @@
         margin-bottom: 10px;
     }
 
+    .grid_footer {
+        display: grid;
+        place-items: center; /* Centers both horizontally and vertically */
+
+    }
+    
     .grid_footer p {
         font-size: 16px; /* Adjust text size */
+        width: clamp(1.5rem, 100%, 550px); /* Adjust min, preferred, and max values */
+        position: relative;
+        top: 15px;
+        left: 10px;
     }
 
     .flex_footer {
@@ -1071,3 +1152,15 @@
 
     
 }
+
+
+
+
+
+
+
+
+
+
+
+

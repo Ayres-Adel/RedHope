@@ -61,6 +61,14 @@ nav {
   align-items: center;
 }
 
+.dark-theme .RedHope {
+  mix-blend-mode:hard-light
+}
+
+.dark-theme .RedHope
+
+
+
 span {
   color: #ff4747;
 }

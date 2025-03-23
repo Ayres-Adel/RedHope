@@ -324,41 +324,37 @@ export default function Search() {
         {/* Map Integration */}
         {buttonClicked && !isLoading && (
           <div className="map-container">
-           <APIProvider apiKey="AIzaSyAeTAUxWY5luBGsf-F6-vP8eDLqgjzmACg">
-  <Map
-    defaultCenter={mapCenter}
-    defaultZoom={10}
-    style={{ height: '400px', width: '100%' }}
-  >
-    {filteredDonors.map((donor, index) => (
-      <Marker
-        key={index}
-        position={{ lat: donor.latitude, lng: donor.longitude }}
-        title={donor.username}
-        onClick={() => setSelectedDonor(donor)}
-        icon={{
-          url: './src/assets/images/marker.png', // Your custom logo
-          scaledSize: new window.google.maps.Size(40, 40), // Adjust size as needed
-        }}
-      />
-    ))}
+            <APIProvider apiKey="AIzaSyAeTAUxWY5luBGsf-F6-vP8eDLqgjzmACg">
+              <Map
+                defaultCenter={mapCenter}
+                defaultZoom={10}
+                style={{ height: '400px', width: '100%' }}
+              >
+                {filteredDonors.map((donor, index) => (
+                  <Marker
+                    key={index}
+                    position={{ lat: donor.latitude, lng: donor.longitude }}
+                    title={donor.username}
+                    onClick={() => setSelectedDonor(donor)}
+                  />
+                ))}
 
-    {selectedDonor && (
-      <InfoWindow
-        position={{ lat: selectedDonor.latitude, lng: selectedDonor.longitude }}
-        onCloseClick={() => setSelectedDonor(null)}
-      >
-        <div>
-          <h3>{selectedDonor.username}</h3>
-          <p>Blood Type: {selectedDonor.bloodType}</p>
-          <p>Gender: {selectedDonor.gender}</p>
-          <p>Email: {selectedDonor.email}</p>
-          <p>Phone: {selectedDonor.phoneNumber}</p>
-        </div>
-      </InfoWindow>
-    )}
-  </Map>
-</APIProvider>
+                {selectedDonor && (
+                  <InfoWindow
+                    position={{ lat: selectedDonor.latitude, lng: selectedDonor.longitude }}
+                    onCloseClick={() => setSelectedDonor(null)}
+                  >
+                    <div>
+                      <h3>{selectedDonor.username}</h3>
+                      <p>Blood Type: {selectedDonor.bloodType}</p>
+                      <p>Gender: {selectedDonor.gender}</p>
+                      <p>Email: {selectedDonor.email}</p>
+                      <p>Phone: {selectedDonor.phoneNumber}</p>
+                    </div>
+                  </InfoWindow>
+                )}
+              </Map>
+            </APIProvider>
           </div>
         )}
 
@@ -453,3 +449,4 @@ export default function Search() {
     </>
   );
 }
+
