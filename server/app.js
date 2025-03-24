@@ -2,6 +2,7 @@
   const mongoose = require('mongoose');
   const authRoutes = require('./routes/authRoutes');
   const cookieParser = require('cookie-parser');
+  const userRoutes = require('./routes/userRoutes');
   const dotenv = require('dotenv');
   const { requireAuth , checkUser } = require('./middleware/authMiddleware');
   const cors = require('cors');
@@ -31,3 +32,4 @@
   // routes
 
   app.use(authRoutes);
+  app.use('/api/user', userRoutes);
