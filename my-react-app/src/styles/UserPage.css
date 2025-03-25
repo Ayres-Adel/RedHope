@@ -779,3 +779,26 @@
     padding: 24px;
   }
 }
+
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-container input {
+  padding-right: 35px;
+  width: 100%;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: rgb(255, 71, 71);
+}
+
+.password-toggle:hover {
+  color: rgb(255, 71, 71);
+}

@@ -4,6 +4,7 @@ import axios from 'axios';
 import '../styles/UserPage.css';
 import Navbar from './Navbar';
 import Toast from './Toast';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const UserPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,9 @@ const UserPage = () => {
   });
   const [messages, setMessages] = useState([]);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -65,6 +69,22 @@ const UserPage = () => {
 
   const removeMessage = (id) => {
     setMessages(prev => prev.filter(msg => msg.id !== id));
+  };
+
+  const togglePasswordVisibility = (field) => {
+    switch (field) {
+      case 'current':
+        setShowCurrentPassword(!showCurrentPassword);
+        break;
+      case 'new':
+        setShowNewPassword(!showNewPassword);
+        break;
+      case 'confirm':
+        setShowConfirmPassword(!showConfirmPassword);
+        break;
+      default:
+        break;
+    }
   };
 
   const handlePasswordChange = async (e) => {
@@ -227,30 +247,54 @@ const UserPage = () => {
                 <div className="password-form">
                   <div className="form-item">
                     <label>Current Password</label>
-                    <input
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Enter current password"
-                    />
+                    <div className="password-input-container">
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Enter current password"
+                      />
+                      <span 
+                        className="password-toggle"
+                        onClick={() => togglePasswordVisibility('current')}
+                      >
+                        {showCurrentPassword ? <FiEyeOff /> : <FiEye />}
+                      </span>
+                    </div>
                   </div>
                   <div className="form-item">
                     <label>New Password</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter new password"
-                    />
+                    <div className="password-input-container">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Enter new password"
+                      />
+                      <span 
+                        className="password-toggle"
+                        onClick={() => togglePasswordVisibility('new')}
+                      >
+                        {showNewPassword ? <FiEyeOff /> : <FiEye />}
+                      </span>
+                    </div>
                   </div>
                   <div className="form-item">
                     <label>Confirm New Password</label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm new password"
-                    />
+                    <div className="password-input-container">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm new password"
+                      />
+                      <span 
+                        className="password-toggle"
+                        onClick={() => togglePasswordVisibility('confirm')}
+                      >
+                        {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                      </span>
+                    </div>
                   </div>
                   <button 
                     className="button button-outline" 

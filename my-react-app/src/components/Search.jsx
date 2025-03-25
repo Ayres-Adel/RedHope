@@ -76,7 +76,7 @@ export default function Search() {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://127.0.0.1:3000/nearby', {
+      const res = await axios.get('http://localhost:3000/nearby', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -169,7 +169,7 @@ export default function Search() {
         return;
       }
       try {
-        const res = await axios.get('http://127.0.0.1:3000/dashboard', {
+        const res = await axios.get('http://localhost:3000/dashboard', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
