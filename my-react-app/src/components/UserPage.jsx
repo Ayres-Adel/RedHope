@@ -26,6 +26,77 @@ const UserPage = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
+
+  // Translations
+  const translations = {
+    en: {
+      accountSettings: 'Account Settings',
+      profileInformation: 'Profile Information',
+      name: 'Name',
+      email: 'Email',
+      phone: 'Phone',
+      bloodType: 'Blood Type',
+      location: 'Location',
+      editInformation: 'Edit Information',
+      changePassword: 'Change Password',
+      currentPassword: 'Current Password',
+      newPassword: 'New Password',
+      confirmPassword: 'Confirm New Password',
+      changePasswordButton: 'Change Password',
+      changing: 'Changing...',
+      deleteAccount: 'Delete Account',
+      deleteConfirmation: 'Type "DELETE" to confirm',
+      deleteButton: 'Delete Account',
+      cancel: 'Cancel',
+      deleteWarning: 'This action cannot be undone. Please type "DELETE" to confirm account deletion.',
+      loading: 'Loading...',
+      passwordRequired: 'Please fill all password fields',
+      passwordMismatch: 'New passwords do not match',
+      passwordLength: 'Password must be at least 6 characters',
+      passwordChanged: 'Password changed successfully!',
+      sessionExpired: 'Session expired. Please login again.',
+      deleteConfirmText: 'Please type DELETE to confirm',
+      accountDeleted: 'Account deleted successfully',
+      failedLoad: 'Failed to load user data',
+      invalidRequest: 'Invalid request',
+      networkError: 'Network error. Please try again.'
+    },
+    fr: {
+      accountSettings: 'Paramètres du Compte',
+      profileInformation: 'Informations du Profil',
+      name: 'Nom',
+      email: 'Email',
+      phone: 'Téléphone',
+      bloodType: 'Groupe Sanguin',
+      location: 'Localisation',
+      editInformation: 'Modifier les Informations',
+      changePassword: 'Changer le Mot de Passe',
+      currentPassword: 'Mot de Passe Actuel',
+      newPassword: 'Nouveau Mot de Passe',
+      confirmPassword: 'Confirmer le Nouveau Mot de Passe',
+      changePasswordButton: 'Changer le Mot de Passe',
+      changing: 'Changement en cours...',
+      deleteAccount: 'Supprimer le Compte',
+      deleteConfirmation: 'Tapez "DELETE" pour confirmer',
+      deleteButton: 'Supprimer le Compte',
+      cancel: 'Annuler',
+      deleteWarning: 'Cette action est irréversible. Veuillez taper "DELETE" pour confirmer la suppression du compte.',
+      loading: 'Chargement...',
+      passwordRequired: 'Veuillez remplir tous les champs du mot de passe',
+      passwordMismatch: 'Les nouveaux mots de passe ne correspondent pas',
+      passwordLength: 'Le mot de passe doit contenir au moins 6 caractères',
+      passwordChanged: 'Mot de passe changé avec succès !',
+      sessionExpired: 'Session expirée. Veuillez vous reconnecter.',
+      deleteConfirmText: 'Veuillez taper DELETE pour confirmer',
+      accountDeleted: 'Compte supprimé avec succès',
+      failedLoad: 'Échec du chargement des données utilisateur',
+      invalidRequest: 'Requête invalide',
+      networkError: 'Erreur réseau. Veuillez réessayer.'
+    }
+  };
+
+  const t = translations[language];
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -54,13 +125,24 @@ const UserPage = () => {
         setLoading(false);
       } catch (error) {
         console.error('Error fetching user data:', error);
-        addMessage('Failed to load user data', 'error');
+        addMessage(t.failedLoad, 'error');
         setLoading(false);
       }
     };
 
     fetchUserData();
-  }, [navigate]);
+  }, [navigate, t.failedLoad]);
+
+  // Language change effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentLang = localStorage.getItem('language') || 'en';
+      if (currentLang !== language) {
+        setLanguage(currentLang);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [language]);
 
   const addMessage = (text, type) => {
     const id = Date.now();
@@ -92,17 +174,17 @@ const UserPage = () => {
     
     // Validate inputs
     if (!currentPassword || !newPassword || !confirmPassword) {
-      addMessage('Please fill all password fields', 'error');
+      addMessage(t.passwordRequired, 'error');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      addMessage('New passwords do not match', 'error');
+      addMessage(t.passwordMismatch, 'error');
       return;
     }
 
     if (newPassword.length < 6) {
-      addMessage('Password must be at least 6 characters', 'error');
+      addMessage(t.passwordLength, 'error');
       return;
     }
 
@@ -130,7 +212,7 @@ const UserPage = () => {
         }
       );
       
-      addMessage('Password changed successfully!', 'success');
+      addMessage(t.passwordChanged, 'success');
       
       // Reset fields
       setCurrentPassword('');
@@ -141,16 +223,16 @@ const UserPage = () => {
       console.error('Password change error:', err);
       if (err.response) {
         if (err.response.status === 400) {
-          addMessage(err.response.data.error || 'Invalid request', 'error');
+          addMessage(err.response.data.error || t.invalidRequest, 'error');
         } else if (err.response.status === 401) {
-          addMessage('Session expired. Please login again.', 'error');
+          addMessage(t.sessionExpired, 'error');
           localStorage.removeItem('token');
           navigate('/login');
         } else {
           addMessage('Failed to change password', 'error');
         }
       } else {
-        addMessage('Network error. Please try again.', 'error');
+        addMessage(t.networkError, 'error');
       }
     } finally {
       setIsChangingPassword(false);
@@ -159,7 +241,7 @@ const UserPage = () => {
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmation !== 'DELETE') {
-      addMessage('Please type DELETE to confirm', 'error');
+      addMessage(t.deleteConfirmText, 'error');
       return;
     }
     
@@ -178,7 +260,7 @@ const UserPage = () => {
       
       // Clear user data from local storage
       localStorage.removeItem('token');
-      addMessage('Account deleted successfully', 'success');
+      addMessage(t.accountDeleted, 'success');
       
       // Redirect to home page
       setTimeout(() => {
@@ -194,65 +276,79 @@ const UserPage = () => {
     }
   };
 
+  useEffect(() => {
+    const toggle = document.getElementById('toggle');
+    toggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark-theme', toggle.checked);
+    });
+
+    // Cleanup event listener
+    return () => {
+      toggle.removeEventListener('change', () => {
+        document.body.classList.toggle('dark-theme', toggle.checked);
+      });
+    };
+  }, []);
+
   return (
     <>
       <Navbar />
       <div className="user-page">
         <div className="settings-wrapper">
           {loading ? (
-            <div className="loading-spinner">Loading...</div>
+            <div className="loading-spinner">{t.loading}</div>
           ) : (
             <div className="settings-card">
               <div className="settings-header">
-                <h1>Account Settings</h1>
+                <h1>{t.accountSettings}</h1>
               </div>
 
               {/* Profile Information */}
               <div className="settings-section">
                 <div className="section-header">
-                  <h2>Profile Information</h2>
+                  <h2>{t.profileInformation}</h2>
                 </div>
                 <div className="info-grid">
                   <div className="info-item">
-                    <label>Name</label>
+                    <label>{t.name}</label>
                     <p>{userInfo.name}</p>
                   </div>
                   <div className="info-item">
-                    <label>Email</label>
+                    <label>{t.email}</label>
                     <p>{userInfo.email}</p>
                   </div>
                   <div className="info-item">
-                    <label>Phone</label>
+                    <label>{t.phone}</label>
                     <p>{userInfo.phone}</p>
                   </div>
                   <div className="info-item">
-                    <label>Blood Type</label>
+                    <label>{t.bloodType}</label>
                     <p>{userInfo.bloodType}</p>
                   </div>
                   <div className="info-item">
-                    <label>Location</label>
+                    <label>{t.location}</label>
                     <p>{userInfo.location}</p>
                   </div>
                 </div>
                 <div className="profile-actions">
-                  <button className="button button-outline">Edit Information</button>
+                  <button className="button button-outline">{t.editInformation}</button>
                 </div>
               </div>
 
               {/* Password Change */}
               <div className="settings-section">
                 <div className="section-header">
-                  <h2>Change Password</h2>
+                  <h2>{t.changePassword}</h2>
                 </div>
                 <div className="password-form">
                   <div className="form-item">
-                    <label>Current Password</label>
+                    <label>{t.currentPassword}</label>
                     <div className="password-input-container">
                       <input
                         type={showCurrentPassword ? "text" : "password"}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        placeholder="Enter current password"
+                        placeholder={t.currentPassword}
                       />
                       <span 
                         className="password-toggle"
@@ -263,13 +359,13 @@ const UserPage = () => {
                     </div>
                   </div>
                   <div className="form-item">
-                    <label>New Password</label>
+                    <label>{t.newPassword}</label>
                     <div className="password-input-container">
                       <input
                         type={showNewPassword ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Enter new password"
+                        placeholder={t.newPassword}
                       />
                       <span 
                         className="password-toggle"
@@ -280,13 +376,13 @@ const UserPage = () => {
                     </div>
                   </div>
                   <div className="form-item">
-                    <label>Confirm New Password</label>
+                    <label>{t.confirmPassword}</label>
                     <div className="password-input-container">
                       <input
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm new password"
+                        placeholder={t.confirmPassword}
                       />
                       <span 
                         className="password-toggle"
@@ -301,7 +397,7 @@ const UserPage = () => {
                     onClick={handlePasswordChange}
                     disabled={isChangingPassword}
                   >
-                    {isChangingPassword ? 'Changing...' : 'Change Password'}
+                    {isChangingPassword ? t.changing : t.changePasswordButton}
                   </button>
                 </div>
               </div>
@@ -309,11 +405,11 @@ const UserPage = () => {
               {/* Delete Account */}
               <div className="settings-section">
                 <div className="section-header">
-                  <h2>Delete Account</h2>
+                  <h2>{t.deleteAccount}</h2>
                 </div>
                 <div className="danger-zone">
                   <button className="button button-danger" onClick={() => setShowDeleteModal(true)}>
-                    Delete Account
+                    {t.deleteButton}
                   </button>
                 </div>
               </div>
@@ -325,11 +421,11 @@ const UserPage = () => {
         {showDeleteModal && (
           <div className="modal-overlay">
             <div className="modal">
-              <h3>Delete Account</h3>
-              <p>This action cannot be undone. Please type "DELETE" to confirm account deletion.</p>
+              <h3>{t.deleteAccount}</h3>
+              <p>{t.deleteWarning}</p>
               <input
                 type="text"
-                placeholder='Type "DELETE" to confirm'
+                placeholder={t.deleteConfirmation}
                 value={deleteConfirmation}
                 onChange={(e) => setDeleteConfirmation(e.target.value)}
               />
@@ -341,19 +437,19 @@ const UserPage = () => {
                     setDeleteConfirmation('');
                   }}
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
                 <button
                   className="button button-danger"
                   onClick={() => {
                     if (deleteConfirmation !== 'DELETE') {
-                      addMessage('Please type DELETE to confirm', 'error');
+                      addMessage(t.deleteConfirmText, 'error');
                       return;
                     }
                     handleDeleteAccount();
                   }}
                 >
-                  Delete Account
+                  {t.deleteButton}
                 </button>
               </div>
             </div>

@@ -47,6 +47,22 @@
     }
 }
 
+/* Add scroll section anchor styling for proper scroll positioning */
+.scroll-section-anchor {
+    position: relative;
+    top: -80px; /* Offset for fixed navbar */
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* Homepage container adjustments */
+.homepage {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* Padding to account for fixed navbar */
+}
+
 .Container_01 {
     font-size: 20px;
     font-weight: bolder;
@@ -54,6 +70,7 @@
     justify-content: center;
     margin: 150px 120px;
     gap: 150px;
+    padding-top: 20px; /* Add space at the top for better visual appearance */
 }
 
 .img_undraw_medicine {

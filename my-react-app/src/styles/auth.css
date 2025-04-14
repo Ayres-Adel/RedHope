@@ -1,22 +1,22 @@
-/* Light Theme Styles */
-form {
+/* Auth-specific CSS - Scoped to prevent affecting other components */
+.auth-specific-container form {
   width: 600px;
   margin: 0 auto;
   margin-top: 150px;
   padding: 40px;
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
-  backdrop-filter: blur(10px); /* Blur effect for glass morphism */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Soft shadow */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Light border for depth */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 }
 
-form:hover {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+.auth-specific-container form:hover {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
 }
 
-form h2 {
+.auth-specific-container form h2 {
   text-align: center;
   font-size: 2.5em;
   font-weight: 900;
@@ -24,73 +24,67 @@ form h2 {
   color: var(--NeutralVery_brown);
 }
 
-.form-row {
+.auth-specific-container .form-row {
   display: flex;
   gap: 30px;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.form-group {
+.auth-specific-container .form-group {
   flex: 1;
   margin-right: 25px;
 }
 
-.form-group:last-child {
+.auth-specific-container .form-group:last-child {
   margin-right: 0;
 }
 
-.sign-container {
+.auth-specific-container .sign-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.form-container {
+.auth-specific-container .form-container {
   flex: 1;
   max-width: 400px;
 }
 
-.image-container {
+.auth-specific-container .image-container {
   flex: 1;
   display: flex;
   justify-content: center;
 }
 
-.image-container img {
+.auth-specific-container .image-container img {
   max-width: 50%;
   height: auto;
 }
 
-.logo img {
+.auth-specific-container .logo img {
   width: 100px;
   height: 100px;
   margin-top: -13px;
 }
 
-.logo {
+.auth-specific-container .logo {
   display: flex;
   margin-left: 170px;
 }
 
-.dark-theme .logo {
-  mix-blend-mode:hard-light
-}
-
-span {
+/* Fix span that affects all pages */
+.auth-specific-container span {
   color: rgb(255, 71, 71);
 }
 
-
-.logo > a {
+.auth-specific-container .logo > a {
   color: var(--Primary_blue);
   margin-left: -10px;
 }
 
-
-
-input,
-select {
+.auth-specific-container input,
+.auth-specific-container select {
   display: block;
   padding: 12px 10px;
   border-radius: 5px;
@@ -100,26 +94,32 @@ select {
   transition: border-color 0.3s ease;
 }
 
-input:focus,
-select:focus {
-  border-color: rgb(255, 71, 71);
-  outline: none;
-  box-shadow: 0 0 8px rgba(255, 71, 71, 0.3); /* Glow effect on focus */
+/* Fix the global checkbox selector that was breaking dark mode toggle */
+/* Instead of hiding all checkboxes, only hide those in this container */
+.auth-specific-container input[type="checkbox"] {
+  display: none;
 }
 
-input::placeholder {
+.auth-specific-container input:focus,
+.auth-specific-container select:focus {
+  border-color: rgb(255, 71, 71);
+  outline: none;
+  box-shadow: 0 0 8px rgba(255, 71, 71, 0.3);
+}
+
+.auth-specific-container input::placeholder {
   color: rgb(182, 178, 178);
   font-weight: var(--Weights_01);
 }
 
-label {
+.auth-specific-container label {
   display: block;
   margin: 10px 0 5px;
   color: var(--NeutralVery_brown);
   font-weight: var(--Weights_02);
 }
 
-.btn_loc {
+.auth-specific-container .btn_loc {
   margin-left: 1px;
   font-size: 16px;
   color: #fff;
@@ -130,13 +130,12 @@ label {
   transition: background-color 0.3s ease;
 }
 
-.btn_loc:hover {
+.auth-specific-container .btn_loc:hover {
   background-color: darkred;
 }
 
-button {
+.auth-specific-container button {
   margin-top: 20px;
-  margin-left: 190px;
   border-radius: 5px;
   border: 0;
   color: #fff;
@@ -149,490 +148,227 @@ button {
   transition: background-color 0.3s ease;
 }
 
-button:hover {
+.auth-specific-container button:hover {
   cursor: pointer;
 }
 
-.error {
+.auth-specific-container .error {
   color: tomato;
   font-size: 0.9em;
   font-weight: bold;
   margin: 5px 0;
 }
 
-.input-icon {
+.auth-specific-container .input-icon {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.input-icon .icon {
+.auth-specific-container .input-icon .icon {
   position: absolute;
-  top: 50%;
-  left: -20px;
-  transform: translateY(-50%);
+  left: 10px;
   color: #999999;
   transition: color 0.3s ease;
+  pointer-events: none;
 }
 
-.input-icon:hover .icon {
-  color: rgb(255, 71, 71); /* Change color on hover */
+.auth-specific-container .input-icon:hover .icon {
+  color: rgb(255, 71, 71);
 }
 
-.password-toggle-icon {
+.auth-specific-container .input-icon input,
+.auth-specific-container .input-icon select {
+  padding-left: 40px;
+}
+
+.auth-specific-container .password-toggle-icon {
   position: absolute;
   top: 50%;
   right: 7px;
   transform: translateY(-50%);
   cursor: pointer;
   color: rgb(255, 71, 71);
-  cursor: url("./RedSelectLinkHope.cur"), auto;
 }
 
-.form-group {
+.auth-specific-container .form-group {
   margin-bottom: 1rem;
 }
 
-.blood-donor-label {
+.auth-specific-container .blood-donor-label {
   display: flex;
   align-items: center;
   cursor: pointer;
 }
 
-.blood-donor-label input[type="checkbox"] {
+/* Restore a proper visible checkbox for the auth components */
+.auth-specific-container .blood-donor-label input[type="checkbox"] {
   margin-left: -244px;
+  display: inline;
 }
 
-/* Donor Group Styling */
-.form-row {
-  margin-bottom: 20px; /* Spacing between rows */
+/* Fix the input[type="radio"] */
+.auth-specific-container .input-icon input[type="radio"] {
+  width: auto;
+  margin-right: 5px;
+  accent-color: rgb(255, 71, 71);
 }
 
-.form-group {
-  margin-bottom: -5px; /* Space below each form group */
+.auth-specific-container .input-icon label {
+  margin-right: 85px;
+  cursor: pointer;
+  display: inline;
 }
 
-.input-icon {
-  display: flex;
-  align-items: center;
-  gap: 1px; /* Space between radio buttons */
-  cursor: url("./RedSelectLinkHope.cur"), auto;
+/* Balloon Styles */
+.auth-specific-container .balloon {
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 100px;
+  height: auto;
+  animation: float 4s ease-in-out infinite;
+  display: block;
 }
 
-/* Radio Button Styling */
-.input-icon input[type="radio"] {
-  margin-right: 5px; /* Space between radio button and label */
-  accent-color: rgb(255, 71, 71); /* Custom color for the radio buttons */
-  cursor: url("./RedSelectLinkHope.cur"), auto;
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
 }
 
-.input-icon label {
-  margin-right: 85px; /* Space between labels */
-  cursor: pointer; /* Change cursor to pointer on hover */
+.auth-specific-container .log_in {
+  margin: 20px auto;
+  width: 100%;
+  max-width: 200px;
 }
 
-/* Dark Theme Styles */
-.dark-theme form {
-  width: 600px; /* Same width as light theme */
-  margin: 0 auto; /* Same margin as light theme */
-  margin-top: 150px; /* Same margin-top as light theme */
-  padding: 40px; /* Same padding as light theme */
-  border-radius: 15px; /* Same border-radius as light theme */
-  background: var(--dark-card); /* Dark background */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6); /* Dark shadow */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Dark border */
-  transition: all 0.3s ease;
+/* Dark theme styles scoped to auth container */
+.dark-theme .auth-specific-container form {
+  background: var(--dark-card);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.dark-theme form:hover {
-  box-shadow: 0 12px 48px rgba(190, 27, 27, 0.2); /* Enhanced shadow on hover */
+.dark-theme .auth-specific-container form:hover {
+  box-shadow: 0 12px 48px rgba(190, 27, 27, 0.2);
 }
 
-.dark-theme form h2 {
-  text-align: center;
-  font-size: 2.5em;
-  font-weight: 900;
-  margin-bottom: 30px;
+.dark-theme .auth-specific-container form h2 {
   color: var(--dark-text);
 }
 
-.dark-theme .form-row {
-  display: flex;
-  gap: 30px;
-  justify-content: space-between;
-  margin-bottom: 20px;
+.dark-theme .auth-specific-container .logo {
+  mix-blend-mode: hard-light;
 }
 
-.dark-theme .form-group {
-  flex: 1;
-  margin-right: 25px;
+.dark-theme .auth-specific-container span {
+  color: white;
 }
 
-.dark-theme .form-group:last-child {
-  margin-right: 0;
-}
-
-.dark-theme .sign-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.dark-theme .form-container {
-  flex: 1;
-  max-width: 400px;
-}
-
-.dark-theme .image-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.dark-theme .image-container img {
-  max-width: 50%;
-  height: auto;
-}
-
-.dark-theme .logo img {
-  width: 100px;
-  height: 100px;
-  margin-top: -13px;
-}
-
-.dark-theme .logo {
-  display: flex;
-  margin-left: 170px;
-}
-
-.dark-theme span {
-  color: white
-}
-
-.dark-theme .logo > a { 
+.dark-theme .auth-specific-container .logo > a {
   color: rgb(252, 158, 158);
   margin-left: -10px;
 }
 
-.dark-theme input,
-.dark-theme select {
-  display: block;
-  padding: 12px 10px;
-  border-radius: 5px;
+.dark-theme .auth-specific-container input,
+.dark-theme .auth-specific-container select {
   border: 1px solid var(--dark-border);
   background-color: var(--dark-card);
   color: var(--dark-text);
-  font-size: 1em;
-  width: 100%;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
-input[type="checkbox"] {
-  display: none;
-}
-
-.input-icon select {
-  padding-left: 30px;
-}
-
-.dark-theme input:focus,
-.dark-theme select:focus {
+.dark-theme .auth-specific-container input:focus,
+.dark-theme .auth-specific-container select:focus {
   border-color: var(--dark-accent);
-  outline: none;
 }
 
-.dark-theme input::placeholder {
+.dark-theme .auth-specific-container input::placeholder {
   color: var(--dark-placeholder);
-  font-weight: var(--Weights_01);
 }
 
-.dark-theme label {
-  display: block;
-  margin: 10px 0 5px;
+.dark-theme .auth-specific-container label {
   color: var(--dark-text);
-  font-weight: var(--Weights_02);
 }
 
-.dark-theme .btn_loc {
-  margin-left: 1px;
-  font-size: 16px;
-  color: #fff;
+.dark-theme .auth-specific-container .btn_loc {
   background-color: var(--dark-accent);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.dark-theme .btn_loc:hover {
-  background-color: darkred;
-}
-
-.dark-theme button {
-  margin-top: 20px;
-  margin-left: 190px;
-  border-radius: 5px;
-  border: 0;
-  color: #fff;
+.dark-theme .auth-specific-container button {
   background-color: var(--dark-accent);
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 0.9em;
-  display: block;
-  padding: 12px 20px;
-  letter-spacing: 1px;
-  transition: background-color 0.3s ease;
 }
 
-.dark-theme .input-icon:hover .icon {
-  color: rgb(255, 71, 71); /* Change color on hover */
-}
-
-.dark-theme button:hover {
-  cursor: pointer;
+.dark-theme .auth-specific-container button:hover {
   background-color: #8b0000;
 }
 
-.dark-theme .error {
-  color: tomato;
-  font-size: 0.9em;
-  font-weight: bold;
-  margin: 5px 0;
-}
-
-.dark-theme .input-icon {
-  position: relative;
-}
-
-.dark-theme .input-icon .icon {
-  position: absolute;
-  top: 50%;
-  left: -20px;
-  transform: translateY(-50%);
-  color: var(--dark-placeholder);
-}
-
-.dark-theme .password-toggle-icon {
-  position: absolute;
-  top: 50%;
-  right: 7px;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: var(--dark-accent);
-}
-
-.dark-theme .blood-donor-label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.dark-theme .blood-donor-label input[type="checkbox"] {
-  margin-left: -244px;
-}
-
-.dark-theme .input-icon input[type="radio"] {
-  margin-right: 5px;
-  accent-color: var(--dark-accent);
-  cursor: pointer;
-}
-
-.dark-theme .input-icon label {
-  margin-right: 85px;
-  cursor: pointer;
-}
-
-/* Fix FontAwesomeIcon Alignment */
-.input-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-icon .icon {
-  position: absolute;
-  left: 10px; /* Adjusted position to stay inside the box */
-  color: #999999;
-  transition: color 0.3s ease;
-  pointer-events: none; /* Prevent icon from blocking input clicks */
-}
-
-.input-icon input {
-  padding-left: 40px; /* Add padding to prevent text overlap with icon */
-}
-
-.dark-theme .input-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.dark-theme .input-icon .icon {
-  position: absolute;
-  left: 10px; /* Adjusted position to stay inside the box */
-  color: #999999;
-  transition: color 0.3s ease;
-  pointer-events: none; /* Prevent icon from blocking input clicks */
-}
-
-.dark-theme .input-icon input {
-  padding-left: 40px; /* Add padding to prevent text overlap with icon */
-}
-
-/* Balloon Styles */
-.balloon {
-  position: absolute;
-  top: 20%; /* Default position */
-  left: 10%; /* Default position */
-  width: 100px; /* Default size */
-  height: auto;
-  animation: float 4s ease-in-out infinite;
-  display: block; /* Ensure it's always visible */
-}
-
-.log_in {
-  margin: 20px auto; /* Center horizontally */
-  width: 100%; /* Full width for smaller screens */
-  max-width: 200px; /* Limit max width for better appearance */
-}
-
-.dark-theme .log_in {
-  margin: 20px auto; /* Center horizontally */
-  width: 100%; /* Full width for smaller screens */
-  max-width: 200px; /* Limit max width for better appearance */
-}
-
-
-
 /* Media Queries for Responsiveness */
-@media (max-width: 1162px) {
-  .balloon {
-    left: 1%; /* Adjusted position for smaller screens */
-    width: 90px; /* Slightly smaller size */
-  }
-}
-
-@media (max-width: 992px) {
-  .balloon {
-    left: -1%; /* Adjusted position for smaller tablets */
-    width: 70px; /* Even smaller size */
-  }
-}
-
-@media (max-width: 825px) {
-  .balloon {
-    top: 8%; /* Adjusted position for smaller tablets */
-    left: 8%; /* Adjusted position for smaller tablets */
-    width: 70px; /* Even smaller size */
-  }
-
-  .dark-theme .balloon {
-    position: fixed;
-    z-index: 9999; /* Set a high z-index to ensure it's on top */
-  }
-}
-
 @media (max-width: 768px) {
-  form,
-  .dark-theme form {
-    width: 90%; /* Make form width responsive */
-    margin-top: 140px; /* Adjusted margin */
-    padding: 20px; /* Reduced padding */
+  .auth-specific-container form {
+    width: 90%;
+    margin-top: 140px;
+    padding: 20px;
   }
 
-  .form-row,
-  .dark-theme .form-row {
-    flex-direction: column; /* Stack form rows vertically */
-    gap: 15px; /* Reduced gap */
+  .auth-specific-container .form-row {
+    flex-direction: column;
+    gap: 15px;
   }
 
-  .form-group,
-  .dark-theme .form-group {
-    margin-right: 0; /* Remove margin for stacked layout */
+  .auth-specific-container .form-group {
+    margin-right: 0;
   }
 
-  .logo,
-  .dark-theme .logo {
-    margin-left: 0; /* Center logo */
+  .auth-specific-container .logo {
+    margin-left: 0;
     justify-content: center;
   }
 
-  button,
-  .dark-theme button {
-    margin-left: 0; /* Center button */
-    width: 100%; /* Full width for button */
+  .auth-specific-container button {
+    margin-left: 0;
+    width: 100%;
   }
 
-  .btn_loc,
-  .dark-theme .btn_loc {
-    margin-left: 0; /* Center location button */
-    width: 100%; /* Full width for button */
+  .auth-specific-container .btn_loc {
+    margin-left: 0;
+    width: 100%;
   }
 
-  .balloon {
-    top: 5%; /* Adjusted position for smaller tablets */
-    left: 5%; /* Adjusted position for smaller tablets */
-    width: 50px; /* Even smaller size */
-  }
-
-  .log_in {
-    margin: 20px auto; /* Center horizontally */
-    width: 100%; /* Full width for smaller screens */
-    max-width: 200px; /* Limit max width for better appearance */
-  }
-}
-
-@media (max-width: 576px) {
-  .balloon {
-    top: 6%; /* Adjusted position for mobile */
-    left: 3%; /* Adjusted position for mobile */
-    width: 40px; /* Smallest size for mobile */
+  .auth-specific-container .balloon {
+    top: 5%;
+    left: 5%;
+    width: 50px;
   }
 }
 
 @media (max-width: 480px) {
-  form,
-  .dark-theme form {
-    margin-top: 140px; /* Adjusted margin */ /* Further adjusted margin */
-    padding: 15px; /* Further reduced padding */
+  .auth-specific-container form {
+    margin-top: 140px;
+    padding: 15px;
   }
 
-  form h2,
-  .dark-theme form h2 {
-    font-size: 2em; /* Reduced font size */
+  .auth-specific-container form h2 {
+    font-size: 2em;
   }
 
-  input,
-  select,
-  .dark-theme input,
-  .dark-theme select {
-    font-size: 0.9em; /* Reduced font size */
+  .auth-specific-container input,
+  .auth-specific-container select {
+    font-size: 0.9em;
   }
 
-  .logo img,
-  .dark-theme .logo img {
-    width: 80px; /* Reduced logo size */
+  .auth-specific-container .logo img {
+    width: 80px;
     height: 80px;
     margin-top: 20px;
   }
 
-  .logo > a,
-  .dark-theme .logo > a {
-    font-size: 1.5em; /* Adjusted font size */
+  .auth-specific-container .btn_loc,
+  .auth-specific-container button {
+    font-size: 14px;
   }
 
-  .btn_loc,
-  button,
-  .dark-theme .btn_loc,
-  .dark-theme button {
-    font-size: 14px; /* Reduced font size */
-  }
-
-  .balloon {
-    width: 60px; /* Further reduced size */
-  }
-
-  .log_in {
-    margin: 20px auto; /* Center horizontally */
-    width: 100%; /* Full width for smaller screens */
-    max-width: 150px; /* Limit max width for better appearance */
+  .auth-specific-container .balloon {
+    width: 60px;
   }
 }

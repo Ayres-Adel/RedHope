@@ -1,21 +1,77 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faGlobe } from '@fortawesome/free-solid-svg-icons';
-import '../styles/NavBarStyle.css';
-import '../components/Map.jsx';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useLocation, Link, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUser,
+  faGlobe,
+  faSignOutAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import "../styles/NavBarStyle.css";
+import "../components/Map.jsx";
+import { useJumpToSection } from "./JumpPages.jsx";
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const isMapPage = location.pathname === '/map';
-  const isSignPage = location.pathname === '/sign';
-  const isLoginPage = location.pathname === '/login';
+  const isHomePage = location.pathname === "/";
+  const isMapPage = location.pathname === "/map";
+  const isSignPage = location.pathname === "/sign";
+  const isLoginPage = location.pathname === "/login";
+  const isUserPage = location.pathname === "/user";
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
+  const { jump, activeSection } = useJumpToSection(); // Use enhanced hook
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
-  const [activeSection, setActiveSection] = useState(isMapPage ? 'map' : 'home'); // Set initial active section
-  const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 }); // State to control the line's position and width
+  const [language, setLanguage] = useState(
+    localStorage.getItem("language") || "en"
+  );
+  const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
+
+  // Optimized event handler with useCallback to prevent re-creation on renders
+  const handleToggleChange = useCallback(() => {
+    const toggle = document.getElementById("toggle");
+    if (toggle) {
+      document.body.classList.toggle("dark-theme", toggle.checked);
+      localStorage.setItem("darkMode", toggle.checked);
+    }
+  }, []);
+
+  // Improved navigation function with useCallback
+  const handleNavigation = useCallback(
+    (section) => {
+      if (isHomePage) {
+        // If already on home page, just jump to section
+        jump(section);
+      } else {
+        // Navigate to home page with section parameter
+        navigate("/", { state: { scrollTo: section } });
+      }
+      setIsMenuOpen(false);
+    },
+    [isHomePage, jump, navigate]
+  );
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    navigate("/login");
+  };
+
+  // Update login state when token changes
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("token"));
+  }, [location.pathname]);
+
+  // Handle navigation when returning to home page with a section to scroll to
+  useEffect(() => {
+    if (isHomePage && location.state?.scrollTo) {
+      jump(location.state.scrollTo);
+      // Clean up state after handling
+      navigate("/", { replace: true, state: {} });
+    }
+  }, [isHomePage, location.state, jump, navigate]);
 
   // Refs for navigation links
   const homeRef = useRef(null);
@@ -25,211 +81,269 @@ export default function Navbar() {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const changeLanguage = () => {
-    const newLanguage = language === 'en' ? 'fr' : 'en';
-    setLanguage(newLanguage);
-    localStorage.setItem('language', newLanguage);
-  };
-
-  // Function to handle smooth scrolling and update the active section
-  const handleScroll = (id) => {
-    if (isMapPage || isSignPage || isLoginPage) {
-      navigate('/');
-      setTimeout(() => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    } else {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
+    // Toggle active class on hamburger for animation
+    const hamburgerElement = document.querySelector('.hamburger');
+    if (hamburgerElement) {
+      hamburgerElement.classList.toggle('active', !isMenuOpen);
     }
-    setActiveSection(id); // Update the active section
   };
+
+  // Update language change function to broadcast the change to all components
+  const changeLanguage = () => {
+    const newLanguage = language === "en" ? "fr" : "en";
+    setLanguage(newLanguage);
+    localStorage.setItem("language", newLanguage);
+    
+    // Dispatch custom event for components that might miss the localStorage change
+    document.dispatchEvent(
+      new CustomEvent('languageChanged', { 
+        detail: { language: newLanguage } 
+      })
+    );
+  };
+
+  // Replace interval with a more efficient language detection approach
+  useEffect(() => {
+    // Create a storage event listener instead of interval polling
+    const handleStorageChange = (e) => {
+      if (e.key === "language" && e.newValue !== language) {
+        setLanguage(e.newValue);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [language]);
+
+  // Optimized dark mode toggle with proper event cleanup
+  useEffect(() => {
+    const toggle = document.getElementById("toggle");
+    if (!toggle) return;
+
+    // Make sure toggle checkbox is visible and functional
+    toggle.style.display = "block";
+    
+    const savedMode = localStorage.getItem("darkMode");
+    if (savedMode === "true") {
+      document.body.classList.add("dark-theme");
+      toggle.checked = true;
+    } else {
+      document.body.classList.remove("dark-theme");
+      toggle.checked = false;
+    }
+
+    toggle.addEventListener("change", handleToggleChange);
+    return () => toggle.removeEventListener("change", handleToggleChange);
+  }, [handleToggleChange]);
 
   // Update the line position and width based on the active section
   useEffect(() => {
     const updateLinePosition = () => {
       let ref;
       switch (activeSection) {
-        case 'home':
+        case "home":
           ref = homeRef;
           break;
-        case 'services':
+        case "services":
           ref = servicesRef;
           break;
-        case 'about':
+        case "about":
           ref = aboutRef;
           break;
-        case 'map':
+        case "map":
           ref = mapRef;
           break;
         default:
-          ref = null;
+          // Set default to home if on home page with no active section
+          ref = isHomePage ? homeRef : null;
       }
 
       if (ref && ref.current) {
         const { offsetWidth, offsetLeft } = ref.current;
-        setLineStyle({ width: offsetWidth, left: offsetLeft });
+        // Add transition styling for smoother movement
+        setLineStyle({
+          width: offsetWidth,
+          left: offsetLeft,
+          transition: "all 0.3s ease",
+          opacity: 1
+        });
+      } else {
+        // Hide line if no active section
+        setLineStyle({ opacity: 0 });
       }
     };
 
     updateLinePosition();
-    window.addEventListener('resize', updateLinePosition); // Update on window resize
-    return () => window.removeEventListener('resize', updateLinePosition);
-  }, [activeSection]);
 
-  // Set active section to 'map' when on the map page
-  useEffect(() => {
-    if (isMapPage) {
-      setActiveSection('map');
-    }
-  }, [isMapPage]);
-
-  // Use IntersectionObserver to detect the active section (for home, services, about)
-  useEffect(() => {
-    const sections = ['home', 'services', 'about'];
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { threshold: 0.5 } // Adjust the threshold as needed
-    );
-
-    sections.forEach((sectionId) => {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        observer.observe(section);
-      }
-    });
-
-    // Cleanup observer
-    return () => observer.disconnect();
-  }, []);
-
-  // Dark mode toggle logic (unchanged)
-  useEffect(() => {
-    const toggle = document.getElementById('toggle');
-    const savedMode = localStorage.getItem('darkMode');
-
-    if (savedMode === 'true') {
-      document.body.classList.add('dark-theme');
-      toggle.checked = true;
-    } else {
-      document.body.classList.remove('dark-theme');
-      toggle.checked = false;
-    }
-
-    toggle.addEventListener('change', () => {
-      document.body.classList.toggle('dark-theme', toggle.checked);
-      localStorage.setItem('darkMode', toggle.checked);
-    });
-
-    return () => {
-      toggle.removeEventListener('change', () => {
-        document.body.classList.toggle('dark-theme', toggle.checked);
-        localStorage.setItem('darkMode', toggle.checked);
-      });
+    // Debounce resize handler for better performance
+    let timeoutId;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(updateLinePosition, 100);
     };
-  }, []);
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [activeSection, isHomePage]);
+
+  // Check if we're on the admin page to remove the duplicate navigation
+  const isAdminPage = window.location.pathname.includes("/admin");
 
   return (
     <header>
-      <nav>
+      <nav className={isMenuOpen ? 'expanded' : ''}>
         <div className="RedHope">
           <img src="./src/assets/images/RedHope_Logo.png" alt="RedHope Logo" />
-          <a href="/"><h1><span>Red</span>Hope</h1></a>
+          <a href="/">
+            <h1>
+              <span>Red</span>Hope
+            </h1>
+          </a>
         </div>
 
-        {/* Hamburger Menu */}
-        <div className="hamburger" onClick={toggleMenu}>
+        {/* Hamburger Menu - now with animation */}
+        <div
+          className="hamburger"
+          onClick={toggleMenu}
+          role="button"
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMenuOpen}
+          tabIndex="0"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") toggleMenu();
+          }}
+        >
           <div></div>
           <div></div>
           <div></div>
         </div>
 
         {/* Navigation Links */}
-        <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+        <div className={`nav-links ${isMenuOpen ? "active" : ""}`}>
           <div
             ref={homeRef}
-            className="HSA"
-            onClick={() => handleScroll('home')}
+            className={`HSA ${activeSection === "home" || (!activeSection && isHomePage) ? "active" : ""}`}
+            onClick={() => handleNavigation("home")}
           >
-            {language === 'en' ? 'Home' : 'Accueil'}
+            {language === "en" ? "Home" : "Accueil"}
           </div>
           <div
             ref={servicesRef}
-            className="HSA"
-            onClick={() => handleScroll('services')}
+            className={`HSA ${activeSection === "services" ? "active" : ""}`}
+            onClick={() => handleNavigation("services")}
           >
-            {language === 'en' ? 'Services' : 'Services'}
+            {language === "en" ? "Services" : "Services"}
           </div>
           <div
             ref={aboutRef}
-            className="HSA"
-            onClick={() => handleScroll('about')}
+            className={`HSA ${activeSection === "about" ? "active" : ""}`}
+            onClick={() => handleNavigation("about")}
           >
-            {language === 'en' ? 'About Us' : 'À Propos'}
+            {language === "en" ? "About Us" : "À Propos"}
           </div>
           <div
             ref={mapRef}
-            className="HSA"
+            className={`HSA ${isMapPage ? "active" : ""}`}
+            onClick={() => {
+              navigate("/map");
+              setIsMenuOpen(false);
+            }}
           >
-            <Link to="/map">{language === 'en' ? 'Map' : 'Carte'}</Link>
+            {language === "en" ? "Map" : "Carte"}
           </div>
 
-          {/* Dynamic Line */}
+          {/* Only show admin navigation in the main navbar if not on the admin page */}
+          {isLoggedIn && !isAdminPage && (
+            <div
+              className={`HSA ${activeSection === "admin" ? "active" : ""}`}
+              onClick={() => {
+                navigate("/admin");
+                setIsMenuOpen(false);
+              }}
+            >
+              {language === "en" ? "Admin Panel" : "Panneau d'Admin"}
+            </div>
+          )}
+
+          {/* Active line with smoother transitions */}
           <div
             className="active-line"
-            style={{
-              width: `${lineStyle.width}px`,
-              left: `${lineStyle.left}px`,
-            }}
+            style={lineStyle}
           />
         </div>
 
-        {/* Login Icon */}
-        <div className={`auth ${isMenuOpen ? 'active' : ''}`}>
-          <Link to="/login">
-            <FontAwesomeIcon icon={faUser} className="login-icon" />
-          </Link>
-        </div>
+        <div className={`nav-icons ${isMenuOpen ? "active" : ""}`}>
+          {/* Login/User Icon */}
+          <div className="auth">
+            {isLoggedIn || isUserPage ? (
+              <>
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="login-icon"
+                  onClick={() => navigate("/user")}
+                  title="User Profile"
+                />
+                <FontAwesomeIcon
+                  icon={faSignOutAlt}
+                  className="login-icon"
+                  onClick={handleLogout}
+                  title="Logout"
+                />
+              </>
+            ) : (
+              <Link to="/login">
+                <FontAwesomeIcon icon={faUser} className="login-icon" />
+              </Link>
+            )}
+          </div>
 
-        {/* Language Switcher Icon */}
-        <div className={`language-switcher ${isMenuOpen ? 'active' : ''}`}>
-          <FontAwesomeIcon
-            icon={faGlobe}
-            className="language-icon"
-            onClick={changeLanguage}
-            title={language === 'en' ? 'Switch to French' : 'Switch to English'}
-          />
-        </div>
+          {/* Language Switcher Icon */}
+          <div className="language-switcher">
+            <FontAwesomeIcon
+              icon={faGlobe}
+              className="language-icon"
+              onClick={changeLanguage}
+              title={
+                language === "en" ? "Switch to French" : "Switch to English"
+              }
+            />
+          </div>
 
-        {/* Dark Mode Toggle */}
-        <div className={`toggle-container ${isMenuOpen ? 'active' : ''}`}>
-          <input type="checkbox" id="toggle" />
-          <label htmlFor="toggle" className="display">
-            <div className="circle">
-              <svg className="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z" />
-              </svg>
-              <svg className="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clipRule="evenodd" />
-              </svg>
-            </div>
-          </label>
+          {/* Dark Mode Toggle */}
+          <div className="toggle-container">
+            <input type="checkbox" id="toggle" />
+            <label htmlFor="toggle" className="display">
+              <div className="circle">
+                <svg
+                  className="sun"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z" />
+                </svg>
+                <svg
+                  className="moon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            </label>
+          </div>
         </div>
       </nav>
-      <hr />
     </header>
   );
 }

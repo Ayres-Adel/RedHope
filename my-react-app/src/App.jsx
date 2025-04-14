@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import LandingPage from "./components/LandingPage.jsx";
 import ErrorHandling from "./components/ErrorHandling.jsx";
 import UserPage from "./components/UserPage.jsx";
+import AdminPage from "./components/AdminPage.jsx";
 import Sign from "./components/Sign.jsx";
 import Login from "./components/Login.jsx";
 import Search from "./components/Search.jsx";
@@ -34,13 +35,14 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/sign" element={<Sign />} />
-      <Route path="/aa" element={<UserPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="map"  element={<Map />}/>
+      <Route path="admin"  element={<AdminPage />}/>
 
       {/* Protect the /search route */}
       <Route element={<PrivateRoute />}>
         <Route path="/search" element={<Search />} />
+        <Route path="/user" element={<UserPage />} />
       </Route>
 
       <Route path="*" element={<ErrorHandling />} />

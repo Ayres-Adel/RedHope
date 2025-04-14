@@ -291,224 +291,226 @@ export default function Sign() {
     <>
       <Navbar />
       <FadeInSection>
-        <img src={floating} alt="Floating Balloon" className="balloon" />
-        <div className="auth-container">
-          <form onSubmit={handleSubmit} className="auth-form">
-            <div className='logo'>
-              <img src={redHopeLogo} alt="RedHope Logo" />
-              <a href="/">
-                <h1><span>Red</span>Hope</h1>
-              </a>
-            </div>
-            {errors.general && <div className="general error">{errors.general}</div>}
+        <div className="auth-specific-container">
+          <img src={floating} alt="Floating Balloon" className="balloon" />
+          <div className="auth-container">
+            <form onSubmit={handleSubmit} className="auth-form">
+              <div className='logo'>
+                <img src={redHopeLogo} alt="RedHope Logo" />
+                <a href="/">
+                  <h1><span>Red</span>Hope</h1>
+                </a>
+              </div>
+              {errors.general && <div className="general error">{errors.general}</div>}
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="username">
-                  {language === 'fr' ? "Nom d'utilisateur" : 'Username'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faUser} className="icon" />
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    placeholder={language === 'fr' ? 'Ex: Ayres123' : 'Ex: Ayres123'}
-                    required
-                  />
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="username">
+                    {language === 'fr' ? "Nom d'utilisateur" : 'Username'}
+                  </label>
+                  <div className="input-icon">
+                    <FontAwesomeIcon icon={faUser} className="icon" />
+                    <input
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      placeholder={language === 'fr' ? 'Ex: Ayres123' : 'Ex: Ayres123'}
+                      required
+                    />
+                  </div>
+                  {errors.username && <div className="username error">{errors.username}</div>}
                 </div>
-                {errors.username && <div className="username error">{errors.username}</div>}
+
+                <div className="form-group">
+                  <label htmlFor="email">
+                    {language === 'fr' ? 'Courriel' : 'Email'}
+                  </label>
+                  <div className="input-icon">
+                    <FontAwesomeIcon icon={faEnvelope} className="icon" />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="User@gmail.com"
+                      required
+                    />
+                  </div>
+                  {errors.email && <div className="email error">{errors.email}</div>}
+                </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="email">
-                  {language === 'fr' ? 'Courriel' : 'Email'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faEnvelope} className="icon" />
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="User@gmail.com"
-                    required
-                  />
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="dateOfBirth">
+                    {language === 'fr' ? 'Date de naissance' : 'Date of Birth'}
+                  </label>
+                  <div className="input-icon">
+                    <FontAwesomeIcon icon={faCalendarAlt} className="icon" />
+                    <input
+                      type="date"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  {errors.dateOfBirth && <div className="dateOfBirth error">{errors.dateOfBirth}</div>}
                 </div>
-                {errors.email && <div className="email error">{errors.email}</div>}
-              </div>
-            </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="dateOfBirth">
-                  {language === 'fr' ? 'Date de naissance' : 'Date of Birth'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faCalendarAlt} className="icon" />
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleChange}
-                    required
-                  />
+                <div className="form-group">
+                  <label htmlFor="password">
+                    {language === 'fr' ? 'Mot de passe' : 'Password'}
+                  </label>
+                  <div className="input-icon">
+                    <FontAwesomeIcon icon={faLock} className="icon" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="@123"
+                      required
+                    />
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEyeSlash : faEye}
+                      className="password-toggle-icon"
+                      onClick={() => setShowPassword(!showPassword)}
+                      role="button"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    />
+                  </div>
+                  {errors.password && <div className="password error">{errors.password}</div>}
                 </div>
-                {errors.dateOfBirth && <div className="dateOfBirth error">{errors.dateOfBirth}</div>}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password">
-                  {language === 'fr' ? 'Mot de passe' : 'Password'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faLock} className="icon" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="@123"
-                    required
-                  />
-                  <FontAwesomeIcon
-                    icon={showPassword ? faEyeSlash : faEye}
-                    className="password-toggle-icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                    role="button"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  />
-                </div>
-                {errors.password && <div className="password error">{errors.password}</div>}
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="bloodType">
-                  {language === 'fr' ? 'Groupe sanguin' : 'Blood Type'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faTint} className="icon" />
-                  <select name="bloodType" value={formData.bloodType} onChange={handleChange} required>
-                    <option value="">{language === 'fr' ? 'Sélectionnez votre groupe' : 'Select Blood Type'}</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                  </select>
-                </div>
-                {errors.bloodType && <div className="bloodType error">{errors.bloodType}</div>}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="gender">
-                  {language === 'fr' ? 'Sexe' : 'Gender'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faMars} className="icon" />
-                  <select name="gender" value={formData.gender} onChange={handleChange} required>
-                    <option value="">{language === 'fr' ? 'Sélectionnez votre sexe' : 'Select Gender'}</option>
-                    <option value="Male">{language === 'fr' ? 'Homme' : 'Male'}</option>
-                    <option value="Female">{language === 'fr' ? 'Femme' : 'Female'}</option>
-                  </select>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="bloodType">
+                    {language === 'fr' ? 'Groupe sanguin' : 'Blood Type'}
+                  </label>
+                  <div className="input-icon">
+                    <FontAwesomeIcon icon={faTint} className="icon" />
+                    <select name="bloodType" value={formData.bloodType} onChange={handleChange} required>
+                      <option value="">{language === 'fr' ? 'Sélectionnez votre groupe' : 'Select Blood Type'}</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                    </select>
+                  </div>
+                  {errors.bloodType && <div className="bloodType error">{errors.bloodType}</div>}
                 </div>
-                {errors.gender && <div className="gender error">{errors.gender}</div>}
-              </div>
-            </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="location">
-                  {language === 'fr' ? 'Localisation' : 'Location'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faMapMarkerAlt} className="icon" />
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.formattedLocation || formData.location}
-                    onChange={handleChange}
-                    placeholder={language === 'fr' ? 'Appuyez sur le bouton Obtenir la localisation' : 'Press GET LOCATION button'}
-                    required
-                    readOnly
-                  />
+                <div className="form-group">
+                  <label htmlFor="gender">
+                    {language === 'fr' ? 'Sexe' : 'Gender'}
+                  </label>
+                  <div className="input-icon">
+                    <FontAwesomeIcon icon={faMars} className="icon" />
+                    <select name="gender" value={formData.gender} onChange={handleChange} required>
+                      <option value="">{language === 'fr' ? 'Sélectionnez votre sexe' : 'Select Gender'}</option>
+                      <option value="Male">{language === 'fr' ? 'Homme' : 'Male'}</option>
+                      <option value="Female">{language === 'fr' ? 'Femme' : 'Female'}</option>
+                    </select>
+                  </div>
+                  {errors.gender && <div className="gender error">{errors.gender}</div>}
                 </div>
-                {errors.location && <div className="location error">{errors.location}</div>}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="phoneNumber">
-                  {language === 'fr' ? 'Numéro de téléphone' : 'Phone Number'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faPhone} className="icon" />
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    placeholder={language === 'fr' ? 'Entrez votre numéro de téléphone' : 'Enter your phone number'}
-                    required
-                  />
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="location">
+                    {language === 'fr' ? 'Localisation' : 'Location'}
+                  </label>
+                  <div className="input-icon">
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="icon" />
+                    <input
+                      type="text"
+                      name="location"
+                      value={formData.formattedLocation || formData.location}
+                      onChange={handleChange}
+                      placeholder={language === 'fr' ? 'Appuyez sur le bouton Obtenir la localisation' : 'Press GET LOCATION button'}
+                      required
+                      readOnly
+                    />
+                  </div>
+                  {errors.location && <div className="location error">{errors.location}</div>}
                 </div>
-                {errors.phoneNumber && <div className="phoneNumber error">{errors.phoneNumber}</div>}
+
+                <div className="form-group">
+                  <label htmlFor="phoneNumber">
+                    {language === 'fr' ? 'Numéro de téléphone' : 'Phone Number'}
+                  </label>
+                  <div className="input-icon">
+                    <FontAwesomeIcon icon={faPhone} className="icon" />
+                    <input
+                      type="tel"
+                      name="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={handleChange}
+                      placeholder={language === 'fr' ? 'Entrez votre numéro de téléphone' : 'Enter your phone number'}
+                      required
+                    />
+                  </div>
+                  {errors.phoneNumber && <div className="phoneNumber error">{errors.phoneNumber}</div>}
+                </div>
               </div>
-            </div>
 
-            <div className="form-row">
-              <button className='btn_loc' type="button" onClick={getLocation}>
-                {language === 'fr' ? 'Obtenir la localisation' : 'Get Location'}
-              </button>
-              <button type="submit" ref={signButton} disabled={!isButtonEnabled}>
-                {language === 'fr' ? 'Inscrivez-vous' : 'Sign Up'}
-              </button>
-            </div>
+              <div className="form-row">
+                <button className='btn_loc' type="button" onClick={getLocation}>
+                  {language === 'fr' ? 'Obtenir la localisation' : 'Get Location'}
+                </button>
+                <button type="submit" ref={signButton} disabled={!isButtonEnabled}>
+                  {language === 'fr' ? 'Inscrivez-vous' : 'Sign Up'}
+                </button>
+              </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    {language === 'fr'
+                      ? 'Souhaitez-vous être donneur ?'
+                      : 'Do you want to be a donor?'}
+                  </label>
+                  <div className="input-icon">
+                    <input
+                      type="radio"
+                      name="isDonor"
+                      value="yes"
+                      checked={formData.isDonor === 'yes'}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="isDonorYes">{language === 'fr' ? 'Oui' : 'Yes'}</label>
+
+                    <input
+                      type="radio"
+                      name="isDonor"
+                      value="no"
+                      checked={formData.isDonor === 'no'}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="isDonorNo">{language === 'fr' ? 'Non' : 'No'}</label>
+                  </div>
+                  {errors.isDonor && <div className="isDonor error">{errors.isDonor}</div>}
+                </div>
+              </div>
+
+              <div className="auth-links">
+                <p>
                   {language === 'fr'
-                    ? 'Souhaitez-vous être donneur ?'
-                    : 'Do you want to be a donor?'}
-                </label>
-                <div className="input-icon">
-                  <input
-                    type="radio"
-                    name="isDonor"
-                    value="yes"
-                    checked={formData.isDonor === 'yes'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="isDonorYes">{language === 'fr' ? 'Oui' : 'Yes'}</label>
-
-                  <input
-                    type="radio"
-                    name="isDonor"
-                    value="no"
-                    checked={formData.isDonor === 'no'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="isDonorNo">{language === 'fr' ? 'Non' : 'No'}</label>
-                </div>
-                {errors.isDonor && <div className="isDonor error">{errors.isDonor}</div>}
+                    ? 'Vous avez déjà un compte ? '
+                    : 'Already have an account? '}
+                  <Link to="/login">{language === 'fr' ? 'Connectez-vous' : 'Log In'}</Link>
+                </p>
               </div>
-            </div>
-
-            <div className="auth-links">
-              <p>
-                {language === 'fr'
-                  ? 'Vous avez déjà un compte ? '
-                  : 'Already have an account? '}
-                <Link to="/login">{language === 'fr' ? 'Connectez-vous' : 'Log In'}</Link>
-              </p>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </FadeInSection>
     </>

@@ -802,3 +802,114 @@
 .password-toggle:hover {
   color: rgb(255, 71, 71);
 }
+
+/* Dark Theme Styles */
+.dark-theme .user-page {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+.dark-theme .settings-card,
+.dark-theme .settings-header,
+.dark-theme .settings-section,
+.dark-theme .info-item,
+.dark-theme .password-form,
+.dark-theme .password-form .form-item,
+.dark-theme .danger-zone,
+.dark-theme .modal {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border-color: #333;
+}
+
+.dark-theme .settings-header,
+.dark-theme .settings-section {
+  border-color: #333;
+}
+
+.dark-theme .info-item label,
+.dark-theme .section-header h2,
+.dark-theme .settings-header h1,
+.dark-theme .modal h3 {
+  color: #f5f5f5;
+}
+
+.dark-theme .info-item p {
+  color: #e0e0e0;
+}
+
+.dark-theme .form-item input,
+.dark-theme .password-field input,
+.dark-theme .modal input {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-theme .form-item input:focus,
+.dark-theme .password-field input:focus,
+.dark-theme .modal input:focus {
+  border-color: #ff4747;
+  background-color: #333;
+}
+
+.dark-theme .button-outline {
+  color: #ff4747;
+  border-color: #ff4747;
+}
+
+.dark-theme .button-outline:hover {
+  background-color: #ff4747;
+  color: white;
+}
+
+.dark-theme .danger-zone {
+  background-color: #2a1a1a;
+  border-color: #3a2a2a;
+}
+
+.dark-theme .password-toggle {
+  color: #ff4747;
+}
+
+.dark-theme .password-toggle:hover {
+  color: #ff6b6b;
+}
+
+.dark-theme .dark-mode-toggle {
+  color: #ffcc00;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.dark-theme .dark-mode-toggle:hover {
+  color: #ffdd33;
+}
+
+/* Dark theme for toasts */
+.dark-theme .toast-container .toast {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-theme .toast-container .toast.success {
+  background-color: #1a2e1a;
+  border-color: #2a4a2a;
+}
+
+.dark-theme .toast-container .toast.error {
+  background-color: #2e1a1a;
+  border-color: #4a2a2a;
+}
+
+/* Dark theme for modal overlay */
+.dark-theme .modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Dark theme for loading spinner */
+.dark-theme .loading-spinner {
+  color: #e0e0e0;
+}

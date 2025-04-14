@@ -1,12 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
 import '../styles/Search.css';
+import Navbar from './Navbar';
+
 
 export default function Search() {
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
   const [buttonClicked, setButtonClicked] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const [donors, setDonors] = useState([]);
@@ -15,11 +19,110 @@ export default function Search() {
     bloodType: '',
     gender: '',
   });
+  const isMapPage = location.pathname === '/map';
+  const isSignPage = location.pathname === '/sign';
+  const isLoginPage = location.pathname === '/login';
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [selectedDonor, setSelectedDonor] = useState(null);
   const mapContainerRef = useRef(null); // Ref for the map container
+  const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 }); // State to control the line's position and width
+  const [activeSection, setActiveSection] = useState(isMapPage ? 'map' : 'home'); // Set initial active section
+
+    // Refs for navigation links
+    const homeRef = useRef(null);
+    const servicesRef = useRef(null);
+    const aboutRef = useRef(null);
+    const mapRef = useRef(null);
+
+    // Function to handle smooth scrolling and update the active section
+    const handleScroll = (id) => {
+      // First navigate to home page if not already there
+      if (location.pathname !== '/') {
+        navigate('/');
+        
+        // Wait for navigation to complete before scrolling
+        setTimeout(() => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100); // Small delay to allow page transition
+      } else {
+        // If already on home page, just scroll
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+      
+      setActiveSection(id);
+    };
+    
+      // Update the line position and width based on the active section
+      useEffect(() => {
+        const updateLinePosition = () => {
+          let ref;
+          switch (activeSection) {
+            case 'home':
+              ref = homeRef;
+              break;
+            case 'services':
+              ref = servicesRef;
+              break;
+            case 'about':
+              ref = aboutRef;
+              break;
+            case 'map':
+              ref = mapRef;
+              break;
+            default:
+              ref = null;
+          }
+    
+          if (ref && ref.current) {
+            const { offsetWidth, offsetLeft } = ref.current;
+            setLineStyle({ width: offsetWidth, left: offsetLeft });
+          }
+        };
+    
+        updateLinePosition();
+        window.addEventListener('resize', updateLinePosition); // Update on window resize
+        return () => window.removeEventListener('resize', updateLinePosition);
+      }, [activeSection]);
+    
+      // Set active section to 'map' when on the map page
+      useEffect(() => {
+        if (isMapPage) {
+          setActiveSection('map');
+        }
+      }, [isMapPage]);
+    
+      // Use IntersectionObserver to detect the active section (for home, services, about)
+      useEffect(() => {
+        const sections = ['home', 'services', 'about'];
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setActiveSection(entry.target.id);
+              }
+            });
+          },
+          { threshold: 0.5 } // Adjust the threshold as needed
+        );
+    
+        sections.forEach((sectionId) => {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            observer.observe(section);
+          }
+        });
+    
+        // Cleanup observer
+        return () => observer.disconnect();
+      }, []);
 
   // Function to handle filter changes
   const handleFilterChange = (e) => {
@@ -247,62 +350,7 @@ export default function Search() {
 
   return (
     <>
-      {/* Section nav bar*/}
-      <header>
-        <nav>
-          <div className="RedHope">
-            <img src="/src/assets/images/RedHope_Logo.png" alt="RedHope Logo" />
-            <a href="/">
-              <h1>
-                <span>Red</span>Hope
-              </h1>
-            </a>
-          </div>
-
-          {/* Hamburger Menu */}
-          <div className="hamburger" onClick={toggleMenu}>
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-
-          <div className={`User ${isMenuOpen ? 'active' : ''}`}>
-            <a href="">
-              <div className={`User_Profile ${isMenuOpen ? 'active' : ''}`}>{message}</div>
-            </a>
-            <a href="/">
-              <div className="User-Profile" onClick={logout}>
-                <FontAwesomeIcon icon={faSignOutAlt} className="login-icon" />
-              </div>
-            </a>
-          </div>
-
-          <div className="theme_change">
-            <div className={`toggle-container ${isMenuOpen ? 'active' : ''}`}>
-              <input type="checkbox" id="toggle" />
-              <label htmlFor="toggle" className="display">
-                <div className="circle">
-                  <svg className="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z" />
-                  </svg>
-                  <svg className="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div className={`language-switcher ${isMenuOpen ? 'active' : ''}`}>
-            <FontAwesomeIcon
-              icon={faGlobe}
-              className="language-icon"
-              onClick={() => changeLanguage(language === 'en' ? 'fr' : 'en')}
-              title={language === 'en' ? 'Switch to French' : 'Switch to English'}
-            />
-          </div>
-        </nav>
-      </header>
+      <Navbar />
 
       {/* Section lean more*/}
       <div className="Lean-More" ref={mapContainerRef}>

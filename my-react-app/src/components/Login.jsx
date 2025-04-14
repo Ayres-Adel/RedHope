@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import floating from '../assets/images/balloon.svg';
 
-
 // Import images
 import redHopeLogo from '../assets/images/RedHope_Logo.png';
 import Navbar from './Navbar.jsx';
@@ -148,87 +147,88 @@ export default function Login() {
       console.error('Error:', error);
     }
   };
-  
+
   return (
     <>
-      {/* Include the ScrollProgress component if desired */}
-      <ScrollProgress />
       <Navbar />
-      {/* Optionally wrap the form with FadeInSection for animation */}
-      <FadeInSection>
-      <img src={floating} alt="Floating Balloon" className="balloon" />
-        <div className="auth-container">
-          <form onSubmit={handleSubmit} className="auth-form">
-            <div className="logo">
-              <img src={redHopeLogo} alt="RedHope Logo" />
-              <a href="/">
-                <h1><span>Red</span>Hope</h1>
-              </a>
-            </div>
-            {errors.general && <div className="general error">{errors.general}</div>}
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="email">
-                  {language === 'fr' ? 'Courriel' : 'Email'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faUser} className="icon" />
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="IrishCat122@gmail.com"
-                    required
-                  />
+      <div className="auth-specific-container">
+        <FadeInSection>
+          <div className="login-page-container">
+            <img src={floating} alt="Floating Balloon" className="balloon" />
+            <div className="auth-container">
+              <form onSubmit={handleSubmit} className="auth-form">
+                <div className="logo">
+                  <img src={redHopeLogo} alt="RedHope Logo" />
+                  <a href="/">
+                    <h1><span>Red</span>Hope</h1>
+                  </a>
                 </div>
-                {errors.email && <div className="email error">{errors.email}</div>}
-              </div>
-            </div>
+                {errors.general && <div className="general error">{errors.general}</div>}
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="password">
-                  {language === 'fr' ? 'Mot de passe' : 'Password'}
-                </label>
-                <div className="input-icon">
-                  <FontAwesomeIcon icon={faLock} className="icon" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="@123"
-                    required
-                  />
-                  <FontAwesomeIcon
-                    icon={showPassword ? faEyeSlash : faEye}
-                    className="password-toggle-icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                    role="button"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  />
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="email">
+                      {language === 'fr' ? 'Courriel' : 'Email'}
+                    </label>
+                    <div className="input-icon">
+                      <FontAwesomeIcon icon={faUser} className="icon" />
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="IrishCat122@gmail.com"
+                        required
+                      />
+                    </div>
+                    {errors.email && <div className="email error">{errors.email}</div>}
+                  </div>
                 </div>
-                {errors.password && <div className="password error">{errors.password}</div>}
-              </div>
-            </div>
 
-            <button className="log_in" type="submit" ref={loginButton} disabled={!isButtonEnabled}>
-              {language === 'fr' ? 'Connexion' : 'Log In'}
-            </button>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="password">
+                      {language === 'fr' ? 'Mot de passe' : 'Password'}
+                    </label>
+                    <div className="input-icon">
+                      <FontAwesomeIcon icon={faLock} className="icon" />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="@123"
+                        required
+                      />
+                      <FontAwesomeIcon
+                        icon={showPassword ? faEyeSlash : faEye}
+                        className="password-toggle-icon"
+                        onClick={() => setShowPassword(!showPassword)}
+                        role="button"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      />
+                    </div>
+                    {errors.password && <div className="password error">{errors.password}</div>}
+                  </div>
+                </div>
 
-            <div className="auth-links">
-              <p>
-                {language === 'fr'
-                  ? "Vous n'avez pas de compte ? "
-                  : "Don't have an account? "}
-                <Link to="/sign">{language === 'fr' ? 'Inscrivez-vous' : 'Sign Up'}</Link>
-              </p>
+                <button className="log_in" type="submit" ref={loginButton} disabled={!isButtonEnabled}>
+                  {language === 'fr' ? 'Connexion' : 'Log In'}
+                </button>
+
+                <div className="auth-links">
+                  <p>
+                    {language === 'fr'
+                      ? "Vous n'avez pas de compte ? "
+                      : "Don't have an account? "}
+                    <Link to="/sign">{language === 'fr' ? 'Inscrivez-vous' : 'Sign Up'}</Link>
+                  </p>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
-      </FadeInSection>
+          </div>
+        </FadeInSection>
+      </div>
     </>
   );
 }
