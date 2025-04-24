@@ -176,49 +176,18 @@ try {
   console.error('Error registering Admin model:', err);
 }
 
-// Create a more robust database connection
-const connectDB = async () => {
-  try {
-    // Default to local MongoDB if MONGO_URI is not provided
-    const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/redhope';
-    
-    console.log('Attempting to connect to database...');
-    
-    const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000 // Timeout after 5s
-    };
-    
-    await mongoose.connect(mongoURI, options);
-    
-    console.log('✅ Connected to MongoDB');
-    
-    // Start server only after successful database connection
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error('❌ Database connection failed:', err.message);
-    
-    if (err.name === 'MongoServerSelectionError') {
-      console.error('Could not connect to MongoDB server. Please check:');
-      console.error('1. MongoDB is running');
-      console.error('2. Connection string is correct');
-      console.error('3. Network allows connection to MongoDB port');
-    }
-    
-    // Start server even if database connection fails
-    // This allows us to at least hit the health endpoint
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`⚠️ Server running on port ${PORT} (NO DATABASE CONNECTION)`);
-    });
-  }
-};
+const connectDB = require('./config/db');
 
-// Initialize connection
-connectDB();
+// Initialize connection and start server
+connectDB().then(connected => {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    if (connected) {
+      console.log(`✅ Server running on port ${PORT}`);
+    } else {
+      console.log(`⚠️ Server running on port ${PORT} (NO DATABASE CONNECTION)`);
+    }
+  });
+});
 
 module.exports = app; // Export for testing
