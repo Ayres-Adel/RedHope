@@ -1,7 +1,3 @@
-
-
-
-
 /* Filters Section */
 .filters {
   display: flex;
@@ -150,7 +146,7 @@
   font-size: 20px; /* Adjust size as needed */
   margin-top: 4px;
   position: relative;
-  left: 200px;
+  left: auto; /* Use auto instead to follow normal document flow */
   cursor: pointer;
   transition: color 0.3s ease, transform 0.3s ease;
 }
@@ -915,4 +911,4 @@ tbody tr:hover {
 
 
 
-  
+

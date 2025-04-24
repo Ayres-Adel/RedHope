@@ -34,6 +34,11 @@ export default function Navbar() {
     if (toggle) {
       document.body.classList.toggle("dark-theme", toggle.checked);
       localStorage.setItem("darkMode", toggle.checked);
+
+      // Update all icons to match theme
+      document.querySelectorAll('.login-icon, .language-icon').forEach(icon => {
+        icon.classList.toggle('dark-themed-icon', !document.body.classList.contains('dark-theme'));
+      });
     }
   }, []);
 
@@ -297,7 +302,11 @@ export default function Navbar() {
               </>
             ) : (
               <Link to="/login">
-                <FontAwesomeIcon icon={faUser} className="login-icon" />
+                <FontAwesomeIcon 
+                  icon={faUser} 
+                  className="login-icon" 
+                  title={language === "en" ? "Login" : "Connexion"}
+                />
               </Link>
             )}
           </div>
@@ -314,9 +323,18 @@ export default function Navbar() {
             />
           </div>
 
-          {/* Dark Mode Toggle */}
+          {/* Dark Mode Toggle with theme-aware styling */}
           <div className="toggle-container">
-            <input type="checkbox" id="toggle" />
+            <input 
+              type="checkbox" 
+              id="toggle" 
+              onChange={() => {
+                // Update all icons to match theme
+                document.querySelectorAll('.login-icon, .language-icon').forEach(icon => {
+                  icon.classList.toggle('dark-themed-icon', !document.body.classList.contains('dark-theme'));
+                });
+              }}
+            />
             <label htmlFor="toggle" className="display">
               <div className="circle">
                 <svg

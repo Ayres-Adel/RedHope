@@ -1,5 +1,5 @@
 import "../styles/map.css";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   APIProvider,
   Map,
@@ -7,10 +7,8 @@ import {
   InfoWindow,
 } from "@vis.gl/react-google-maps";
 import Navbar from "./Navbar";
-import BloodIcon from "../assets/images/blood-donation.png";
-import HospitalIcon from "../assets/images/hospital.png"; // Add hospital icon
+import HospitalIcon from "../assets/images/hospital.png";
 import CitySelector from "./CitiesSelect";
-import hospitalsData from "../assets/Hospitals.json";
 
 export default function MapComponent() {
   const mapStyle = {
@@ -18,12 +16,17 @@ export default function MapComponent() {
     height: "450px",
     borderRadius: "15px",
     margin: "20px auto",
+    position: "relative", // Add this to make absolute positioning work correctly
   };
 
   const defaultCenter = {
     lat: 36.16215909617758,
     lng: 1.330560770492638,
   };
+
+  const [hospitals, setHospitals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [open, setOpen] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null);
@@ -39,6 +42,65 @@ export default function MapComponent() {
   const searchInputRef = useRef(null);
   const mapRef = useRef(null);
 
+  // Add a state to track dark theme
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.body.classList.contains("dark-theme")
+  );
+
+  useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch("http://localhost:3000/api/hospitals");
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Check if we're in dark mode to apply theme-specific processing if needed
+        const isDarkMode = document.body.classList.contains("dark-theme");
+
+        setHospitals(data);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching hospitals:", err);
+        setError(err.message);
+        setIsLoading(false);
+      }
+    };
+
+    fetchHospitals();
+
+    // Listen for theme changes to update UI accordingly
+    const handleThemeChange = () => {
+      // Force re-render when theme changes
+      setShowSearch(showSearch);
+    };
+
+    window.addEventListener("themeChange", handleThemeChange);
+
+    return () => {
+      window.removeEventListener("themeChange", handleThemeChange);
+    };
+  }, []);
+
+  // Update dark mode state when it changes
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          setIsDarkMode(document.body.classList.contains("dark-theme"));
+        }
+      });
+    });
+
+    observer.observe(document.body, { attributes: true });
+
+    return () => observer.disconnect();
+  }, []);
+
   const searchIconStyle = {
     display: "flex",
     alignItems: "center",
@@ -53,16 +115,18 @@ export default function MapComponent() {
 
   const searchContainerStyle = {
     position: "absolute",
-    top: "-10px",
-    left: "-180px",
+    top: "10px",
+    left: "10px",
     zIndex: 1000,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "white",
+    background: isDarkMode ? "#333" : "white",
     borderRadius: showSearch ? "25px" : "50%",
     padding: showSearch ? "10px 15px" : "12px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+    boxShadow: isDarkMode
+      ? "0 2px 6px rgba(0,0,0,0.3)"
+      : "0 2px 6px rgba(0,0,0,0.1)",
     width: showSearch ? "300px" : "45px",
     height: showSearch ? "45px" : "45px",
     transition: "all 0.3s ease",
@@ -77,6 +141,7 @@ export default function MapComponent() {
     fontSize: "14px",
     opacity: showSearch ? 1 : 0,
     transition: "opacity 0.2s ease 0.2s",
+    color: isDarkMode ? "#f0f0f0" : "#333",
   };
 
   const suggestionsStyle = {
@@ -84,9 +149,11 @@ export default function MapComponent() {
     top: "calc(100% + 5px)",
     left: 0,
     width: "100%",
-    background: "white",
+    background: isDarkMode ? "#333" : "white",
     borderRadius: "8px",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+    boxShadow: isDarkMode
+      ? "0 4px 8px rgba(0,0,0,0.3)"
+      : "0 4px 8px rgba(0,0,0,0.1)",
     zIndex: 1001,
     maxHeight: "200px",
     overflowY: "auto",
@@ -96,14 +163,15 @@ export default function MapComponent() {
     padding: "10px 15px",
     cursor: "pointer",
     transition: "background-color 0.2s ease",
+    backgroundColor: isDarkMode ? "#333" : "white",
     "&:hover": {
-      backgroundColor: "#f5f5f5",
+      backgroundColor: isDarkMode ? "#444" : "#f5f5f5",
     },
   };
 
   const suggestionItemHoverStyle = {
     ...suggestionItemStyle,
-    backgroundColor: "#fff0f0",
+    backgroundColor: isDarkMode ? "#444" : "#fff0f0",
     transform: "translateX(5px)",
     borderLeft: "3px solid #ff4747",
   };
@@ -124,7 +192,7 @@ export default function MapComponent() {
   const handleSearch = (value) => {
     setSearchTerm(value);
     if (value.length > 0) {
-      const filtered = hospitalsData.hospitals
+      const filtered = hospitals
         .filter(
           (hospital) =>
             hospital.name.toLowerCase().includes(value.toLowerCase()) ||
@@ -142,11 +210,16 @@ export default function MapComponent() {
   const handleSuggestionClick = (hospital) => {
     setIsControlled(false);
     setMapCenter({
-      lat: Number(hospital.latitude),
-      lng: Number(hospital.longitude),
+      lat: Number(hospital.location.coordinates[1]),
+      lng: Number(hospital.location.coordinates[0]),
     });
 
-    setSelectedMarker({ ...hospital, type: "hospital" });
+    setSelectedMarker({
+      ...hospital,
+      latitude: hospital.location.coordinates[1],
+      longitude: hospital.location.coordinates[0],
+      type: "hospital",
+    });
     setOpen(true);
     handleCloseSearch();
   };
@@ -157,62 +230,22 @@ export default function MapComponent() {
     setSearchTerm("");
   };
 
-  const bloodDonationCenters = [
-    {
-      name: "المركز الولائي للدم بالشلف",
-      lat: 36.16215909617758,
-      lng: 1.330560770492638,
-    },
-    {
-      name: "Centre De Sang De Wilaya De Tipaza",
-      lat: 36.58741763731009,
-      lng: 2.438952555242627,
-    },
-    {
-      name: "المركز الولائي للدم بومرداس",
-      lat: 36.7545339057727,
-      lng: 3.4415622171743987,
-    },
-  ];
-
   const renderMarkers = () => {
     return (
       <>
-        {/* Blood Donation Centers Markers */}
-        {bloodDonationCenters.map((center, index) => (
-          <AdvancedMarker
-            key={`blood-${index}`}
-            position={{ lat: center.lat, lng: center.lng }}
-            title={center.name}
-            onClick={() => {
-              setSelectedMarker({
-                ...center,
-                type: "blood",
-              });
-              setOpen(true);
-
-            }}
-          >
-            <img
-              src={BloodIcon}
-              alt={center.name}
-              style={{ width: "30px", height: "30px" }}
-            />
-          </AdvancedMarker>
-        ))}
-
-        {/* Hospitals Markers */}
-        {hospitalsData.hospitals.map((hospital, index) => (
+        {hospitals.map((hospital, index) => (
           <AdvancedMarker
             key={`hospital-${index}`}
             position={{
-              lat: hospital.latitude,
-              lng: hospital.longitude,
+              lat: hospital.location.coordinates[1],
+              lng: hospital.location.coordinates[0],
             }}
             title={hospital.name}
             onClick={() => {
               setSelectedMarker({
                 ...hospital,
+                latitude: hospital.location.coordinates[1],
+                longitude: hospital.location.coordinates[0],
                 type: "hospital",
               });
               setOpen(true);
@@ -229,200 +262,261 @@ export default function MapComponent() {
     );
   };
 
+  if (isLoading) {
+    return (
+      <>
+        <Navbar />
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          <div
+            className="loading-spinner"
+            style={{
+              border: "4px solid #f3f3f3",
+              borderTop: "4px solid #ff4747",
+              borderRadius: "50%",
+              width: "40px",
+              height: "40px",
+              animation: "spin 1s linear infinite",
+              margin: "20px auto",
+            }}
+          ></div>
+          <p>Loading hospitals data...</p>
+        </div>
+        <style jsx>{`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          <h2>Error loading hospitals</h2>
+          <p>{error}</p>
+          <p>Please try again later</p>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
-      <CitySelector onLocationChange={handleLocationChange} />
-      <APIProvider apiKey="AIzaSyAeTAUxWY5luBGsf-F6-vP8eDLqgjzmACg">
-        <div style={mapStyle}>
-          <Map
-            ref={mapRef}
-            mapId={"7e663c504dc4b013"}
-            defaultCenter={mapCenter}
-            center={isControlled ? controlledCenter : undefined}
-            defaultZoom={12}
-            onClick={handleCloseSearch}
-            onDragStart={() => {
-              setIsControlled(false);
-              handleCloseSearch();
-            }}
-            onDrag={() => {
-              setIsControlled(false);
-              handleCloseSearch();
-            }}
-            options={{
-              gestureHandling: "cooperative",
-            }}
-          >
-            <button
-              style={{
-                ...searchContainerStyle,
-                appearance: "none",
-                border: "none",
-                outline: "none",
+      <div className="map-container">
+        <h2 className={isDarkMode ? "dark-mode-text" : ""}>
+          Find Hospitals and Blood Centers
+        </h2>
+        <CitySelector onLocationChange={handleLocationChange} />
+        <APIProvider apiKey="AIzaSyAeTAUxWY5luBGsf-F6-vP8eDLqgjzmACg">
+          <div style={mapStyle}>
+            <Map
+              ref={mapRef}
+              mapId={isDarkMode ? "8f51571e39b5d5e" : "7e663c504dc4b013"} // Use dark map style in dark mode
+              defaultCenter={mapCenter}
+              center={isControlled ? controlledCenter : undefined}
+              defaultZoom={12}
+              onClick={handleCloseSearch}
+              onDragStart={() => {
+                setIsControlled(false);
+                handleCloseSearch();
               }}
-              onClick={() => {
-                if (!showSearch) {
-                  setShowSearch(true);
-                  setTimeout(() => searchInputRef.current?.focus(), 300);
-                  setOpen(false);
-                  setSelectedMarker(null);
-                }
+              onDrag={() => {
+                setIsControlled(false);
+                handleCloseSearch();
               }}
-              aria-label="Search hospitals"
+              options={{
+                gestureHandling: "cooperative",
+              }}
             >
-              {showSearch ? (
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search hospitals..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  style={{
-                    border: "none",
-                    outline: "none",
-                    width: "100%",
-                    background: "transparent",
-                  }}
-                />
-              ) : (
-                <svg viewBox="0 0 20 20" width="22" height="22" fill="none">
-                  <path
-                    d="M9 16C12.866 16 16 12.866 16 9C16 5.13401 12.866 2 9 2C5.13401 2 2 5.13401 2 9C2 12.866 5.13401 16 9 16Z"
-                    stroke="#ff4747"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
+              <button
+                style={{
+                  ...searchContainerStyle,
+                  appearance: "none",
+                  border: "none",
+                  outline: "none",
+                }}
+                onClick={() => {
+                  if (!showSearch) {
+                    setShowSearch(true);
+                    setTimeout(() => searchInputRef.current?.focus(), 300);
+                    setOpen(false);
+                    setSelectedMarker(null);
+                  }
+                }}
+                aria-label="Search hospitals"
+              >
+                {showSearch ? (
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search hospitals..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      width: "100%",
+                      background: "transparent",
+                      color: isDarkMode ? "#f0f0f0" : "#333",
+                    }}
                   />
-                  <path
-                    d="M18 18L14 14"
-                    stroke="#ff4747"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              )}
-              {showSuggestions && suggestions.length > 0 && (
-                <div
-                  className="suggestions-container"
-                  style={{
-                    position: "absolute",
-                    top: "calc(100% + 8px)",
-                    left: 0,
-                    width: "100%",
-                    background: "white",
-                    borderRadius: "10px",
-                    boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
-                    zIndex: 1001,
-                    maxHeight: "180px",
-                    overflowY: "auto",
-                    overflowX: "hidden",
-                    padding: "4px 0",
-                    border: "1px solid rgba(0,0,0,0.06)",
+                ) : (
+                  <svg viewBox="0 0 20 20" width="22" height="22" fill="none">
+                    <path
+                      d="M9 16C12.866 16 16 12.866 16 9C16 5.13401 12.866 2 9 2C5.13401 2 2 5.13401 2 9C2 12.866 5.13401 16 9 16Z"
+                      stroke="#ff4747"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M18 18L14 14"
+                      stroke="#ff4747"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                )}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div
+                    className="suggestions-container"
+                    style={{
+                      position: "absolute",
+                      top: "calc(100% + 8px)",
+                      left: 0,
+                      width: "100%",
+                      background: isDarkMode ? "#333" : "white",
+                      borderRadius: "10px",
+                      boxShadow: isDarkMode
+                        ? "0 6px 16px rgba(0,0,0,0.3)"
+                        : "0 6px 16px rgba(0,0,0,0.08)",
+                      zIndex: 1001,
+                      maxHeight: "180px",
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      padding: "4px 0",
+                      border: isDarkMode
+                        ? "1px solid rgba(255,255,255,0.1)"
+                        : "1px solid rgba(0,0,0,0.06)",
+                    }}
+                  >
+                    {suggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          padding: "8px 10px",
+                          cursor: "pointer",
+                          backgroundColor: isDarkMode ? "#333" : "white",
+                          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          textAlign: "left",
+                          borderLeft: "2px solid transparent",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = isDarkMode
+                            ? "#444"
+                            : "#ff474715";
+                          e.currentTarget.style.transform = "translateX(4px)";
+                          e.currentTarget.style.borderLeft =
+                            "2px solid #ff4747";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = isDarkMode
+                            ? "#333"
+                            : "white";
+                          e.currentTarget.style.transform = "translateX(0)";
+                          e.currentTarget.style.borderLeft =
+                            "2px solid transparent";
+                        }}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <path
+                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+                            stroke="#ff4747"
+                            strokeWidth="1.5"
+                            fill="#ff474710"
+                          />
+                        </svg>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "2px",
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              color: isDarkMode ? "#f0f0f0" : "#2c3e50",
+                            }}
+                          >
+                            {suggestion.name}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              color: isDarkMode ? "#ccc" : "#666",
+                              fontWeight: "400",
+                            }}
+                          >
+                            {suggestion.wilaya}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </button>
+              {renderMarkers()}
+              {open && selectedMarker && (
+                <InfoWindow
+                  position={
+                    selectedMarker.type === "blood"
+                      ? { lat: selectedMarker.lat, lng: selectedMarker.lng }
+                      : {
+                          lat: selectedMarker.latitude,
+                          lng: selectedMarker.longitude,
+                        }
+                  }
+                  onCloseClick={() => {
+                    setOpen(false);
+                    setSelectedMarker(null);
                   }}
                 >
-                  {suggestions.map((suggestion, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        padding: "8px 10px",
-                        cursor: "pointer",
-                        backgroundColor: "white",
-                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        textAlign: "left",
-                        borderLeft: "2px solid transparent",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#ff474715";
-                        e.currentTarget.style.transform = "translateX(4px)";
-                        e.currentTarget.style.borderLeft = "2px solid #ff4747";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "white";
-                        e.currentTarget.style.transform = "translateX(0)";
-                        e.currentTarget.style.borderLeft =
-                          "2px solid transparent";
-                      }}
-                      onClick={() => handleSuggestionClick(suggestion)}
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <path
-                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                          stroke="#ff4747"
-                          strokeWidth="1.5"
-                          fill="#ff474710"
-                        />
-                      </svg>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "2px",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: "13px",
-                            fontWeight: "500",
-                            color: "#2c3e50",
-                          }}
-                        >
-                          {suggestion.name}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: "11px",
-                            color: "#666",
-                            fontWeight: "400",
-                          }}
-                        >
-                          {suggestion.wilaya}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                  <div style={{ color: "#333" }}>
+                    <h3>{selectedMarker.name}</h3>
+                    {selectedMarker.type === "hospital" && (
+                      <>
+                        <p>Structure: {selectedMarker.structure}</p>
+                        <p>Phone: {selectedMarker.telephone}</p>
+                        <p>Fax: {selectedMarker.fax}</p>
+                        <p>Wilaya: {selectedMarker.wilaya}</p>
+                      </>
+                    )}
+                  </div>
+                </InfoWindow>
               )}
-            </button>
-            {renderMarkers()}
-            {open && selectedMarker && (
-              <InfoWindow
-                position={
-                  selectedMarker.type === "blood"
-                    ? { lat: selectedMarker.lat, lng: selectedMarker.lng }
-                    : {
-                        lat: selectedMarker.latitude,
-                        lng: selectedMarker.longitude,
-                      }
-                }
-                onCloseClick={() => {
-                  setOpen(false);
-                  setSelectedMarker(null);
-                }}
-              >
-                <div>
-                  <h3>{selectedMarker.name}</h3>
-                  {selectedMarker.type === "hospital" && (
-                    <>
-                      <p>Structure: {selectedMarker.structure}</p>
-                      <p>Phone: {selectedMarker.telephone}</p>
-                      <p>Fax: {selectedMarker.fax}</p>
-                      <p>Wilaya: {selectedMarker.wilaya}</p>
-                    </>
-                  )}
-                </div>
-              </InfoWindow>
-            )}
-          </Map>
-        </div>
-      </APIProvider>
+            </Map>
+          </div>
+        </APIProvider>
+      </div>
     </>
   );
 }

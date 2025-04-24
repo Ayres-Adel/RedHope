@@ -44,20 +44,28 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 40px;
-  backdrop-filter: blur(10px); /* Apply blur effect */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 2s forwards;
-  z-index: 1000; /* Ensure it's above other content */
-  height: 70px; /* Slightly reduced height */
+  padding: 0 40px;
+  backdrop-filter: blur(10px); /* Enhanced blur effect */
+  -webkit-backdrop-filter: blur(10px); /* For Safari */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Softer shadow */
+  animation: fadeIn 1s forwards;
+  z-index: 1000;
+  height: 70px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04); /* Subtle border */
+  transition: all 0.3s ease;
 }
 
 .RedHope img {
-  width: 80px;
-  height: 80px;
+  width: 75px;
+  height: 75px;
   margin-top: -8px;
   position: relative;
   top: 6px;
+  transition: transform 0.3s ease;
+}
+
+.RedHope img:hover {
+  transform: scale(1.05);
 }
 
 .RedHope {
@@ -88,6 +96,45 @@ nav {
 
 .dark-theme .Sign-up:hover {
   color: rgb(77, 50, 50);
+}
+
+/* Dark theme styles for icons */
+.dark-theme .login-icon,
+.dark-theme .language-icon {
+  color: #e0e0e0; /* Light color for dark mode */
+  transition: all 0.3s ease;
+  font-size: 20px; /* Standardized icon size */
+  cursor: pointer;
+  position: static;
+  display: flex; /* Ensure icon is properly displayed */
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+}
+
+/* Hover effect for icons in dark theme */
+.dark-theme .login-icon:hover,
+.dark-theme .language-icon:hover {
+  color: #ff4747; /* Keep the red accent color on hover */
+  transform: scale(1.2) rotate(5deg);
+  text-shadow: 0 0 10px rgba(255, 71, 71, 0.5); /* Glow effect in dark mode */
+}
+
+/* Make sure the nav-icons container is properly themed */
+.dark-theme .nav-icons {
+  background-color: transparent; /* Ensure transparent background */
+}
+
+/* Make toggle more visible in dark theme */
+.dark-theme .toggle-container {
+  opacity: 1;
+}
+
+/* Ensure all nav-icons elements are properly colored in dark theme */
+.dark-theme .nav-icons a,
+.dark-theme .nav-icons button,
+.dark-theme .nav-icons .auth {
+  color: #e0e0e0;
 }
 
 .RedHope > a {
@@ -138,7 +185,7 @@ hr {
 .nav-icons {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px; /* Increased gap for better spacing */
   margin-right: 0;
 }
 
@@ -153,6 +200,12 @@ hr {
   text-decoration: none;
   cursor: pointer;
   cursor: url("./RedSelectLinkHope.cur"), auto;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.HSA:hover {
+  color: #ff4747;
+  transform: translateY(-2px);
 }
 
 .HSA::after {
@@ -163,7 +216,7 @@ hr {
   height: 2px;
   background: linear-gradient(90deg, rgb(255, 182, 193), rgb(255, 0, 0), rgb(139, 0, 0));
   transform: translateX(-50%) scaleX(0);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, height 0.3s ease;
   width: 70%;
 }
 
@@ -175,36 +228,48 @@ hr {
 .Sign-up {
   font-weight: var(--Weights_02);
   color: var(--Primary_blue);
-  border: 3px solid var(--light-coral);
-  border-radius: 20px;
+  border: 2px solid #ff4747; /* More modern border */
+  border-radius: 25px; /* More rounded corners */
   display: inline-block;
-  padding: 10px 20px;
+  padding: 10px 24px;
   text-decoration: none;
-  transition: 0.5s;
+  transition: all 0.4s ease;
+  background-color: transparent; /* Initially transparent */
+  box-shadow: 0 0 0 rgba(255, 71, 71, 0); /* Initial shadow state */
 }
 
 .Sign-up:hover {
-  background-color: #f1c7c7;
+  background-color: rgba(255, 71, 71, 0.1);
+  box-shadow: 0 5px 15px rgba(255, 71, 71, 0.2);
+  transform: translateY(-2px);
+  color: #ff4747;
 }
 
 .Login {
   font-weight: var(--Weights_02);
-  color: var(--Primary_blue);
-  border: 3px solid var(--light-coral);
-  background-color: #f1c7c7;
-  border-radius: 20px;
+  color: white; /* White text for better contrast */
+  border: none; /* Remove border for cleaner look */
+  background-color: #ff4747; /* Solid background */
+  border-radius: 25px; /* More rounded corners */
   display: inline-block;
-  padding: 10px 27px;
+  padding: 12px 30px;
   text-decoration: none;
-  transition: 0.5s;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 10px rgba(255, 71, 71, 0.3); /* Initial subtle shadow */
+}
+
+.Login:hover {
+  background-color: #ff3333;
+  box-shadow: 0 7px 20px rgba(255, 71, 71, 0.4);
+  transform: translateY(-2px);
 }
 
 /* Login Icon Improvement */
 .login-icon {
   color: #5f5f61;
-  font-size: 22px; /* Slightly increased size for visibility */
+  font-size: 20px; /* Standardized icon size */
   cursor: pointer;
-  transition: color 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
   position: static;
   display: flex; /* Ensure icon is properly displayed */
   align-items: center;
@@ -214,11 +279,7 @@ hr {
 
 .login-icon:hover {
   color: #ff4747;
-  transform: scale(1.2);
-}
-
-.Login:hover {
-  background-color: #f7b8b8;
+  transform: scale(1.2) rotate(5deg); /* Adding slight rotation for more dynamic effect */
 }
 
 /* General Container */
@@ -338,17 +399,19 @@ input[type="checkbox"]:focus-visible + label.display {
 }
 
 .language-icon {
-  font-size: 22px; /* Adjust size as needed */
+  font-size: 20px; /* Standardized icon size to match login icon */
   color: #5f5f61;
   cursor: pointer;
-  transition: color 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
   margin-top: 0; /* Remove margin that was causing misalignment */
-  display: block;
+  display: flex; /* Match display style of login icon */
+  align-items: center;
+  justify-content: center;
 }
 
 .language-icon:hover {
   color: #ff4747; /* Change color on hover */
-  transform: scale(1.2); /* Slightly enlarge on hover */
+  transform: scale(1.2) rotate(5deg); /* Matching login icon hover effect */
 }
 
 /* Hamburger Menu */
@@ -374,78 +437,134 @@ input[type="checkbox"]:focus-visible + label.display {
 @media (max-width: 1200px) {
   .hamburger {
     display: flex; /* Show hamburger menu */
-  }
-
-  .nav-links,
-  .auth,
-  .toggle-container,
-  .language-switcher {
-    display: none; /* Hide nav links and other elements by default */
-  }
-
-  .toggle-container {
-    margin-right: 0; /* Remove negative margins */
-  }
-
-  .login-icon {
-    margin-left: 0; /* Reset any margins causing misalignment */
-    top: auto;
-    position: static;
-  }
-
-  .language-switcher {
-    position: relative;
-    margin-right: 0;
-    top: auto;
-    right: auto;
-  }
-
-  .nav-links.active {
-    display: flex;
-    flex-direction: column;
     position: absolute;
-    top: 70px;
-    left: 0;
-    width: 100%;
-    background-color: white;
-    padding: 20px 0;
-    z-index: 999;
+    left: 20px;
+    top: 25px; /* Adjusted for better vertical alignment */
+    z-index: 1001; /* Ensure it stays above the mobile menu */
   }
 
-  .auth.active,
-  .toggle-container.active,
-  .language-switcher.active {
-    display: flex; /* Show when active */
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px; /* Reduce from 60px */
-    align-items: center; /* Center instead of left-align */
-    padding-left: 0; /* Remove padding */
-    width: 100%; /* Take full width */
+  nav {
+    flex-direction: row; /* Keep as row to maintain logo position */
+    justify-content: center; /* Center the logo */
+    height: 80px; /* Slightly taller for mobile */
+    padding: 0 20px;
   }
 
   .RedHope {
     margin: 0 auto; /* Center the logo */
+    z-index: 1001; /* Keep logo above mobile menu */
   }
-
-  nav {
-    flex-direction: column;
-    align-items: flex-start; /* Align items to the left */
-    padding: 10px;
+  
+  .nav-links {
+    display: none; /* Hide nav links by default */
   }
-}
-
-@media (max-width: 944px) {
-  .toggle-container {
-    position: absolute;
-    top: 25px; /* Adjust vertical position */
-    right: 80px;
-  }
-
+  
+  /* Keep these elements visible and position them properly */
+  .auth,
+  .toggle-container,
   .language-switcher {
+    display: flex; /* Keep them visible */
+    position: static;
+  }
+  
+  /* Create a container for utility items on the right */
+  .nav-icons {
     position: absolute;
-    top: 25px;
-    right: 30px;
+    right: 20px;
+    top: 25px; /* Aligned with hamburger */
+    z-index: 1001; /* Ensure they stay above the mobile menu */
+    gap: 15px;
+  }
+
+  /* Mobile menu styling */
+  .nav-links.active {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 80px; /* Start below the navbar */
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.95); /* More modern semi-transparent background */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 25px 0;
+    z-index: 999;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    gap: 25px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+  }
+  
+  /* Dark theme adjustments for mobile menu */
+  .dark-theme .nav-links.active {
+    background-color: rgba(28, 30, 35, 0.95);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* When mobile menu is active */
+  .hamburger.active div:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  
+  .hamburger.active div:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .hamburger.active div:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+  
+  /* Adjust auth items in mobile menu */
+  .auth {
+    flex-direction: row; /* Keep auth buttons side by side */
+    gap: 10px;
+  }
+  
+  /* Add animation for mobile menu */
+  .nav-links.active {
+    animation: slideDown 0.3s forwards;
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
+
+/* Smaller screens */
+@media (max-width: 600px) {
+  .Sign-up, .Login {
+    padding: 8px 15px; /* Smaller padding */
+    font-size: 14px; /* Smaller font */
+  }
+  
+  .hamburger {
+    left: 10px; /* Closer to edge */
+  }
+  
+  .nav-icons {
+    right: 10px; /* Closer to edge */
+  }
+  
+  .RedHope img {
+    width: 65px; /* Slightly smaller logo */
+    height: 65px;
+  }
+  
+  /* Stack auth buttons in very small screens */
+  @media (max-width: 400px) {
+    .auth {
+      flex-direction: column;
+    }
+  }
+}
+
+
 

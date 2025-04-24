@@ -1,153 +1,248 @@
 // controllers/authController.js
 const User = require('../models/User');
+const Admin = require('../models/Admin'); // Ensure Admin model is imported
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
-
-// Max token age: 3 days
-const maxAge = 3 * 24 * 60 * 60;
-
-// Function to create JWT token
-const createToken = (id) => {
-  return jwt.sign({ id }, 'net ninja secret', { expiresIn: maxAge });
+// Helper function to create JWT token
+const createToken = (id, role) => {
+  return jwt.sign(
+    { id, role },
+    process.env.JWT_SECRET || 'your-secret-key',
+    { expiresIn: '24h' }
+  );
 };
 
-// Handle errors (customized for various cases)
-const handleErrors = (err) => {
-  let errors = { email: '', password: '' };
-
-  if (err.message === ' ') {
-    errors.email = 'That email is not registered';
-  }
-  if (err.message === 'incorrect password') {
-    errors.password = 'That password is incorrect';
-  }
-
-  if (err.code === 11000) {
-    errors.email = 'That email is already registered';
-    return errors;
-  }
-
-  if (err.message.includes('User validation failed')) {
-    Object.values(err.errors).forEach(({ properties }) => {
-      errors[properties.path] = properties.message;
-    });
-  }
-
-  return errors;
-};
-
-// Handle signup
-module.exports.signup_post = async (req, res) => {
-  const { username, email, dateOfBirth, location, bloodType, gender, password, isDonor, phoneNumber } = req.body;
-
-  try {
-    await User.checkExisting({ email, phoneNumber, password });
-
-    const user = await User.create({
-      username,  // Even if the username repeats, MongoDB will allow it
-      email,
-      dateOfBirth,
-      location,
-      bloodType,
-      gender,
-      password,
-      isDonor,
-      phoneNumber,
-    });
-
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.json({ token });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-};
-
-
-
-// Handle login
-module.exports.login_post = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.login(email, password); // Assuming User model has login method
-
-    const payload = { userId: user.id };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.json({ token });
-
-
-    
-
-  } catch (err) {
-    const errors = handleErrors(err);
-    res.status(400).json({ errors });
-  }
-};
-
-module.exports.dashboard_get =  async (req, res) => {
-  try {
-      const user = await User.findById(req.user.userId).select('-password');
-      res.json({
-        msg: `${user.email}`,
-      });
-  } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
-  }
-};
-
-const haversineDistance = (coords1, coords2) => {
-  const toRad = (value) => (value * Math.PI) / 180;
+// Login controller - handles both User and Admin authentication
+exports.login = async (req, res) => {
+  console.log('Login attempt with body:', req.body);
   
-  const [lat1, lon1] = coords1;
-  const [lat2, lon2] = coords2;
-
-  const R = 6371; // Earth's radius in kilometers
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in kilometers
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      console.log('Missing email or password in request');
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide both email and password'
+      });
+    }
+    
+    // First, try to find in Admin collection
+    let admin = null;
+    let user = null;
+    let isAdmin = false;
+    
+    try {
+      console.log('Checking admin collection for:', email);
+      admin = await Admin.findOne({ email }).select('+password');
+      
+      if (admin) {
+        console.log('Found in admin collection:', admin._id);
+        isAdmin = true;
+        user = admin; // Use admin as the user object for login
+      } else {
+        // If not found in admin, check regular users
+        console.log('Not found in admin collection, checking users collection');
+        user = await User.findOne({ email }).select('+password');
+        
+        if (user) {
+          console.log('Found in users collection:', user._id);
+        } else {
+          console.log('User not found in either collection');
+        }
+      }
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      return res.status(500).json({
+        success: false,
+        message: 'Database error occurred',
+        error: dbError.message
+      });
+    }
+    
+    // If no user found in either collection
+    if (!user) {
+      console.log(`No user or admin found with email: ${email}`);
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Check password
+    let isPasswordValid = false;
+    try {
+      isPasswordValid = await bcrypt.compare(password, user.password);
+      console.log('Password validation result:', isPasswordValid);
+    } catch (bcryptError) {
+      console.error('Bcrypt error:', bcryptError);
+      return res.status(500).json({
+        success: false,
+        message: 'Authentication error',
+        error: bcryptError.message
+      });
+    }
+    
+    if (!isPasswordValid) {
+      console.log('Invalid password provided');
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Determine role for token
+    const role = isAdmin ? (admin.role || 'admin') : (user.role || 'user');
+    
+    // Create token
+    const token = createToken(user._id, role);
+    
+    // Create refresh token
+    const refreshToken = jwt.sign(
+      { id: user._id, role },
+      process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
+      { expiresIn: '7d' }
+    );
+    
+    console.log('Login successful as:', isAdmin ? 'admin' : 'user');
+    
+    // If admin, update last login time
+    if (isAdmin) {
+      try {
+        await Admin.findByIdAndUpdate(admin._id, { lastLogin: new Date() });
+      } catch (updateError) {
+        console.error('Error updating last login time:', updateError);
+      }
+    }
+    
+    // Send response
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      token,
+      refreshToken,
+      user: {
+        id: user._id,
+        username: user.username || user.firstName + ' ' + user.lastName,
+        email: user.email,
+        role,
+        isAdmin
+      }
+    });
+    
+  } catch (error) {
+    console.error('Unexpected error in login:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'An error occurred during login',
+      error: error.message
+    });
+  }
 };
 
-module.exports.nearby_get = async (req, res) => {
+// Register controller
+exports.register = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
-    if (!user || !user.location) {
-      return res.status(400).json({ msg: 'User location not found.' });
+    const { username, email, password, firstName, lastName, bloodType, isDonor } = req.body;
+    
+    // Validation
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide username, email and password'
+      });
     }
-
-    const userLocation = user.location.split(',').map(Number); // Convert to [latitude, longitude]
-
-    // Fetch all users who are donors except the current user
-    const donors = await User.find({
-      isDonor: true,
-      _id: { $ne: req.user.userId }, // Exclude the current user
+    
+    // Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already registered'
+      });
+    }
+    
+    // Create new user
+    const user = await User.create({
+      username,
+      email,
+      password,
+      firstName: firstName || username,
+      lastName: lastName || '',
+      bloodType: bloodType || 'Unknown',
+      role: 'user',
+      isDonor: isDonor || false
     });
-
-    // Calculate distances for each donor
-    const donorsWithDistance = donors.map((donor) => {
-      const donorLocation = donor.location.split(',').map(Number); // Convert to [latitude, longitude]
-      const distance = haversineDistance(userLocation, donorLocation);
-      return { ...donor._doc, distance }; // Spread donor fields and add distance
+    
+    // Generate token
+    const token = createToken(user._id, 'user');
+    
+    // Send response
+    res.status(201).json({
+      success: true,
+      message: 'Registration successful',
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email
+      }
     });
+    
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Registration failed',
+      error: error.message
+    });
+  }
+};
 
-    // Sort donors by distance (ascending)
-    donorsWithDistance.sort((a, b) => a.distance - b.distance);
+// Logout controller
+exports.logout = (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Logged out successfully'
+  });
+};
 
-    res.json(donorsWithDistance);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+// Refresh token controller
+exports.refreshToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'No token provided'
+      });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const user = await User.findById(decoded.id);
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    const newToken = createToken(user._id, user.role);
+    
+    res.status(200).json({
+      success: true,
+      token: newToken
+    });
+    
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    res.status(401).json({
+      success: false,
+      message: 'Invalid or expired token'
+    });
   }
 };
 

@@ -37,3 +37,38 @@
   border: 1.5px solid #ffffff;
 }
 
+.map-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.map-container h2 {
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center;
+}
+
+/* Add these styles to your map.css file */
+
+.dark-mode-text {
+  color: #f0f0f0 !important;
+}
+
+body.dark-theme .map-container h2 {
+  color: #f0f0f0;
+}
+
+body.dark-theme .loading-spinner {
+  border: 4px solid #333;
+  border-top: 4px solid #ff4747;
+}
+
+body.dark-theme .info-window-content {
+  color: #333; /* Keep info window content dark as Google Maps uses light backgrounds */
+}
+

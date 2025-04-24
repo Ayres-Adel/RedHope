@@ -1,87 +1,148 @@
 /* CitySelector.css */
 
 /* General styles */
-.wilaya-selector {
-  font-family: 'Arial', sans-serif;
-  max-width: 300px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
+.city-selector {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+  margin: 15px auto;
+  padding: 10px;
+  background: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 130px;
-  transition: background-color 0.3s, color 0.3s;
-  transition: 0.5s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-
-
-/* Dark mode styles */
-.dark-theme .wilaya-selector {
-  background-color: #333;
-  color: #fff;
+.selector-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
 }
 
-/* Label styling */
-.wilaya-selector label {
-  display: block;
-  margin-bottom: 8px;
+.wilaya-select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
   font-size: 16px;
   color: #333;
-  font-weight: bold;
-}
-
-/* Dark mode label */
-.dark-theme .wilaya-selector label {
-  color: #fff;
-}
-
-/* Select dropdown styling */
-.wilaya-selector select {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
-  appearance: none;
+  background-color: white;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3e%3cpath fill='none' d='M0 0h24v24H0z'/%3e%3cpath d='M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z' fill='rgba(0,0,0,0.5)'/%3e%3c/svg%3e");
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+  transition: border-color 0.3s;
 }
 
-/* Dark mode dropdown */
-.dark-theme .wilaya-selector select {
-  background-color: #555;
-  color: #fff;
-  border-color: #888;
+.wilaya-select:focus {
+  border-color: #ff4747;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 71, 71, 0.2);
 }
 
-/* Loading message styling */
-.loading {
-  text-align: center;
-  font-size: 16px;
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border: 3px solid rgba(255, 71, 71, 0.2);
+  border-top-color: #ff4747;
+  border-radius: 50%;
+  animation: spin 1s infinite linear;
+}
+
+.selector-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  background: #f9f9f9;
+  border-radius: 6px;
   color: #666;
-  padding: 20px;
 }
 
-/* Dark mode loading */
-.dark-theme .loading {
-  color: #bbb;
+.error-message {
+  color: #e53935;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* Error message styling */
-.error {
-  text-align: center;
-  font-size: 16px;
-  color: #ff4d4d;
-  padding: 20px;
-  background-color: #ffe6e6;
+.error-message button {
+  background: #ff4747;
+  color: white;
+  border: none;
+  padding: 5px 10px;
   border-radius: 4px;
-  border: 1px solid #ff4d4d;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
-/* Dark mode error */
-.dark-theme .error {
-  background-color: #660000;
-  color: #ff9999;
-  border-color: #ff9999;
+.error-message button:hover {
+  background: #e04141;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Make sure it works well on mobile */
+@media (max-width: 768px) {
+  .city-selector {
+    max-width: 100%;
+    padding: 8px;
+  }
+  
+  .wilaya-select {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+/* Dark theme styles */
+body.dark-theme .city-selector {
+  background: #2d2d2d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .selector-label {
+  color: #f0f0f0;
+}
+
+body.dark-theme .wilaya-select {
+  background-color: #3a3a3a;
+  border-color: #555;
+  color: #f0f0f0;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3e%3cpath fill='none' d='M0 0h24v24H0z'/%3e%3cpath d='M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z' fill='rgba(240,240,240,0.7)'/%3e%3c/svg%3e");
+}
+
+body.dark-theme .wilaya-select:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.3);
+}
+
+body.dark-theme .selector-placeholder {
+  background: #3a3a3a;
+  color: #ccc;
+}
+
+body.dark-theme .loading-spinner {
+  border: 3px solid rgba(255, 107, 107, 0.2);
+  border-top-color: #ff6b6b;
+}
+
+body.dark-theme .error-message {
+  color: #ff8a8a;
+}
+
+body.dark-theme .error-message button {
+  background: #ff6b6b;
+}
+
+body.dark-theme .error-message button:hover {
+  background: #ff5252;
 }

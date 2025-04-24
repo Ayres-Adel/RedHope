@@ -103,7 +103,9 @@ export default function Login() {
     setErrors({ email: '', password: '', general: '' }); // Reset errors before submitting
 
     try {
-      const response = await fetch('http://localhost:3000/login', {
+      console.log('Sending login request to server...');
+      
+      const response = await fetch('http://localhost:3000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -112,14 +114,50 @@ export default function Login() {
       });
 
       const data = await response.json();
+      console.log('Server response:', response.status, data);
 
       if (response.ok) {
-        // Store token in localStorage if provided
+        console.log('Login successful!', data);
+        
+        // Store token in localStorage
         if (data.token) {
-          localStorage.setItem('token', data.token); // Store token in localStorage
+          localStorage.setItem('token', data.token);
+          
+          // Also store refresh token if available
+          if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+          }
+          
+          // Check if user is admin based on data returned from server
+          const isAdmin = data.user?.isAdmin === true || data.user?.role === 'admin' || data.user?.role === 'superadmin';
+          
+          // Store role and admin status
+          localStorage.setItem('userRole', data.user?.role || 'user');
+          localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
+          
+          // Store user ID for future API calls
+          if (data.user?.id) {
+            localStorage.setItem('userId', data.user.id);
+          }
+          
+          console.log('Admin status:', isAdmin);
+          
+          // Redirect based on admin status
+          if (isAdmin) {
+            console.log('Admin login detected, redirecting to admin page');
+            navigate('/admin');
+            return;
+          } else {
+            // Regular user redirect
+            navigate('/search');
+          }
+        } else {
+          // Handle missing token
+          setErrors({
+            ...errors,
+            general: 'Authentication token not received. Please try again.'
+          });
         }
-        // Redirect to another page on success
-        navigate('/search'); // Redirect to desired path after login
       } else {
         // Handle errors from the server
         const serverErrors = {};
@@ -137,7 +175,7 @@ export default function Login() {
         });
       }
     } catch (error) {
-      // Handle network or other errors
+      console.error('Login error details:', error);
       setErrors({
         ...errors,
         general: language === 'fr'

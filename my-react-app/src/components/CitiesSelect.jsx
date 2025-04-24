@@ -1,54 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import "../styles/CitySelector.css";
+import { wilayaService } from '../services/api';
+import '../styles/CitySelector.css';
 
 const CitySelector = ({ onLocationChange }) => {
-  // Language state: reads from localStorage
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
+  const [wilayas, setWilayas] = useState([]);
+  const [selectedWilaya, setSelectedWilaya] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Poll localStorage for language changes
   useEffect(() => {
+    const fetchWilayas = async () => {
+      try {
+        setLoading(true);
+        const response = await wilayaService.getAllWilayas();
+        setWilayas(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error:', err);
+        setError(language === 'en' ? 'Failed to load wilayas' : 'Échec du chargement des wilayas');
+        setLoading(false);
+      }
+    };
+
+    fetchWilayas();
+
+    // Check for language updates
     const interval = setInterval(() => {
       const currentLang = localStorage.getItem('language') || 'en';
       if (currentLang !== language) {
         setLanguage(currentLang);
       }
-    }, 100);
+    }, 1000);
+
     return () => clearInterval(interval);
-  }, [language]);
-
-  // Dark theme toggle effect
-  useEffect(() => {
-    const toggle = document.getElementById('toggle');
-    if (toggle) {
-      const toggleDarkMode = () => {
-        document.body.classList.toggle('dark-theme', toggle.checked);
-      };
-
-      toggle.addEventListener('change', toggleDarkMode);
-
-      return () => {
-        toggle.removeEventListener('change', toggleDarkMode);
-      };
-    }
-  }, []);
-
-  const [selectedWilaya, setSelectedWilaya] = useState('');
-  const [wilayas, setWilayas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetch('/src/assets/wilayas_algerie.json')
-      .then(response => response.json())
-      .then(data => {
-        setWilayas(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error:', err);
-        setError(language === 'en' ? 'Failed to load wilayas' : 'Échec du chargement des wilayas');
-        setLoading(false);
-      });
   }, [language]);
 
   const handleWilayaChange = (e) => {
@@ -61,6 +46,7 @@ const CitySelector = ({ onLocationChange }) => {
         lat: parseFloat(selectedWilayaData.latitude),
         lng: parseFloat(selectedWilayaData.longitude),
       });
+      
       onLocationChange({
         lat: parseFloat(selectedWilayaData.latitude),
         lng: parseFloat(selectedWilayaData.longitude),
@@ -68,24 +54,48 @@ const CitySelector = ({ onLocationChange }) => {
     }
   };
 
-  if (loading) return <div className="loading">{language === 'en' ? 'Loading...' : 'Chargement...'}</div>;
-  if (error) return <div className="error">{error}</div>;
+  // Improved loading and error states with better styling
+  if (loading) {
+    return (
+      <div className="city-selector loading">
+        <div className="selector-placeholder">
+          <div className="loading-spinner"></div>
+          <span>{language === 'en' ? 'Loading wilayas...' : 'Chargement des wilayas...'}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="city-selector error">
+        <div className="selector-placeholder error-message">
+          <span>{error}</span>
+          <button onClick={() => window.location.reload()}>
+            {language === 'en' ? 'Try Again' : 'Réessayer'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="wilaya-selector">
-      <label htmlFor="wilaya-select">
-        {language === 'en' ? 'Select Wilaya:' : 'Sélectionnez une Wilaya:'}
+    <div className="city-selector">
+      <label htmlFor="wilaya-select" className="selector-label">
+        {language === 'en' ? 'Choose a Wilaya:' : 'Choisissez une Wilaya:'}
       </label>
-      <select 
-        id="wilaya-select" 
-        value={selectedWilaya} 
+      <select
+        id="wilaya-select"
+        value={selectedWilaya}
         onChange={handleWilayaChange}
         className="wilaya-select"
       >
-        <option value="">{language === 'en' ? 'Select a Wilaya' : 'Sélectionnez une Wilaya'}</option>
+        <option value="">
+          {language === 'en' ? '-- Select a wilaya --' : '-- Sélectionner une wilaya --'}
+        </option>
         {wilayas.map((wilaya) => (
           <option key={wilaya.code} value={wilaya.code}>
-            {wilaya.code} - {wilaya.name}
+            {wilaya.name}
           </option>
         ))}
       </select>

@@ -1,19 +1,24 @@
 // routes/authRoutes.js
 const { Router } = require('express');
-const authController = require('../controllers/authController');
-const authMiddleware = require('../middleware/authMiddleware');
-
-
 const router = Router();
+const authController = require('../controllers/authController');
 
-router.post('/signup', authController.signup_post); 
+// Add debugging middleware
+router.use((req, res, next) => {
+  console.log(`Auth API request: ${req.method} ${req.originalUrl}`);
+  next();
+});
 
-router.post('/login', authController.login_post);
+// Login route
+router.post('/login', authController.login);
 
-router.get('/dashboard' , authMiddleware , authController.dashboard_get);
+// Register route
+router.post('/register', authController.register);
 
-router.get('/nearby' , authMiddleware , authController.nearby_get);
+// Logout route
+router.get('/logout', authController.logout);
 
-
+// Refresh token route
+router.post('/refresh-token', authController.refreshToken);
 
 module.exports = router;
