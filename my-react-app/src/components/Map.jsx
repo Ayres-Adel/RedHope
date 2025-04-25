@@ -8,7 +8,7 @@ import {
 } from "@vis.gl/react-google-maps";
 import Navbar from "./Navbar";
 import HospitalIcon from "../assets/images/hospital.png";
-import CitySelector from "./CitiesSelect";
+import CitySelector from "./CitySelect";
 
 export default function MapComponent() {
   const mapStyle = {
@@ -46,27 +46,40 @@ export default function MapComponent() {
   const [isDarkMode, setIsDarkMode] = useState(
     document.body.classList.contains("dark-theme")
   );
+  
+  // Create a stable map ID that doesn't change when theme changes
+  // This prevents the map from reloading when switching themes
+  const stableMapId = "redhope-map-id";
 
   useEffect(() => {
     const fetchHospitals = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("http://localhost:3000/api/hospitals");
+        // Hardcode the URL without using process.env
+        const response = await fetch("http://localhost:3000/api/map/hospitals");
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
-
-        // Check if we're in dark mode to apply theme-specific processing if needed
-        const isDarkMode = document.body.classList.contains("dark-theme");
-
-        setHospitals(data);
+        
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to fetch hospitals');
+        }
+        
+        const hospitalsData = data.data?.locations || [];
+        console.log(`Loaded ${hospitalsData.length} hospitals`);
+        
+        if (hospitalsData.length === 0) {
+          console.warn('No hospitals found in the data');
+        }
+        
+        setHospitals(hospitalsData);
         setIsLoading(false);
       } catch (err) {
         console.error("Error fetching hospitals:", err);
-        setError(err.message);
+        setError(`Failed to load hospitals: ${err.message}`);
         setIsLoading(false);
       }
     };
@@ -75,8 +88,8 @@ export default function MapComponent() {
 
     // Listen for theme changes to update UI accordingly
     const handleThemeChange = () => {
-      // Force re-render when theme changes
-      setShowSearch(showSearch);
+      // Just update the isDarkMode state without forcing a re-render of the map
+      setIsDarkMode(document.body.classList.contains("dark-theme"));
     };
 
     window.addEventListener("themeChange", handleThemeChange);
@@ -84,21 +97,6 @@ export default function MapComponent() {
     return () => {
       window.removeEventListener("themeChange", handleThemeChange);
     };
-  }, []);
-
-  // Update dark mode state when it changes
-  useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === "class") {
-          setIsDarkMode(document.body.classList.contains("dark-theme"));
-        }
-      });
-    });
-
-    observer.observe(document.body, { attributes: true });
-
-    return () => observer.disconnect();
   }, []);
 
   const searchIconStyle = {
@@ -231,33 +229,45 @@ export default function MapComponent() {
   };
 
   const renderMarkers = () => {
+    if (!hospitals || hospitals.length === 0) {
+      return null;
+    }
+    
     return (
       <>
-        {hospitals.map((hospital, index) => (
-          <AdvancedMarker
-            key={`hospital-${index}`}
-            position={{
-              lat: hospital.location.coordinates[1],
-              lng: hospital.location.coordinates[0],
-            }}
-            title={hospital.name}
-            onClick={() => {
-              setSelectedMarker({
-                ...hospital,
-                latitude: hospital.location.coordinates[1],
-                longitude: hospital.location.coordinates[0],
-                type: "hospital",
-              });
-              setOpen(true);
-            }}
-          >
-            <img
-              src={HospitalIcon}
-              alt={hospital.name}
-              style={{ width: "30px", height: "30px" }}
-            />
-          </AdvancedMarker>
-        ))}
+        {hospitals.map((hospital, index) => {
+          // Skip hospitals without valid position data
+          if (!hospital.position || !hospital.position.lat || !hospital.position.lng) {
+            console.warn(`Hospital ${hospital.name} has invalid position data`);
+            return null;
+          }
+          
+          return (
+            <AdvancedMarker
+              key={`hospital-${index}`}
+              position={{
+                lat: hospital.position.lat,
+                lng: hospital.position.lng
+              }}
+              title={hospital.name}
+              onClick={() => {
+                setSelectedMarker({
+                  ...hospital,
+                  latitude: hospital.position.lat,
+                  longitude: hospital.position.lng,
+                  type: "hospital",
+                });
+                setOpen(true);
+              }}
+            >
+              <img
+                src={HospitalIcon}
+                alt={hospital.name}
+                style={{ width: "30px", height: "30px" }}
+              />
+            </AdvancedMarker>
+          );
+        })}
       </>
     );
   };
@@ -280,17 +290,17 @@ export default function MapComponent() {
             }}
           ></div>
           <p>Loading hospitals data...</p>
+          <style>{`
+            @keyframes spin {
+              0% {
+                transform: rotate(0deg);
+              }
+              100% {
+                transform: rotate(360deg);
+              }
+            }
+          `}</style>
         </div>
-        <style jsx>{`
-          @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
       </>
     );
   }
@@ -315,12 +325,33 @@ export default function MapComponent() {
         <h2 className={isDarkMode ? "dark-mode-text" : ""}>
           Find Hospitals and Blood Centers
         </h2>
-        <CitySelector onLocationChange={handleLocationChange} />
-        <APIProvider apiKey="AIzaSyAeTAUxWY5luBGsf-F6-vP8eDLqgjzmACg">
-          <div style={mapStyle}>
+        <CitySelector onLocationChange={handleLocationChange} isDarkMode={isDarkMode} />
+        {/* Use a key that doesn't change when themes change */}
+        <APIProvider apiKey="AIzaSyAeTAUxWY5luBGsf-F6-vP8eDLqgjzmACg" key="api-provider">
+          <div style={mapStyle} key="map-container">
             <Map
               ref={mapRef}
-              mapId={isDarkMode ? "8f51571e39b5d5e" : "7e663c504dc4b013"} // Use dark map style in dark mode
+              /* Use a single mapId that doesn't change when theme changes */
+              mapId="7e663c504dc4b013"
+              /* Apply custom styling based on dark mode */
+              options={{
+                gestureHandling: "cooperative",
+                styles: isDarkMode ? [
+                  {
+                    elementType: "geometry",
+                    stylers: [{ color: "#242f3e" }]
+                  },
+                  {
+                    elementType: "labels.text.stroke",
+                    stylers: [{ color: "#242f3e" }]
+                  },
+                  {
+                    elementType: "labels.text.fill",
+                    stylers: [{ color: "#746855" }]
+                  },
+                  // ...more dark mode styles can go here
+                ] : undefined
+              }}
               defaultCenter={mapCenter}
               center={isControlled ? controlledCenter : undefined}
               defaultZoom={12}
@@ -332,9 +363,6 @@ export default function MapComponent() {
               onDrag={() => {
                 setIsControlled(false);
                 handleCloseSearch();
-              }}
-              options={{
-                gestureHandling: "cooperative",
               }}
             >
               <button
@@ -373,18 +401,19 @@ export default function MapComponent() {
                   <svg viewBox="0 0 20 20" width="22" height="22" fill="none">
                     <path
                       d="M9 16C12.866 16 16 12.866 16 9C16 5.13401 12.866 2 9 2C5.13401 2 2 5.13401 2 9C2 12.866 5.13401 16 9 16Z"
-                      stroke="#ff4747"
+                      stroke={isDarkMode ? "#ff6b6b" : "#ff4747"}
                       strokeWidth="1.5"
                       strokeLinecap="round"
                     />
                     <path
                       d="M18 18L14 14"
-                      stroke="#ff4747"
+                      stroke={isDarkMode ? "#ff6b6b" : "#ff4747"}
                       strokeWidth="1.5"
                       strokeLinecap="round"
                     />
                   </svg>
                 )}
+
                 {showSuggestions && suggestions.length > 0 && (
                   <div
                     className="suggestions-container"
@@ -504,10 +533,10 @@ export default function MapComponent() {
                     <h3>{selectedMarker.name}</h3>
                     {selectedMarker.type === "hospital" && (
                       <>
-                        <p>Structure: {selectedMarker.structure}</p>
-                        <p>Phone: {selectedMarker.telephone}</p>
-                        <p>Fax: {selectedMarker.fax}</p>
-                        <p>Wilaya: {selectedMarker.wilaya}</p>
+                        <p>Address: {selectedMarker.address || 'Not available'}</p>
+                        <p>Contact: {selectedMarker.contact?.phone || 'Not available'}</p>
+                        <p>Wilaya: {selectedMarker.wilaya || 'Not specified'}</p>
+                        {selectedMarker.category && <p>Type: {selectedMarker.category}</p>}
                       </>
                     )}
                   </div>

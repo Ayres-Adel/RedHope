@@ -8,7 +8,6 @@ const { requireAuth, checkUser } = require('./middleware/authMiddleware');
 
 // Import all route files
 const authRoutes = require('./routes/authRoutes');
-// Fix: Add userRoutes import which was missing
 const userRoutes = require('./routes/userRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const hospitalRoutes = require('./routes/hospitalRoutes');
@@ -17,6 +16,8 @@ const donationRoutes = require('./routes/donationRoutes');
 const donationRequestRoutes = require('./routes/donationRequestRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+// Add map routes
+const mapRoutes = require('./routes/mapRoutes');
 
 const app = express();
 
@@ -50,6 +51,8 @@ app.use('/api/donation-request', donationRequestRoutes);
 app.use('/api/notification', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/stats', statsRoutes);
+// Add map routes
+app.use('/api/map', mapRoutes);
 
 // Simple test route that doesn't require database
 app.get('/api/health', (req, res) => {
