@@ -1,74 +1,669 @@
-.suggestions-container {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  width: 100%;
+/* Map component styles - simplified design with blood type stats */
+
+/* Base container styles */
+.hospitals-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hospitals-header {
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.hospitals-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.hospitals-header p {
+  font-size: 16px;
+  color: #666;
+}
+
+/* Dark theme header styles */
+body.dark-theme .hospitals-header h1 {
+  color: #f0f0f0;
+}
+
+body.dark-theme .hospitals-header p {
+  color: #ccc;
+}
+
+/* Map section layout */
+.map-section {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-  padding: 4px 2px 4px 0;  /* Adjusted padding */
-  border: 1px solid rgba(0,0,0,0.06);
-  overflow: hidden;  /* Contains the scrollbar */
 }
 
-.suggestions-container::-webkit-scrollbar {
-  width: 9px;
-  margin-right: 0;
+body.dark-theme .map-section {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  background: #2a2a2a;
 }
 
-.suggestions-container::-webkit-scrollbar-track {
-  background: #ebebeb;
-  border-radius: 10px;
-  margin: 4px 2px;  /* Add margin to keep track inside container */
-  border: 1px solid rgba(0,0,0,0.09);
+.map-controls {
+  padding: 15px;
+  border-bottom: 1px solid #eaeaea;
 }
 
-.suggestions-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(to right, #ff4747, #e00d27);
-  border-radius: 10px;
-  border: 2px solid #ebebeb;
-  background-clip: padding-box;
-  margin-right: 2px;  /* Keep thumb inside container */
-  transition: all 0.2s ease;
-}
-
-.suggestions-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to right, #e00d27, #cc0000);
-  border: 1.5px solid #ffffff;
+body.dark-theme .map-controls {
+  border-color: #444;
 }
 
 .map-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 600px;
+}
+
+/* Map content styles */
+.hospital-map-content {
+  flex: 1;
+  position: relative;
+  height: 600px;
+}
+
+/* Blood type statistics section */
+.blood-type-stats {
+  width: 300px;
   padding: 20px;
+  background-color: #fff;
+  border-left: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
 }
 
-.map-container h2 {
-  margin-bottom: 15px;
+body.dark-theme .blood-type-stats {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+.stats-header {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.stats-header h3 {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
   color: #333;
-  text-align: center;
+  font-weight: 600;
 }
 
-/* Add these styles to your map.css file */
-
-.dark-mode-text {
-  color: #f0f0f0 !important;
+.stats-header .stats-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #ff4747;
+  margin-bottom: 8px;
 }
 
-body.dark-theme .map-container h2 {
+body.dark-theme .stats-header .stats-location {
+  color: #ff6b6b;
+}
+
+.stats-header .donor-count {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+body.dark-theme .stats-header h3 {
   color: #f0f0f0;
 }
 
-body.dark-theme .loading-spinner {
-  border: 4px solid #333;
-  border-top: 4px solid #ff4747;
+body.dark-theme .stats-header .donor-count {
+  color: #aaa;
 }
 
-body.dark-theme .info-window-content {
-  color: #333; /* Keep info window content dark as Google Maps uses light backgrounds */
+.blood-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.blood-type-card {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.blood-type-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-theme .blood-type-card {
+  background-color: #333;
+  border: 1px solid #444;
+}
+
+body.dark-theme .blood-type-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.blood-type-symbol {
+  height: 45px;
+  width: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+body.dark-theme .blood-type-symbol {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.blood-type-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.blood-count {
+  font-weight: 600;
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+body.dark-theme .blood-count {
+  color: #f0f0f0;
+}
+
+.blood-label {
+  font-size: 12px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+body.dark-theme .blood-label {
+  color: #aaa;
+}
+
+/* Add blood type chart */
+.blood-chart {
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+body.dark-theme .blood-chart {
+  background-color: #2d2d2d;
+}
+
+.chart-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chart-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+}
+
+.chart-bar-label {
+  width: 35px;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+}
+
+.chart-bar-wrapper {
+  flex-grow: 1;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+body.dark-theme .chart-bar-wrapper {
+  background-color: #444;
+}
+
+.chart-bar {
+  height: 100%;
+  min-width: 1%;
+  border-radius: 4px;
+  transition: width 0.5s ease-out;
+}
+
+.chart-bar-value {
+  width: 45px;
+  font-size: 12px;
+  text-align: right;
+  color: #666;
+}
+
+body.dark-theme .chart-bar-value {
+  color: #aaa;
+}
+
+/* Improve footer and button */
+.stats-footer {
+  margin-top: auto;
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #eaeaea;
+}
+
+body.dark-theme .stats-footer {
+  border-color: #444;
+}
+
+.stats-footer p {
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
+body.dark-theme .stats-footer p {
+  color: #aaa;
+}
+
+.become-donor-btn {
+  padding: 12px 16px;
+  background-color: #ff4747;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  font-size: 15px;
+  box-shadow: 0 4px 6px rgba(255, 71, 71, 0.2);
+}
+
+.become-donor-btn:hover {
+  background-color: #e03b3b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(255, 71, 71, 0.3);
+}
+
+.become-donor-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 71, 71, 0.2);
+}
+
+body.dark-theme .become-donor-btn {
+  background-color: #ff6b6b;
+  box-shadow: 0 4px 6px rgba(255, 107, 107, 0.3);
+}
+
+body.dark-theme .become-donor-btn:hover {
+  background-color: #ff5252;
+  box-shadow: 0 6px 10px rgba(255, 107, 107, 0.4);
+}
+
+/* Search button on map */
+.map-search-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  background: white;
+  border: none;
+  border-radius: 50px;
+  width: auto;
+  min-width: 45px;
+  height: 45px;
+  padding: 0 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  outline: none;
+  color: #ff4747;
+}
+
+body.dark-theme .map-search-button {
+  background: #333;
+  color: #ff6b6b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.map-search-input {
+  border: none;
+  outline: none;
+  width: 250px;
+  background: transparent;
+  color: #333;
+  font-size: 15px;
+  padding: 0 10px;
+}
+
+body.dark-theme .map-search-input {
+  color: #f0f0f0;
+}
+
+.map-search-input::placeholder {
+  color: #999;
+}
+
+body.dark-theme .map-search-input::placeholder {
+  color: #aaa;
+}
+
+/* Suggestions container */
+.suggestions-container {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 280px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+body.dark-theme .suggestions-container {
+  background: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.suggestion-item {
+  padding: 12px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background-color: #f5f5f5;
+}
+
+body.dark-theme .suggestion-item:hover {
+  background-color: #444;
+}
+
+.suggestion-icon {
+  color: #ff4747;
+}
+
+body.dark-theme .suggestion-icon {
+  color: #ff6b6b;
+}
+
+.suggestion-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.suggestion-name {
+  font-weight: 500;
+  color: #333;
+}
+
+body.dark-theme .suggestion-name {
+  color: #f0f0f0;
+}
+
+.suggestion-wilaya {
+  font-size: 12px;
+  color: #777;
+}
+
+body.dark-theme .suggestion-wilaya {
+  color: #aaa;
+}
+
+/* Map location indicator */
+.map-location-indicator {
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  background-color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #555;
+}
+
+body.dark-theme .map-location-indicator {
+  background-color: #333;
+  color: #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.coordinates {
+  font-family: monospace;
+  font-weight: 500;
+}
+
+/* Info window styling */
+.hospital-info-window {
+  padding: 12px;
+  min-width: 250px;
+}
+
+.hospital-info-window h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #333;
+  font-size: 16px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.hospital-info-window p {
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 14px;
+}
+
+.hospital-info-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.donation-button {
+  padding: 6px 10px;
+  border-radius: 15px;
+  border: none;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.donation-button.accepting {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+}
+
+.donation-button.emergency {
+  background-color: rgba(255, 71, 71, 0.15);
+  color: #ff4747;
+}
+
+/* Animation for loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #ff4747;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+body.dark-theme .loading-spinner {
+  border-color: #333;
+  border-top-color: #ff6b6b;
+}
+
+/* Add loading and error states for blood type stats */
+
+.stats-loading {
+  animation: fadeIn 0.3s ease;
+}
+
+.skeleton {
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  min-height: 69px; /* Match the height of actual blood type cards */
+}
+
+body.dark-theme .skeleton {
+  background-color: #3a3a3a;
+}
+
+.skeleton::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    transparent 100%);
+  animation: shimmer 1.5s infinite;
+  transform: translateX(-100%);
+}
+
+body.dark-theme .skeleton::after {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    transparent 100%);
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #888;
+}
+
+body.dark-theme .loading-text {
+  color: #aaa;
+}
+
+.stats-error {
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(255, 71, 71, 0.05);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+body.dark-theme .stats-error {
+  background-color: rgba(255, 71, 71, 0.1);
+}
+
+.retry-button {
+  background-color: #ff4747;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #e03b3b;
+}
+
+body.dark-theme .retry-button {
+  background-color: #ff6b6b;
+}
+
+body.dark-theme .retry-button:hover {
+  background-color: #ff5252;
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+  .map-container {
+    flex-direction: column;
+  }
+  
+  .blood-type-stats {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #eaeaea;
+  }
+  
+  .blood-type-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  body.dark-theme .blood-type-stats {
+    border-color: #444;
+  }
+}
+
+@media (max-width: 600px) {
+  .blood-type-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hospital-map-content {
+    height: 450px;
+  }
 }
 

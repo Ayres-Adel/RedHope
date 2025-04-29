@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/CitySelect.css';
 
-const CitySelector = ({ onLocationChange, isDarkMode }) => {
+const CitySelector = ({ onLocationChange, isDarkMode, includeAllCities = false }) => {
+  // Set the default value to 'all' instead of an empty string
   const [cities, setCities] = useState([]);
-  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCity, setSelectedCity] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // Modified useEffect to prevent auto-triggering API calls when not needed
   useEffect(() => {
     const fetchCities = async () => {
       try {
@@ -51,7 +53,7 @@ const CitySelector = ({ onLocationChange, isDarkMode }) => {
           throw new Error('Unexpected API response format');
         }
         
-        // Sort cities by their code
+        // Sort cities by their code after fetching
         const sortedCities = citiesData.sort((a, b) => {
           const codeA = a.code || a.wilayaCode || 0;
           const codeB = b.code || b.wilayaCode || 0;
@@ -71,9 +73,42 @@ const CitySelector = ({ onLocationChange, isDarkMode }) => {
     fetchCities();
   }, []);
   
+  // Remove the effect that previously triggered the All Cities selection automatically
+  // Instead, we'll manually trigger it only once on first render
+  const initialSelectionMade = useRef(false);
+  useEffect(() => {
+    // Only trigger once when component mounts and cities are loaded
+    if (!isLoading && cities.length > 0 && !initialSelectionMade.current) {
+      initialSelectionMade.current = true;
+      
+      // Only if this is the first time and All Cities is selected
+      if (selectedCity === 'all') {
+        // Delayed execution to prevent race conditions with parent components
+        setTimeout(() => {
+          console.log('Initial selection: All Cities');
+          onLocationChange(
+            {
+              lat: 36.16215909617758,
+              lng: 1.330560770492638
+            }, 
+            "All Cities", 
+            null
+          );
+        }, 100);
+      }
+    }
+  }, [isLoading, cities, selectedCity, onLocationChange]);
+  
   const handleCityChange = (e) => {
     const cityId = e.target.value;
     setSelectedCity(cityId);
+    
+    if (cityId === "all") {
+      // Handle "All Cities" option without changing coordinates
+      console.log('Selected: All Cities - keeping current map view');
+      onLocationChange(null, "All Cities", null);
+      return;
+    }
     
     if (!cityId) return; // Handle empty selection
     
@@ -84,14 +119,14 @@ const CitySelector = ({ onLocationChange, isDarkMode }) => {
       onLocationChange({
         lat: city.location.coordinates[1], // Latitude is second in GeoJSON
         lng: city.location.coordinates[0]  // Longitude is first in GeoJSON
-      });
+      }, city.name, cityId);
     } else if (city && city.latitude && city.longitude) {
       // Alternative data format
       console.log('Selected city (alt format):', city.name, city.latitude, city.longitude);
       onLocationChange({
         lat: parseFloat(city.latitude),
         lng: parseFloat(city.longitude)
-      });
+      }, city.name, cityId);
     } else {
       console.warn('Selected city has no valid coordinates:', city);
     }
@@ -106,25 +141,23 @@ const CitySelector = ({ onLocationChange, isDarkMode }) => {
   }
   
   return (
-    <div className={`city-selector ${isDarkMode ? 'dark-theme' : ''}`}>
+    <div className="city-selector">
       <select 
         value={selectedCity} 
         onChange={handleCityChange} 
         disabled={isLoading}
         className={isDarkMode ? 'dark-mode' : 'light-mode'}
+        aria-label="Select a city"
       >
-        <option value="" disabled>-- Select a City --</option>
+        {/* Always include All Cities and make it the first option */}
+        <option value="all">All Cities</option>
+        
         {cities.map(city => (
-          <option 
-            key={city._id || city.id} 
-            value={city._id || city.id}
-            className={isDarkMode ? 'dark-mode-option' : ''}
-          >
+          <option key={city._id || city.id} value={city._id || city.id}>
             {city.code ? `${city.code} - ${city.name}` : city.name}
           </option>
         ))}
       </select>
-      
       {isLoading && (
         <div className={`loading-indicator ${isDarkMode ? 'dark-mode' : ''}`}>
           Loading cities...

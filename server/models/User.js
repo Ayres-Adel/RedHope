@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
 
-const userSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: [true, 'Please enter a username'],
@@ -21,10 +21,6 @@ const userSchema = new mongoose.Schema({
   dateOfBirth: {
     type: Date,
     required: [true, 'Please enter your date of birth']
-  },
-  location: {
-    type: String,
-    required: [true, 'Please enter your location']
   },
   bloodType: {
     type: String,
@@ -55,14 +51,42 @@ const userSchema = new mongoose.Schema({
       },
       message: props => `${props.value} is not a valid phone number!`
     }
+  },
+  // Keep the cityId field for backward compatibility if needed
+  cityId: {
+    type: String,
+    default: null
+  },
+  // Keep the location object for geo features
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      default: [0, 0]
+    }
+  },
+  
+  // Add a textual address field
+  address: {
+    type: String,
+    default: ''
+  },
+  
+  // Add lastCityUpdate timestamp to track when city was last determined
+  lastCityUpdate: {
+    type: Date,
+    default: null
   }
-
 });
 
 // Password hashing and login method (same as before)
 
 // fire a function before doc saved to db
-userSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -72,7 +96,7 @@ userSchema.pre('save', async function (next) {
 });
 
 // static method to login user (same as before)
-userSchema.statics.login = async function (email, password) {
+UserSchema.statics.login = async function (email, password) {
   const user = await this.findOne({ email });
   if (user) {
     const auth = await bcrypt.compare(password, user.password);
@@ -85,7 +109,7 @@ userSchema.statics.login = async function (email, password) {
 };
 
 
-userSchema.statics.checkExisting = async function ({ email, phoneNumber, password }) {
+UserSchema.statics.checkExisting = async function ({ email, phoneNumber, password }) {
   // Check if email exists
   const emailExists = await this.findOne({ email });
   if (emailExists) {
@@ -111,5 +135,75 @@ userSchema.statics.checkExisting = async function ({ email, phoneNumber, passwor
   return null;
 };
 
-const User = mongoose.model('user', userSchema);
+UserSchema.methods.updateCityFromCoordinates = async function() {
+  try {
+    // Skip if no valid coordinates
+    if (!this.location || !this.location.coordinates || 
+        this.location.coordinates.length !== 2 ||
+        (this.location.coordinates[0] === 0 && this.location.coordinates[1] === 0)) {
+      return null;
+    }
+    
+    // Get longitude and latitude
+    const [longitude, latitude] = this.location.coordinates;
+    
+    // Find the nearest city using geospatial query
+    const City = mongoose.model('City');
+    const nearestCity = await City.findOne({
+      'location': {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [longitude, latitude]
+          },
+          $maxDistance: 50000 // 50km radius
+        }
+      }
+    });
+    
+    if (nearestCity) {
+      // Update city reference
+      this.city = nearestCity._id;
+      this.cityId = nearestCity.code.toString();
+      this.lastCityUpdate = new Date();
+      await this.save();
+      
+      return nearestCity;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error determining city from coordinates:', error);
+    return null;
+  }
+};
+
+// Add a static method to bulk update cities for users with coordinates but no city
+UserSchema.statics.bulkUpdateCitiesFromCoordinates = async function(limit = 100) {
+  try {
+    // Find users with coordinates but no city
+    const users = await this.find({
+      city: null,
+      'location.coordinates.0': { $ne: 0 },
+      'location.coordinates.1': { $ne: 0 }
+    }).limit(limit);
+    
+    console.log(`Found ${users.length} users with coordinates but no city`);
+    
+    let updatedCount = 0;
+    for (const user of users) {
+      const city = await user.updateCityFromCoordinates();
+      if (city) {
+        updatedCount++;
+      }
+    }
+    
+    return { processed: users.length, updated: updatedCount };
+  } catch (error) {
+    console.error('Error in bulk city update:', error);
+    return { processed: 0, updated: 0, error: error.message };
+  }
+};
+
+const User = mongoose.model('user', UserSchema);
 module.exports = User;

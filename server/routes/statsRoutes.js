@@ -40,4 +40,10 @@ router.get('/donations/*', authMiddleware, (req, res) => {
   });
 });
 
+// Add blood type distribution stats endpoint (separate from blood-supply used by admin)
+router.get('/blood-types', asyncHandler(statsController.getBloodTypeStats));
+
+// Add a route to update user cities based on coordinates
+router.get('/update-user-cities', authMiddleware, asyncHandler(statsController.updateUserCities));
+
 module.exports = router;
