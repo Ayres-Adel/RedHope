@@ -15,6 +15,9 @@ router.post('/login', authController.login);
 // Register route
 router.post('/register', authController.register);
 
+// Add an alias route for /signup that points to the register function
+router.post('/signup', authController.register);
+
 // Logout route
 router.get('/logout', authController.logout);
 

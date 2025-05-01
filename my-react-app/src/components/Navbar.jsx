@@ -34,11 +34,8 @@ export default function Navbar() {
     if (toggle) {
       document.body.classList.toggle("dark-theme", toggle.checked);
       localStorage.setItem("darkMode", toggle.checked);
-
-      // Update all icons to match theme
-      document.querySelectorAll('.login-icon, .language-icon').forEach(icon => {
-        icon.classList.toggle('dark-themed-icon', !document.body.classList.contains('dark-theme'));
-      });
+      
+      // REMOVED: Don't manipulate icon classes directly here as it causes layout shifts
     }
   }, []);
 
@@ -328,12 +325,8 @@ export default function Navbar() {
             <input 
               type="checkbox" 
               id="toggle" 
-              onChange={() => {
-                // Update all icons to match theme
-                document.querySelectorAll('.login-icon, .language-icon').forEach(icon => {
-                  icon.classList.toggle('dark-themed-icon', !document.body.classList.contains('dark-theme'));
-                });
-              }}
+              onChange={handleToggleChange}
+              // REMOVED: Additional onChange handler that was causing layout shifts
             />
             <label htmlFor="toggle" className="display">
               <div className="circle">

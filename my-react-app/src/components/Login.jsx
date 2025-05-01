@@ -11,6 +11,7 @@ import floating from '../assets/images/balloon.svg';
 // Import images
 import redHopeLogo from '../assets/images/RedHope_Logo.png';
 import Navbar from './Navbar.jsx';
+import { API_BASE_URL } from '../config';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -105,7 +106,7 @@ export default function Login() {
     try {
       console.log('Sending login request to server...');
       
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

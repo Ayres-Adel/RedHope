@@ -11,6 +11,9 @@ import HospitalIcon from "../assets/images/hospital.png";
 import CitySelector from "./CitySelect";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faPhone, faHospital, faClock, faSearch, faTint, faUsers, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { API_BASE_URL } from '../config';
+
+// Define API base URL in one place for easy updates when deploying
 
 export default function MapComponent() {
   const mapStyle = {
@@ -76,8 +79,8 @@ export default function MapComponent() {
     try {
       // Build the endpoint URL based on whether a city is selected
       const endpoint = cityId 
-        ? `http://localhost:3000/api/stats/blood-types?cityId=${cityId}` 
-        : 'http://localhost:3000/api/stats/blood-types';
+        ? `${API_BASE_URL}/api/stats/blood-types?cityId=${cityId}` 
+        : `${API_BASE_URL}/api/stats/blood-types`;
       
       console.log(`Fetching blood stats from: ${endpoint}`);
       const response = await fetch(endpoint);
@@ -165,8 +168,8 @@ export default function MapComponent() {
     const fetchHospitals = async () => {
       try {
         setIsLoading(true);
-        // Hardcode the URL without using process.env
-        const response = await fetch("http://localhost:3000/api/map/hospitals");
+        // Use API_BASE_URL variable instead of hardcoded URL
+        const response = await fetch(`${API_BASE_URL}/api/map/hospitals`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -495,7 +498,7 @@ export default function MapComponent() {
           
           <div className="map-container">
             <div className="hospital-map-content">
-              <APIProvider apiKey="AIzaSyAeTAUxWY5luBGsf-F6-vP8eDLqgjzmACg">
+              <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}>
                 <Map
                   ref={mapRef}
                   mapId={isDarkMode ? "8f51571e39b5d5e" : "7e663c504dc4b013"}

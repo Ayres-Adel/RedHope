@@ -105,10 +105,6 @@ nav {
   transition: all 0.3s ease;
   font-size: 20px; /* Standardized icon size */
   cursor: pointer;
-  position: static;
-  display: flex; /* Ensure icon is properly displayed */
-  align-items: center;
-  justify-content: center;
   margin-top: 0;
 }
 
@@ -270,10 +266,6 @@ hr {
   font-size: 20px; /* Standardized icon size */
   cursor: pointer;
   transition: all 0.3s ease;
-  position: static;
-  display: flex; /* Ensure icon is properly displayed */
-  align-items: center;
-  justify-content: center;
   margin-top: 0;
 }
 

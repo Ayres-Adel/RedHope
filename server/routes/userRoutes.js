@@ -104,7 +104,7 @@ router.get('/profile', async (req, res) => {
         role: userData.role || userRole || 'user',
         bloodType: userData.bloodType || 'Not specified',
         location: userData.location || userData.address || 'Not specified',
-        phone: userData.phone || 'Not specified',
+        phoneNumber: userData.phoneNumber || 'Not specified', // Changed key from 'phone' to 'phoneNumber'ng as 'phone'
         isActive: userData.isActive !== false,
         isDonor: userData.isDonor || false
       };
@@ -227,6 +227,99 @@ router.post('/create', async (req, res) => {
       success: false,
       message: 'Failed to create user',
       error: error.message
+    });
+  }
+});
+
+// Add a dedicated route for changing password
+router.put('/change-password', async (req, res) => {
+  try {
+    // Get token from authorization header
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+    
+    // Decode token to get userId
+    const jwt = require('jsonwebtoken');
+    const secret = process.env.JWT_SECRET || 'your-secret-key';
+    
+    try {
+      const decoded = jwt.verify(token, secret);
+      const userId = decoded.id;
+      
+      // Validate password change request
+      const { currentPassword, newPassword, confirmNewPassword } = req.body;
+      
+      if (!currentPassword || !newPassword || !confirmNewPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide current password, new password and confirmation'
+        });
+      }
+      
+      if (newPassword !== confirmNewPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'New password and confirmation do not match'
+        });
+      }
+      
+      // Find user
+      const user = await User.findById(userId);
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+      
+      // Verify current password
+      const bcrypt = require('bcrypt');
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: 'Current password is incorrect'
+        });
+      }
+      
+      // Update password
+      user.password = newPassword; // The pre-save hook in the User model will hash this
+      await user.save();
+      
+      return res.status(200).json({
+        success: true,
+        message: 'Password changed successfully'
+      });
+      
+    } catch (tokenError) {
+      // Handle token errors
+      if (tokenError.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Token expired',
+          expired: true
+        });
+      }
+      
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid authentication token'
+      });
+    }
+  } catch (error) {
+    console.error('Password change error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });

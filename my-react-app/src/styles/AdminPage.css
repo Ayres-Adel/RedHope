@@ -1,21 +1,18 @@
 /* Admin Page Styles */
 
 .admin-page {
-  padding-top: 100px;
-  min-height: 100vh;
+  padding-top: 80px;
+  min-height: 97.6vh;
   background-color: #f8f9fa;
   animation: fadeIn 0.5s ease-in-out;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
+/* Layout */
 .admin-container {
   display: flex;
   max-width: 1400px;
@@ -33,7 +30,7 @@
   margin-right: 24px;
   height: calc(100vh - 130px);
   position: sticky;
-  top: 100px;
+  top: 80px;
 }
 
 .admin-profile {
@@ -127,7 +124,7 @@
   font-weight: 600;
 }
 
-/* Dashboard Styles */
+/* Dashboard Metrics */
 .dashboard-metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -178,7 +175,7 @@
   color: #2c3e50;
 }
 
-/* Improved Recent Activity Styles - consistent for both light and dark modes */
+/* Activity Styles */
 .activity-item {
   display: flex;
   flex-direction: column;
@@ -189,6 +186,7 @@
   position: relative;
   background-color: #f8f9fa;
   border-left: 3px solid rgb(255, 71, 71);
+  border-bottom: 1px solid #eee;
 }
 
 .activity-item:hover {
@@ -197,6 +195,7 @@
 }
 
 .activity-item:last-child {
+  border-bottom: none;
   margin-bottom: 0;
 }
 
@@ -215,8 +214,7 @@
   line-height: 1.4;
 }
 
-/* Recent Activity Section improvements */
-.recent-activity-section {
+.recent-activity-section, .blood-supply-section {
   margin-top: 30px;
   background: white;
   border-radius: 10px;
@@ -234,10 +232,6 @@
   align-items: center;
 }
 
-.dark-theme .recent-activity-section h3 {
-  color: #e0e0e0;
-}
-
 .recent-activity-section h3::before {
   content: '';
   display: inline-block;
@@ -248,33 +242,11 @@
   margin-right: 10px;
 }
 
-/* Quick Stats Styles */
-.quick-stats {
-  background-color: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
-  border: 1px solid #eee;
+.activity-list {
+  margin-top: 15px;
 }
 
-.quick-stats h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  color: #2c3e50;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-/* Add these styles to fix blood type grid and section layouts */
-
-.blood-supply-section {
-  margin-top: 30px;
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
+/* Blood Supply Styles */
 .blood-types-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -295,7 +267,7 @@
   margin: 0 0 8px 0;
 }
 
-.blood-type-card.available {
+.blood-type-card.available, .blood-type-card.stable {
   background-color: #e6f7e6;
   border: 1px solid #c3e6c3;
 }
@@ -310,98 +282,24 @@
   border: 1px solid #f5c3c3;
 }
 
-.blood-type-card.stable {
-  background-color: #e6f7e6;
-  border: 1px solid #c3e6c3;
+/* Quick Stats */
+.quick-stats {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eee;
 }
 
-.activity-list {
-  margin-top: 15px;
-}
-
-.activity-item {
-  display: flex;
-  flex-direction: column;
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-}
-
-.activity-item:last-child {
-  border-bottom: none;
-}
-
-.activity-time {
-  font-size: 12px;
-  color: #777;
-  margin-bottom: 5px;
-}
-
-.activity-desc {
-  font-size: 14px;
-}
-
-/* Dark mode styles for the recent activities section */
-
-.dark-theme .recent-activity-section {
-  background-color: #2a2a2a;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-  border: 1px solid #3a3a3a;
-}
-
-.dark-theme .activity-item {
-  border-bottom-color: #3a3a3a;
-  padding: 12px 16px;
-}
-
-.dark-theme .activity-time {
-  color: #aaa;
-}
-
-.dark-theme .activity-desc {
-  color: #e0e0e0;
+.quick-stats h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #2c3e50;
+  font-size: 18px;
   font-weight: 500;
 }
 
-.dark-theme .blood-supply-section {
-  background-color: #2a2a2a;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-  border: 1px solid #3a3a3a;
-}
-
-/* Add hover effects for better user experience */
-.dark-theme .activity-item:hover {
-  background-color: #333;
-  transition: background-color 0.2s ease;
-}
-
-/* Improved styling for blood type cards in dark mode */
-.dark-theme .blood-type-card {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.dark-theme .blood-type-card.stable {
-  background-color: #1e3a1e;
-  border-color: #2a4a2a;
-  color: #a0e0a0;
-}
-
-.dark-theme .blood-type-card.low {
-  background-color: #3a3420;
-  border-color: #4a4428;
-  color: #e0d0a0;
-}
-
-.dark-theme .blood-type-card.critical {
-  background-color: #3e2222;
-  border-color: #4e2a2a;
-  color: #e0a0a0;
-}
-
-/* User Management Styles */
-.admin-users, .admin-donations, .admin-content, .admin-settings {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
+/* Controls and Search */
 .controls {
   display: flex;
   justify-content: space-between;
@@ -457,33 +355,143 @@
   transform: translateY(-2px);
 }
 
+/* Table Styles - Updated */
 .table-container {
   overflow-x: auto;
   margin-bottom: 32px;
+  /* Make container visually invisible but keep functionality */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  /* Remove any unwanted margins */
+  margin-top: 0;
+  margin-left: 0;
 }
 
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 14px;
+  table-layout: auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+  /* Remove any unwanted margins */
+  margin: 0;
 }
 
-.data-table th, .data-table td {
-  padding: 12px 16px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
+/* Adjust dark theme for tables - Updated to maintain sizing consistency */
+.dark-theme .table-container {
+  /* Keep all functionality and invisibility, just like in light mode */
+  overflow-x: auto;
+  margin-bottom: 32px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  /* Remove any unwanted margins */
+  margin-top: 0;
+  margin-left: 0;
 }
 
-.data-table th {
-  color: #7f8c8d;
+.dark-theme .data-table {
+  /* Maintain exact same dimensions and layout */
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  table-layout: auto;
+  border-radius: 8px;
+  overflow: hidden;
+  /* Only change color properties */
+  border-color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: #1e1e1e;
+  /* Remove any unwanted margins */
+  margin: 0;
+}
+
+/* Pagination Styles - Enhanced */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px; /* Ensure space above pagination */
+  margin-bottom: 16px; /* Ensure space below pagination */
+  gap: 12px;
+}
+
+.pagination button {
+  background-color: white;
+  color: #333; /* SVG will inherit this color */
+  border: 1px solid #ddd;
+  padding: 8px 12px; /* Adjusted padding for icons */
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 500;
-  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex; /* Align SVG nicely */
+  align-items: center; /* Align SVG nicely */
+  justify-content: center; /* Align SVG nicely */
+  line-height: 1; /* Prevent extra space */
 }
 
-.data-table tbody tr:hover {
-  background-color: #f8f9fa;
+/* Style for SVG inside pagination buttons */
+.pagination button svg {
+  width: 1em; /* Use font size */
+  height: 1em; /* Use font size */
+  vertical-align: middle; /* Align icon vertically */
 }
 
+.pagination button:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  border-color: #ccc;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.pagination button:disabled {
+  background-color: #f8f9fa;
+  color: #aaa; /* Disabled SVG color */
+  border-color: #eee;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.pagination .page-info {
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+  padding: 0 8px; /* Add some horizontal padding */
+}
+
+/* Dark Theme Pagination */
+.dark-theme .pagination button {
+  background-color: #2a2a2a;
+  color: #e0e0e0; /* Dark theme SVG color */
+  border-color: #444;
+}
+
+.dark-theme .pagination button:hover:not(:disabled) {
+  background-color: #333;
+  border-color: #555;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.dark-theme .pagination button:disabled {
+  background-color: #252525;
+  color: #666; /* Dark theme disabled SVG color */
+  border-color: #333;
+  opacity: 0.6;
+}
+
+.dark-theme .pagination .page-info {
+  color: #a0a0a0;
+}
+
+/* Status and Permission Badges */
 .status-badge {
   display: inline-block;
   padding: 4px 8px;
@@ -493,7 +501,7 @@
   text-transform: capitalize;
 }
 
-.status-badge.active {
+.status-badge.active, .status-badge.completed {
   background-color: rgba(46, 213, 115, 0.1);
   color: #2ed573;
 }
@@ -508,11 +516,6 @@
   color: #ffa502;
 }
 
-.status-badge.completed {
-  background-color: rgba(46, 213, 115, 0.1);
-  color: #2ed573;
-}
-
 .status-badge.scheduled {
   background-color: rgba(3, 169, 244, 0.1);
   color: #03a9f4;
@@ -523,64 +526,143 @@
   color: #ff4747;
 }
 
+.permission-badges {
+  display: flex;
+  gap: 6px;
+}
+
+.permission-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(255, 71, 71, 0.1);
+  color: #ff4747;
+  font-size: 12px;
+}
+
+/* Action Buttons - Refined Design */
 .actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  justify-content: center;
+  min-width: 100%;
+  padding: 0;
 }
 
 .action-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+/* Remove the pseudo-element animation that doesn't look good */
+.action-btn::before {
+  display: none;
+}
+
+.action-btn svg {
+  font-size: 16px;
+  transition: transform 0.2s ease;
 }
 
 .action-btn.edit {
-  background-color: rgba(3, 169, 244, 0.1);
+  background-color: rgba(3, 169, 244, 0.12);
   color: #03a9f4;
 }
 
-.action-btn.delete {
-  background-color: rgba(255, 71, 71, 0.1);
+.action-btn.delete, .action-btn.reject {
+  background-color: rgba(255, 71, 71, 0.12);
   color: #ff4747;
 }
 
 .action-btn.approve {
-  background-color: rgba(46, 213, 115, 0.1);
+  background-color: rgba(46, 213, 115, 0.12);
   color: #2ed573;
 }
 
-.action-btn.reject {
-  background-color: rgba(255, 71, 71, 0.1);
-  color: #ff4747;
+/* Simpler, cleaner hover effects */
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-btn:hover svg {
+  transform: scale(1.1);
 }
 
 .action-btn.edit:hover {
   background-color: #03a9f4;
   color: white;
+  box-shadow: 0 3px 6px rgba(3, 169, 244, 0.25);
 }
 
-.action-btn.delete:hover {
+.action-btn.delete:hover, .action-btn.reject:hover {
   background-color: #ff4747;
   color: white;
+  box-shadow: 0 3px 6px rgba(255, 71, 71, 0.25);
 }
 
 .action-btn.approve:hover {
   background-color: #2ed573;
   color: white;
+  box-shadow: 0 3px 6px rgba(46, 213, 115, 0.25);
 }
 
-.action-btn.reject:hover {
-  background-color: #ff4747;
-  color: white;
+/* Column sizing - Update Action column width */
+.data-table th:last-child, .data-table td:last-child { /* Actions column */
+  width: 140px;
+  text-align: center;
+  padding: 14px; /* Consistent padding */
+  vertical-align: middle; /* Vertically center content */
 }
 
-/* Control buttons styling improvement */
+/* Make sure cells with actions have proper spacing */
+.data-table td:last-child {
+  height: 66px; /* Fixed height to make buttons align consistently */
+  white-space: nowrap;
+}
+
+/* Dark theme adjustments for action buttons */
+.dark-theme .action-btn {
+  box-shadow: none;
+}
+
+.dark-theme .action-btn.edit {
+  background-color: rgba(3, 169, 244, 0.18);
+}
+
+.dark-theme .action-btn.delete, 
+.dark-theme .action-btn.reject {
+  background-color: rgba(255, 71, 71, 0.18);
+}
+
+.dark-theme .action-btn.approve {
+  background-color: rgba(46, 213, 115, 0.18);
+}
+
+.dark-theme .action-btn.edit:hover {
+  box-shadow: 0 3px 6px rgba(3, 169, 244, 0.3);
+}
+
+.dark-theme .action-btn.delete:hover, 
+.dark-theme .action-btn.reject:hover {
+  box-shadow: 0 3px 6px rgba(255, 71, 71, 0.3);
+}
+
+.dark-theme .action-btn.approve:hover {
+  box-shadow: 0 3px 6px rgba(46, 213, 115, 0.3);
+}
+
+/* Control Buttons */
 .action-buttons {
   display: flex;
   gap: 12px;
@@ -613,22 +695,7 @@
   color: rgb(255, 71, 71);
 }
 
-/* Dark theme adjustments */
-.dark-theme .control-button {
-  background-color: #2a2a2a;
-  color: #e0e0e0;
-  border-color: #333;
-}
-
-.dark-theme .control-button:hover {
-  background-color: #333;
-}
-
-.dark-theme .control-button svg {
-  color: rgb(255, 71, 71);
-}
-
-/* Redesigned Content Management Section */
+/* Content Management */
 .content-sections-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -669,7 +736,7 @@
   color: #ff4747;
   font-size: 20px;
   float: right;
-  margin: 16px 16px 0 16px;
+  margin: 16px 16px 0 24px;
 }
 
 .section-content {
@@ -734,83 +801,6 @@
   font-size: 12px;
 }
 
-/* Dark theme adjustments for new content design */
-.dark-theme .content-section {
-  background: #1e1e1e;
-  border-color: #333;
-}
-
-.dark-theme .section-icon {
-  background: rgba(255, 71, 71, 0.15);
-  color: #ff6b6b;
-}
-
-.dark-theme .section-content h3,
-.dark-theme .section-content h4 {
-  color: #e0e0e0;
-}
-
-.dark-theme .content-description {
-  color: #aaa;
-}
-
-.dark-theme .content-footer {
-  border-top-color: #333;
-}
-
-.dark-theme .last-modified {
-  color: #999;
-}
-
-.dark-theme .content-status.published {
-  background: #143a14;
-  color: #81c784;
-}
-
-.dark-theme .content-status.draft {
-  background: #3e2e00;
-  color: #ffcc80;
-}
-
-/* Responsive Settings */
-@media (max-width: 768px) {
-  .content-sections-container {
-    gap: 16px;
-  }
-  
-  .content-section .section-header {
-    padding: 12px 16px;
-  }
-  
-  .content-section .section-body {
-    padding: 16px;
-  }
-  
-  .content-card-header,
-  .content-description,
-  .content-card-footer {
-    padding: 12px 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .content-card-footer {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  
-  .content-edit-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Settings Page Styles */
-.admin-settings {
-  padding: 20px 0;
-}
-
 .admin-settings h2 {
   margin-bottom: 28px;
   color: #2c3e50;
@@ -860,7 +850,6 @@
   color: #ff4747;
   font-size: 20px;
   float: right;
-  margin: -8px -8px 0 16px;
 }
 
 .card-content {
@@ -908,6 +897,7 @@
   box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2);
 }
 
+/* System Info */
 .system-info {
   background: white;
   border-radius: 12px;
@@ -966,142 +956,49 @@
   font-weight: 600;
 }
 
-.info-value.status-ok {
-  color: #28a745;
+.info-value.status-ok,
+.info-value.status-warning,
+.info-value.status-error {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.info-value.status-ok:before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background-color: #28a745;
-  border-radius: 50%;
+.info-value.status-ok {
+  color: #28a745;
 }
 
 .info-value.status-warning {
   color: #ffc107;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.info-value.status-warning:before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background-color: #ffc107;
-  border-radius: 50%;
 }
 
 .info-value.status-error {
   color: #dc3545;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
+.info-value.status-ok:before,
+.info-value.status-warning:before,
 .info-value.status-error:before {
   content: "";
   display: inline-block;
   width: 8px;
   height: 8px;
-  background-color: #dc3545;
   border-radius: 50%;
 }
 
-/* Dark Theme Settings - Updated button hover effects */
-.dark-theme .settings-card {
-  background: #1e1e1e;
-  border-color: #333;
+.info-value.status-ok:before {
+  background-color: #28a745;
 }
 
-.dark-theme .card-header {
-  background: #252525;
-  border-color: #333;
+.info-value.status-warning:before {
+  background-color: #ffc107;
 }
 
-.dark-theme .card-icon {
-  background: rgba(255, 71, 71, 0.15);
-  color: #ff6b6b;
+.info-value.status-error:before {
+  background-color: #dc3545;
 }
 
-.dark-theme .card-content h3 {
-  color: #e0e0e0;
-}
-
-.dark-theme .card-content p {
-  color: #aaa;
-}
-
-/* Updated settings button hover effects in dark mode */
-.dark-theme .settings-btn {
-  background-color: #2a2a2a;
-  color: #ff6b6b;
-  border-color: #ff6b6b;
-}
-
-.dark-theme .settings-btn:hover {
-  background-color: #ff4747;
-  color: #fff;
-  border-color: #ff4747;
-  box-shadow: 0 0 12px rgba(255, 71, 71, 0.4);
-  transform: translateY(-3px);
-  transition: all 0.3s ease;
-}
-
-.dark-theme .system-info {
-  background: #1e1e1e;
-  border-color: #333;
-}
-
-.dark-theme .system-info h3 {
-  color: #e0e0e0;
-}
-
-.dark-theme .info-item {
-  background: #252525;
-  border-color: #333;
-}
-
-.dark-theme .info-label {
-  color: #aaa;
-}
-
-.dark-theme .info-value {
-  color: #e0e0e0;
-}
-
-/* Responsive Settings */
-@media (max-width: 768px) {
-  .settings-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .info-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .admin-settings h2 {
-    font-size: 20px;
-  }
-  
-  .system-info {
-    padding: 16px;
-  }
-}
-
-/* Loading Spinner */
+/* Loading and States */
 .admin-loading {
   display: flex;
   flex-direction: column;
@@ -1121,9 +1018,7 @@
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .admin-loading p {
@@ -1203,7 +1098,22 @@
   border-color: rgb(255, 71, 71);
 }
 
-/* Dark Mode Styles */
+/* Checkbox Groups */
+.checkbox-group {
+  margin-bottom: 10px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Dark Theme Styles */
 .dark-theme .admin-page {
   background-color: #121212;
   color: #e0e0e0;
@@ -1212,9 +1122,10 @@
 .dark-theme .admin-sidebar,
 .dark-theme .admin-content-area,
 .dark-theme .metric-card,
-.dark-theme .recent-activity,
+.dark-theme .recent-activity-section,
+.dark-theme .blood-supply-section,
 .dark-theme .quick-stats,
-.dark-theme .content-card,
+.dark-theme .content-section,
 .dark-theme .settings-card,
 .dark-theme .system-info {
   background-color: #1e1e1e;
@@ -1225,12 +1136,12 @@
 .dark-theme .admin-info h3,
 .dark-theme .admin-content-area h2,
 .dark-theme .metric-data p,
-.dark-theme .recent-activity h3,
+.dark-theme .recent-activity-section h3,
 .dark-theme .quick-stats h3,
-.dark-theme .content-header h3,
-.dark-theme .settings-card h3,
+.dark-theme .section-content h3,
+.dark-theme .section-content h4,
+.dark-theme .card-content h3,
 .dark-theme .system-info h3,
-.dark-theme .content-text,
 .dark-theme .info-value {
   color: #e0e0e0;
 }
@@ -1238,8 +1149,9 @@
 .dark-theme .admin-info p,
 .dark-theme .metric-data h3,
 .dark-theme .activity-time,
-.dark-theme .settings-card p,
-.dark-theme .info-label {
+.dark-theme .card-content p,
+.dark-theme .info-label,
+.dark-theme .last-modified {
   color: #a0a0a0;
 }
 
@@ -1249,11 +1161,16 @@
 
 .dark-theme .admin-menu li.active {
   background-color: rgb(255, 71, 71);
+}
+
+.dark-theme .admin-menu li.active span,
+.dark-theme .admin-menu li.active svg {
   color: white;
 }
 
-.dark-theme .admin-menu li.active span {
+.dark-theme .admin-menu li svg {
   color: white;
+  transition: color 0.3s ease;
 }
 
 .dark-theme .search-container input {
@@ -1267,43 +1184,83 @@
   box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.2);
 }
 
-.dark-theme .data-table th {
-  background-color: #1a1a1a;
-  color: #a0a0a0;
-}
-
-.dark-theme .data-table td {
-  border-color: #333;
-}
-
-.dark-theme .data-table tbody tr:hover {
-  background-color: #2a2a2a;
-}
-
-.dark-theme .content-header {
-  border-color: #333;
-}
-
 .dark-theme .activity-item {
   background-color: #2a2a2a;
+  border-bottom-color: #3a3a3a;
+}
+
+.dark-theme .activity-item:hover {
+  background-color: #333;
 }
 
 .dark-theme .activity-desc {
   color: #e0e0e0;
 }
 
+.dark-theme .blood-type-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .blood-type-card.stable {
+  background-color: #1e3a1e;
+  border-color: #2a4a2a;
+  color: #a0e0a0;
+}
+
+.dark-theme .blood-type-card.low {
+  background-color: #3a3420;
+  border-color: #4a4428;
+  color: #e0d0a0;
+}
+
+.dark-theme .blood-type-card.critical {
+  background-color: #3e2222;
+  border-color: #4e2a2a;
+  color: #e0a0a0;
+}
+
+.dark-theme .control-button,
 .dark-theme .settings-btn {
   background-color: #2a2a2a;
   color: #e0e0e0;
   border-color: #333;
 }
 
-.dark-theme .settings-btn:hover {
+.dark-theme .control-button:hover {
   background-color: #333;
 }
 
-.dark-theme .info-item {
+.dark-theme .control-button svg {
+  color: rgb(255, 71, 71);
+}
+
+.dark-theme .section-icon,
+.dark-theme .card-icon {
+  background: rgba(255, 71, 71, 0.15);
+  color: #ff6b6b;
+}
+
+.dark-theme .content-description {
+  color: #aaa;
+}
+
+.dark-theme .content-footer,
+.dark-theme .card-header {
   border-color: #333;
+}
+
+.dark-theme .content-status.published {
+  background: #143a14;
+  color: #81c784;
+}
+
+.dark-theme .content-status.draft {
+  background: #3e2e00;
+  color: #ffcc80;
+}
+
+.dark-theme .info-item {
+  background: #252525;
 }
 
 .dark-theme .admin-unauthorized h2 {
@@ -1321,6 +1278,28 @@
 
 .dark-theme .language-btn:hover {
   background-color: #2a2a2a;
+}
+
+.dark-theme .permission-badge {
+  background-color: rgba(255, 71, 71, 0.2);
+  color: #ff7979;
+}
+
+/* Enhanced button styling for dark mode */
+.dark-theme .settings-btn {
+  background-color: #2a2a2a;
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.dark-theme .settings-btn:hover,
+.dark-theme .content-edit-btn:hover {
+  background-color: #ff4747;
+  color: #fff;
+  border-color: #ff4747;
+  box-shadow: 0 0 12px rgba(255, 71, 71, 0.4);
+  transform: translateY(-3px);
+  transition: all 0.3s ease;
 }
 
 /* Responsive Styles */
@@ -1352,24 +1331,19 @@
     min-width: 120px;
     text-align: center;
     justify-content: center;
+    flex-direction: column;
   }
 
   .admin-menu li svg {
     margin-right: 0;
     margin-bottom: 4px;
   }
-
-  .admin-menu li {
-    flex-direction: column;
-  }
 }
 
 @media (max-width: 768px) {
-  .dashboard-metrics {
-    grid-template-columns: 1fr;
-  }
-
-  .content-grid, .settings-grid {
+  .dashboard-metrics,
+  .content-grid, 
+  .settings-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1400,11 +1374,37 @@
     margin-right: -20px;
     width: calc(100% + 40px);
     overflow-x: auto;
+    /* Remove any unwanted top margin that might be inherited */
+    margin-top: 0;
   }
 
   .data-table {
     width: max-content;
     min-width: 100%;
+    /* Ensure no margins here either */
+    margin: 0;
+  }
+  
+  .content-sections-container {
+    gap: 16px;
+  }
+  
+  .section-header {
+    padding: 12px 16px;
+  }
+  
+  .section-body {
+    padding: 16px;
+  }
+  
+  .card-header,
+  .content-description,
+  .content-footer {
+    padding: 12px 16px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -1417,10 +1417,6 @@
   .admin-avatar {
     margin-right: 0;
     margin-bottom: 12px;
-  }
-
-  .admin-page {
-    padding-top: 80px;
   }
 
   .admin-menu li {
@@ -1436,78 +1432,85 @@
     margin-right: 0;
     margin-bottom: 12px;
   }
+  
+  .content-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .content-edit-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-settings h2 {
+    font-size: 20px;
+  }
+  
+  .system-info {
+    padding: 16px;
+  }
 }
 
-/* Improved Dark theme styles for content section */
-.dark-theme .content-section {
-  background: #1e1e1e;
-  border: 1px solid #333;
+/* Add these styles at the end of the file */
+
+.blood-supply-unavailable {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  margin: 15px 0;
+  color: #856404;
 }
 
-.dark-theme .content-section .section-header {
-  background: #252525;
-  border-bottom-color: #333;
+.blood-supply-unavailable svg {
+  font-size: 24px;
+  margin-bottom: 10px;
 }
 
-.dark-theme .content-section .section-header h3 {
-  color: #e0e0e0;
+.blood-supply-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  width: 100%;
 }
 
-.dark-theme .content-card {
-  background: #2d2d2d;
-  border-color: #444;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+/* Add this to your existing stylesheet */
+.no-blood-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #ccc;
+  margin: 10px 0;
+  width: 100%;
+  text-align: center;
+  color: #6c757d;
 }
 
-.dark-theme .content-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  border-color: #555;
+.no-blood-data .fa-exclamation-triangle {
+  color: #ffc107;
+  margin-right: 10px;
+  font-size: 1.2em;
 }
 
-.dark-theme .content-card-header {
-  border-bottom-color: #444;
-  background-color: #252525;
+.no-blood-data p {
+  margin: 0;
+  font-weight: 500;
 }
 
-.dark-theme .content-card-header h4 {
-  color: #e0e0e0;
-}
-
-.dark-theme .content-description {
-  color: #bbb;
-}
-
-.dark-theme .content-card-footer {
-  border-top-color: #444;
-  background-color: #252525;
-}
-
-.dark-theme .last-modified {
-  color: #999;
-}
-
-/* Enhanced button styling for dark mode in content page */
-.dark-theme .content-edit-btn {
+.dark-theme .no-blood-data {
   background-color: #2a2a2a;
-  color: #ff6b6b;
-  border-color: #ff6b6b;
-}
-
-.dark-theme .content-edit-btn:hover {
-  background-color: #ff4747;
-  color: #fff;
-  border-color: #ff4747;
-  box-shadow: 0 0 12px rgba(255, 71, 71, 0.4);
-  transform: translateY(-3px);
-  transition: all 0.3s ease;
-}
-
-.dark-theme .content-status.published {
-  background: #143a14;
-  color: #81c784;
-}
-
-.dark-theme .content-status.draft {
-  background: #3e2e00;
-  color: #ffcc80;
+  border-color: #444;
+  color: #adb5bd;
 }

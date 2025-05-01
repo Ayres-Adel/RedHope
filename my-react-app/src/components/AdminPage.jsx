@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faUsers, faTint, faNewspaper, faCog, faBell, 
-  faSearch, faEdit, faTrash, faCheck, faTimes, 
+import {
+  faUsers, faTint, faNewspaper, faCog, faBell,
+  faSearch, faEdit, faTrash, faCheck, faTimes,
   faChartLine, faUserShield, faCalendarAlt, faMapMarkerAlt,
   faDownload, faFilter, faLanguage, faMoon, faSun,
   faExclamationTriangle, faUserPlus, faServer, faDatabase
@@ -11,45 +11,170 @@ import {
 import Navbar from './Navbar';
 import '../styles/AdminPage.css';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
+// --- Constants ---
+const ITEMS_PER_PAGE = 10;
+const DEBOUNCE_DELAY = 500;
+
+const ROLES = {
+  USER: 'user',
+  DONOR: 'donor',
+  ADMIN: 'admin',
+  SUPERADMIN: 'superadmin',
+};
+
+const STATUS = {
+  ACTIVE: 'Active',
+  INACTIVE: 'Inactive',
+  PENDING: 'Pending',
+  COMPLETED: 'Completed',
+  CANCELLED: 'Cancelled',
+};
+
+const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+const BLOOD_SUPPLY_STATUS = {
+  STABLE: 'stable',
+  LOW: 'low',
+  CRITICAL: 'critical',
+};
+
+const MODAL_TYPE = {
+  USER: 'user',
+  ADMIN: 'admin',
+};
+
+const INITIAL_USER_FORM_DATA = {
+  username: '',
+  email: '',
+  role: ROLES.USER,
+  bloodType: '',
+  isDonor: false,
+  isActive: true,
+};
+
+const INITIAL_ADMIN_FORM_DATA = {
+  username: '',
+  email: '',
+  role: ROLES.ADMIN,
+  permissions: {
+    manageUsers: true,
+    manageDonations: true,
+    manageContent: true,
+    manageSettings: false,
+  },
+};
+
+// --- Helper Components (Internal) ---
+const EmptyStateMessage = ({ type, message, icon = faExclamationTriangle }) => (
+  <div className="no-data-message error">
+    <FontAwesomeIcon icon={icon} size="2x" />
+    <p>{message || `Unable to retrieve ${type} data. Please check connection.`}</p>
+  </div>
+);
+
+const LoadingIndicator = ({ message }) => (
+  <div className="admin-loading">
+    <div className="spinner"></div>
+    <p>{message}</p>
+  </div>
+);
+
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  if (totalPages <= 1) return null;
+  return (
+    <div className="pagination">
+      <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} aria-label="Previous Page">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+        </svg>
+      </button>
+      <span className="page-info">Page {currentPage} of {totalPages}</span>
+      <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} aria-label="Next Page">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+      </button>
+    </div>
+  );
+};
+
+const ActionButton = ({ type, onClick, title }) => {
+  const icons = { edit: faEdit, delete: faTrash, approve: faCheck, reject: faTimes };
+  return (
+    <button className={`action-btn ${type}`} onClick={onClick} title={title || type}>
+      <FontAwesomeIcon icon={icons[type]} />
+    </button>
+  );
+};
+
+const StatusBadge = ({ status, isDonor }) => {
+  let badgeClass = (status || '').toLowerCase();
+  let text = status;
+
+  if (typeof isDonor !== 'undefined') {
+    badgeClass = isDonor ? 'active' : 'cancelled'; // Reusing styles
+    text = isDonor ? 'Donor' : 'Non-Donor';
+  }
+
+  return <span className={`status-badge ${badgeClass}`}>{text}</span>;
+};
+
+// --- Main Component ---
 const AdminPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+  const [isDarkMode, setIsDarkMode] = useState(() => document.body.classList.contains('dark-theme'));
+
+  // Data States
   const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [donations, setDonations] = useState([]);
-  const [hospitals, setHospitals] = useState([]);
+  const [adminAccounts, setAdminAccounts] = useState([]);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalDonors: 0,
     totalDonations: 0,
     pendingRequests: 0,
-    bloodSupply: {}
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
-  const [error, setError] = useState(null);
-  const [pageInfo, setPageInfo] = useState({ page: 1, totalPages: 1, totalItems: 0 });
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [showUserModal, setShowUserModal] = useState(false);
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    role: 'user',
-    bloodType: '',
-    isDonor: false,
-    isActive: true
-  });
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.body.classList.contains('dark-theme');
+    bloodSupply: {},
+    bloodSupplyUnavailable: false,
   });
 
-  const translations = {
+  // UI States
+  const [loadingStates, setLoadingStates] = useState({
+    global: true, // For initial admin check
+    dashboard: false,
+    users: false,
+    donations: false,
+    admins: false,
+    action: false, // For specific actions like delete/update/create
+  });
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [pageInfo, setPageInfo] = useState({
+    users: { page: 1, totalPages: 1, totalItems: 0 },
+    donations: { page: 1, totalPages: 1, totalItems: 0 },
+  });
+
+  // Modal State
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    type: null, // 'user' or 'admin'
+    data: null, // user or admin object for editing
+  });
+  const [userFormData, setUserFormData] = useState(INITIAL_USER_FORM_DATA);
+  const [adminFormData, setAdminFormData] = useState(INITIAL_ADMIN_FORM_DATA);
+
+  // --- Translations ---
+  const translations = useMemo(() => ({
     en: {
       dashboard: 'Dashboard',
       dashboardOverview: 'Dashboard Overview',
       userManagement: 'User Management',
+      adminManagement: 'Admin Management',
       donations: 'Donations',
       donationManagement: 'Donation Management',
       content: 'Content',
@@ -60,6 +185,7 @@ const AdminPage = () => {
       totalDonations: 'Total Donations',
       scheduledDonations: 'Scheduled Donations',
       pendingRequests: 'Pending Requests',
+      totalDonors: 'Total Donors',
       recentActivity: 'Recent Activity',
       bloodTypeAvailability: 'Blood Type Availability',
       available: 'Available',
@@ -68,6 +194,7 @@ const AdminPage = () => {
       searchUsers: 'Search users...',
       searchDonations: 'Search donations...',
       addNewUser: 'Add New User',
+      addNewAdmin: 'Add New Admin',
       id: 'ID',
       name: 'Name',
       email: 'Email',
@@ -87,6 +214,7 @@ const AdminPage = () => {
       contactInformation: 'Contact Information',
       adminAccounts: 'Admin Accounts',
       adminAccountsDesc: 'Manage administrator access and permissions',
+      adminAccountsManagement: 'Admin Accounts Management',
       notificationSettings: 'Notification Settings',
       notificationSettingsDesc: 'Configure system notifications and alerts',
       systemBackup: 'System Backup',
@@ -113,11 +241,13 @@ const AdminPage = () => {
       lightMode: 'Light Mode',
       exportData: 'Export Data',
       filterData: 'Filter Data',
+      noBloodSupplyData: 'No blood supply data available',
     },
     fr: {
       dashboard: 'Tableau de bord',
       dashboardOverview: 'Aperçu du tableau de bord',
       userManagement: 'Gestion des utilisateurs',
+      adminManagement: 'Gestion des Administrateurs',
       donations: 'Dons',
       donationManagement: 'Gestion des dons',
       content: 'Contenu',
@@ -128,6 +258,7 @@ const AdminPage = () => {
       totalDonations: 'Dons totaux',
       scheduledDonations: 'Dons programmés',
       pendingRequests: 'Demandes en attente',
+      totalDonors: 'Donneurs totaux',
       recentActivity: 'Activité récente',
       bloodTypeAvailability: 'Disponibilité des groupes sanguins',
       available: 'Disponible',
@@ -136,6 +267,7 @@ const AdminPage = () => {
       searchUsers: 'Rechercher des utilisateurs...',
       searchDonations: 'Rechercher des dons...',
       addNewUser: 'Ajouter un nouvel utilisateur',
+      addNewAdmin: 'Ajouter un Admin',
       id: 'ID',
       name: 'Nom',
       email: 'Email',
@@ -155,6 +287,7 @@ const AdminPage = () => {
       contactInformation: 'Coordonnées',
       adminAccounts: 'Comptes administrateurs',
       adminAccountsDesc: 'Gérer l\'accès et les autorisations des administrateurs',
+      adminAccountsManagement: 'Gestion des Comptes Administrateurs',
       notificationSettings: 'Paramètres de notification',
       notificationSettingsDesc: 'Configurer les notifications et alertes du système',
       systemBackup: 'Sauvegarde du système',
@@ -181,91 +314,54 @@ const AdminPage = () => {
       lightMode: 'Mode clair',
       exportData: 'Exporter les données',
       filterData: 'Filtrer les données',
+      noBloodSupplyData: 'Aucune donnée sur l\'approvisionnement en sang disponible',
     }
-  };
+  }), [language]); // Only depends on language
 
-  const API_BASE_URL = 'http://localhost:3000/api';
+  const t = useMemo(() => translations[language], [translations, language]);
 
-  const getAuthHeaders = () => {
+  // --- Helper Functions ---
+  const setLoading = useCallback((key, value) => {
+    setLoadingStates(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const handleApiError = useCallback((operation, error) => {
+    const errorMessage = `Failed to ${operation}: ${error?.response?.data?.message || error?.message || 'Unknown error'}`;
+    console.error(errorMessage, error);
+    setError(errorMessage);
+    const timer = setTimeout(() => setError(null), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const getAuthHeaders = useCallback(() => {
     const token = localStorage.getItem('token');
-    return {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    };
-  };
+    return { headers: { Authorization: `Bearer ${token}` } };
+  }, []);
 
-  // Optimize data fetching functions
-  const fetchStats = async () => {
+  // --- API Fetching Functions ---
+  const fetchBloodSupply = useCallback(async () => {
     try {
-      setLoading(true);
-      
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No token found');
-      
-      // Single API call for all stats
-      const response = await axios.get(
-        `${API_BASE_URL}/stats/dashboard`,
-        { headers: { Authorization: `Bearer ${token}` }}
-      );
-      
-      // If API responds with data, use it
-      if (response.data && response.data.success) {
-        setStats(response.data.stats);
+      const response = await axios.get(`${API_BASE_URL}/api/stats/blood-types`, getAuthHeaders());
+      if (response.data?.success) {
+        const bloodData = response.data.data?.bloodTypes || {};
+        const supply = {};
+        Object.entries(bloodData).forEach(([type, count]) => {
+          if (count >= 10) supply[type] = BLOOD_SUPPLY_STATUS.STABLE;
+          else if (count >= 5) supply[type] = BLOOD_SUPPLY_STATUS.LOW;
+          else supply[type] = BLOOD_SUPPLY_STATUS.CRITICAL;
+        });
+        setStats(prev => ({ ...prev, bloodSupply: supply, bloodSupplyUnavailable: false }));
       } else {
-        // Calculate stats from user and donation data separately if needed
-        await fetchStatsFromDatabase();
+        throw new Error('Invalid response format');
       }
-      
-      setLoading(false);
     } catch (err) {
-      console.error('Stats fetch error:', err.message);
-      setError(err.message);
-      
-      // Try fallback
-      try {
-        await fetchStatsFromDatabase();
-      } catch (fallbackErr) {
-        console.error('Fallback stats fetch failed:', fallbackErr);
-      }
-      
-      setLoading(false);
-      setTimeout(() => setError(null), 5000);
+      handleApiError('retrieve blood supply', err);
+      setStats(prev => ({ ...prev, bloodSupply: {}, bloodSupplyUnavailable: true }));
     }
-  };
+  }, [getAuthHeaders, handleApiError]);
 
-  // Calculate blood supply based on available donors
-  const calculateBloodSupply = (donors) => {
-    const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-    const supply = {};
-    
-    // Initialize all blood types as 'critical'
-    bloodTypes.forEach(type => {
-      supply[type] = 'critical';
-    });
-    
-    // Count donors for each blood type
-    donors.forEach(donor => {
-      if (donor.bloodType && bloodTypes.includes(donor.bloodType)) {
-        // Update status based on count
-        const count = donors.filter(d => d.bloodType === donor.bloodType).length;
-        
-        if (count >= 10) {
-          supply[donor.bloodType] = 'stable';
-        } else if (count >= 5) {
-          supply[donor.bloodType] = 'low';
-        }
-        // else leave as 'critical'
-      }
-    });
-    
-    return supply;
-  };
-
-  // Fallback function that tries to get stats directly from database
-  const fetchStatsFromDatabase = async () => {
+  const fetchStatsFromDatabase = useCallback(async () => {
     try {
-      // Try different endpoints to get user data - modified to handle API issues
       const mockUsers = [
         { _id: 1, username: 'John Doe', email: 'john@example.com', role: 'Donor', bloodType: 'A+', status: 'Active', location: 'New York', isDonor: true },
         { _id: 2, username: 'Jane Smith', email: 'jane@example.com', role: 'Recipient', bloodType: 'O-', status: 'Active', location: 'Los Angeles', isDonor: false },
@@ -276,22 +372,16 @@ const AdminPage = () => {
       ];
 
       try {
-        // First try the API endpoint
-        const userResponse = await axios.get(`${API_BASE_URL}/user/all`, getAuthHeaders());
-        const users = userResponse.data.users || [];
-        
-        if (users.length > 0) {
-          // Set basic stats from API data
-          setStats({
-            totalUsers: users.length,
-            totalDonors: users.filter(u => u.isDonor === true).length,
-            totalDonations: 0,
-            pendingRequests: 0,
-            bloodSupply: calculateBloodSupply(users)
-          });
-          
-          // Make users available for other components
-          setUsers(users.map(user => ({
+        const userResponse = await axios.get(`${API_BASE_URL}/api/user/all`, getAuthHeaders());
+        const usersData = userResponse.data.users || [];
+
+        if (usersData.length > 0) {
+          setStats(prev => ({
+            ...prev,
+            totalUsers: usersData.length,
+            totalDonors: usersData.filter(u => u.isDonor === true).length,
+          }));
+          setUsers(usersData.map(user => ({
             _id: user._id || user.id,
             username: user.username || user.name,
             email: user.email,
@@ -302,572 +392,624 @@ const AdminPage = () => {
             isDonor: Boolean(user.isDonor)
           })));
         } else {
-          throw new Error("No users found in API response");
+          throw new Error("No users found in API response for fallback");
         }
       } catch (apiError) {
-        console.log("API call failed, using mock data:", apiError);
-        
-        // Set basic stats using mock data as fallback
-        setStats({
+        console.warn("Fallback user fetch failed, using mock data:", apiError);
+        setStats(prev => ({
+          ...prev,
           totalUsers: mockUsers.length,
           totalDonors: mockUsers.filter(u => u.isDonor === true).length,
-          totalDonations: 8,
-          pendingRequests: 3,
-          bloodSupply: calculateBloodSupply(mockUsers)
-        });
-        
-        // Make mock users available for other components
+        }));
         setUsers(mockUsers);
       }
-      
-      // Try to get donation data
+
       try {
-        const donationsResponse = await axios.get(`${API_BASE_URL}/donations`, getAuthHeaders());
-        if (donationsResponse.data && donationsResponse.data.donations) {
-          const donations = donationsResponse.data.donations;
-          
-          // Update stats with donation data
-          setStats(prevStats => ({
-            ...prevStats,
-            totalDonations: donations.length,
-            pendingRequests: donations.filter(d => d.status === 'Pending').length
+        const donationsResponse = await axios.get(`${API_BASE_URL}/api/donations`, getAuthHeaders());
+        if (donationsResponse.data?.donations) {
+          const donationsData = donationsResponse.data.donations;
+          setStats(prev => ({
+            ...prev,
+            totalDonations: donationsData.length,
+            pendingRequests: donationsData.filter(d => d.status === STATUS.PENDING).length
           }));
-          
-          // Make donations available
-          setDonations(donations);
+          setDonations(donationsData);
+        } else {
+          setStats(prev => ({ ...prev, totalDonations: 0, pendingRequests: 0 }));
+          setDonations([]);
         }
       } catch (donationError) {
-        console.log('Failed to fetch donation data:', donationError);
-        // Use mock donation data
-        const mockDonations = [
-          { _id: 101, donorName: 'John Doe', bloodType: 'A+', date: new Date(), location: 'Central Hospital', status: 'Completed' },
-          { _id: 102, donorName: 'Michael Brown', bloodType: 'A-', date: new Date(), location: 'Red Cross Center', status: 'Pending' },
-          { _id: 103, donorName: 'Emily Davis', bloodType: 'O+', date: new Date(), location: 'Community Clinic', status: 'Scheduled' }
-        ];
-        
-        setDonations(mockDonations);
+        handleApiError('retrieve fallback donation stats', donationError);
+        setStats(prev => ({ ...prev, totalDonations: 0, pendingRequests: 0 }));
+        setDonations([]);
       }
     } catch (err) {
-      console.error('Failed to fetch data from database:', err);
-      // Use full mock data as absolute fallback
+      handleApiError('retrieve fallback user/stats data', err);
       const mockUsers = [
         { _id: 1, username: 'John Doe', email: 'john@example.com', role: 'Donor', bloodType: 'A+', status: 'Active', location: 'New York', isDonor: true },
         { _id: 2, username: 'Jane Smith', email: 'jane@example.com', role: 'Recipient', bloodType: 'O-', status: 'Active', location: 'Los Angeles', isDonor: false },
-        { _id: 3, username: 'Robert Johnson', email: 'robert@example.com', role: 'Donor', bloodType: 'B+', status: 'Inactive', location: 'Chicago', isDonor: true },
-        { _id: 4, username: 'Sarah Williams', email: 'sarah@example.com', role: 'Admin', bloodType: 'AB+', status: 'Active', location: 'Miami', isDonor: false },
-        { _id: 5, username: 'Michael Brown', email: 'michael@example.com', role: 'Donor', bloodType: 'A-', status: 'Active', location: 'Seattle', isDonor: true },
-        { _id: 6, username: 'Emily Davis', email: 'emily@example.com', role: 'Donor', bloodType: 'O+', status: 'Active', location: 'Boston', isDonor: true }
       ];
-      
       setUsers(mockUsers);
       setStats({
         totalUsers: mockUsers.length,
         totalDonors: mockUsers.filter(u => u.isDonor === true).length,
         totalDonations: 8,
         pendingRequests: 3,
-        bloodSupply: {
-          'A+': 'stable', 'A-': 'low', 'B+': 'low', 'B-': 'critical',
-          'AB+': 'low', 'AB-': 'critical', 'O+': 'stable', 'O-': 'critical'
-        }
+        bloodSupply: {},
+        bloodSupplyUnavailable: true,
       });
+      setDonations([]);
     }
-  };
+  }, [getAuthHeaders, handleApiError]);
 
-  // Optimize user fetching with proper pagination and caching
-  const fetchUsers = async (page = 1, limit = 10, searchQuery = '') => {
-    // Use cached results if available and not searching
-    if (!searchQuery && 
-        pageInfo.page === page && 
-        users.length > 0 && 
-        pageInfo.totalPages > 0) {
-      return;
-    }
-    
-    setLoading(true);
-    
+  const fetchStats = useCallback(async () => {
+    setLoading('dashboard', true);
+    setError(null);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${API_BASE_URL}/user/all`,
-        { 
-          headers: { Authorization: `Bearer ${token}` },
-          params: { page, limit, search: searchQuery }
-        }
-      );
-      
-      const userData = response.data?.users || [];
-      
-      // Normalize user data format
+      const response = await axios.get(`${API_BASE_URL}/api/stats/dashboard`, getAuthHeaders());
+      if (response.data?.success) {
+        setStats(prev => ({ ...prev, ...response.data.stats, bloodSupplyUnavailable: false }));
+      } else {
+        console.warn('Primary stats fetch failed, attempting fallback.');
+        await fetchStatsFromDatabase();
+      }
+      await fetchBloodSupply();
+    } catch (err) {
+      handleApiError('retrieve dashboard statistics', err);
+      try {
+        await fetchStatsFromDatabase();
+      } catch (fallbackErr) {
+        console.error('Fallback stats fetch also failed:', fallbackErr);
+      }
+    } finally {
+      setLoading('dashboard', false);
+    }
+  }, [getAuthHeaders, handleApiError, fetchBloodSupply, fetchStatsFromDatabase, setLoading]);
+
+  const fetchAllUsers = useCallback(async () => {
+    setLoading('users', true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/user/all`, {
+        ...getAuthHeaders(),
+      });
+
+      const responseData = response.data || {};
+      const userData = responseData.users || [];
+
       const normalizedUsers = userData.map(user => ({
         _id: user._id || user.id,
         username: user.username || user.name || 'Unknown',
         email: user.email || 'No email',
-        role: user.role || 'user',
-        bloodType: user.bloodType || 'Unknown',
-        status: user.isActive !== false ? 'Active' : 'Inactive',
-        location: user.location || 'Unknown',
-        isDonor: Boolean(user.isDonor)
+        role: user.role || ROLES.USER,
+        bloodType: user.bloodType || 'N/A',
+        location: user.location || 'N/A',
+        isDonor: Boolean(user.isDonor),
+        isActive: user.isActive !== false,
       }));
-      
-      setUsers(normalizedUsers);
-      setPageInfo({
-        page: response.data?.page || page,
-        totalPages: response.data?.totalPages || Math.ceil(normalizedUsers.length / limit) || 1,
-        totalItems: response.data?.totalItems || normalizedUsers.length
-      });
+
+      setAllUsers(normalizedUsers);
+
     } catch (err) {
-      console.error('Error fetching users:', err);
-      setError(`Failed to load users: ${err.message}`);
+      handleApiError('retrieve all users', err);
+      setAllUsers([]);
     } finally {
-      setLoading(false);
+      setLoading('users', false);
     }
-  };
+  }, [getAuthHeaders, handleApiError, setLoading]);
 
-  const fetchDonations = async (page = 1, limit = 10, searchQuery = '') => {
+  const filteredAndPaginatedUsers = useMemo(() => {
+    const lowerSearchTerm = searchTerm.toLowerCase();
+
+    const filtered = allUsers.filter(user =>
+      (user.username?.toLowerCase() || '').includes(lowerSearchTerm) ||
+      (user.email?.toLowerCase() || '').includes(lowerSearchTerm) ||
+      (user._id?.toLowerCase() || '').includes(lowerSearchTerm)
+    );
+
+    const totalItems = filtered.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const currentPage = Math.max(1, Math.min(pageInfo.users.page, totalPages));
+
+    const calculatedPageInfo = {
+      page: currentPage,
+      totalPages: totalPages,
+      totalItems: totalItems
+    };
+
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const paginated = filtered.slice(startIndex, endIndex);
+
+    return { paginatedUsers: paginated, calculatedPageInfo };
+
+  }, [allUsers, searchTerm, pageInfo.users.page]);
+
+  useEffect(() => {
+    setUsers(filteredAndPaginatedUsers.paginatedUsers);
+    if (pageInfo.users.page !== filteredAndPaginatedUsers.calculatedPageInfo.page ||
+      pageInfo.users.totalPages !== filteredAndPaginatedUsers.calculatedPageInfo.totalPages ||
+      pageInfo.users.totalItems !== filteredAndPaginatedUsers.calculatedPageInfo.totalItems) {
+      setPageInfo(prev => ({
+        ...prev,
+        users: filteredAndPaginatedUsers.calculatedPageInfo
+      }));
+    }
+  }, [filteredAndPaginatedUsers, pageInfo.users]);
+
+  const fetchDonations = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
+    setLoading('donations', true);
+    setError(null);
     try {
-      setLoading(true);
-      const response = await axios.get(
-        `${API_BASE_URL}/donations?page=${page}&limit=${limit}&search=${searchQuery}`,
-        getAuthHeaders()
-      );
-      setDonations(response.data.donations);
-      setPageInfo({
-        page: response.data.page,
-        totalPages: response.data.totalPages,
-        totalItems: response.data.totalItems
+      const response = await axios.get(`${API_BASE_URL}/api/donations`, {
+        ...getAuthHeaders(),
+        params: { page, limit, search: searchQuery }
       });
-      setLoading(false);
+      setDonations(response.data?.donations || []);
+      setPageInfo(prev => ({
+        ...prev,
+        donations: {
+          page: response.data?.page || page,
+          totalPages: response.data?.totalPages || 1,
+          totalItems: response.data?.totalItems || 0
+        }
+      }));
     } catch (err) {
-      console.error('Error fetching donations:', err);
-      setError(err.message);
-      setLoading(false);
+      handleApiError('retrieve donations', err);
+      setDonations([]);
+      setPageInfo(prev => ({ ...prev, donations: { page: 1, totalPages: 1, totalItems: 0 } }));
+    } finally {
+      setLoading('donations', false);
     }
-  };
+  }, [getAuthHeaders, handleApiError, setLoading]);
 
-  const fetchHospitals = async () => {
+  const fetchAdminAccounts = useCallback(async () => {
+    setLoading('admins', true);
+    setError(null);
     try {
-      const response = await axios.get(`${API_BASE_URL}/hospitals`);
-      setHospitals(response.data);
+      const response = await axios.get(`${API_BASE_URL}/api/admin/accounts`, getAuthHeaders());
+      if (response.data?.success) {
+        const adminData = response.data.admins || [];
+        const normalizedAdmins = adminData.map(admin => ({
+          id: admin.id || admin._id,
+          username: admin.username || 'Unknown Admin',
+          email: admin.email || 'No email',
+          role: admin.role || ROLES.ADMIN,
+          permissions: admin.permissions || { ...INITIAL_ADMIN_FORM_DATA.permissions, manageSettings: admin.role === ROLES.SUPERADMIN },
+          lastLogin: admin.lastLogin || null,
+          isActive: admin.isActive !== false,
+        }));
+        setAdminAccounts(normalizedAdmins);
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (err) {
-      console.error('Error fetching hospitals:', err);
+      handleApiError('retrieve admin accounts', err);
+      setAdminAccounts([]);
+    } finally {
+      setLoading('admins', false);
     }
-  };
+  }, [getAuthHeaders, handleApiError, setLoading]);
 
-  // Optimize admin checking with cleaner code
+  // --- CRUD Operations ---
+  const createUser = useCallback(async (userData) => {
+    setLoading('action', true);
+    setError(null);
+    try {
+      await axios.post(`${API_BASE_URL}/api/user/create`, userData, getAuthHeaders());
+      alert('User created successfully!');
+      await fetchAllUsers();
+      setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: 1 } }));
+      return true;
+    } catch (err) {
+      handleApiError('create user', err);
+      return false;
+    } finally {
+      setLoading('action', false);
+    }
+  }, [getAuthHeaders, handleApiError, fetchAllUsers, setLoading]);
+
+  const updateUser = useCallback(async (userId, userData) => {
+    setLoading('action', true);
+    setError(null);
+    try {
+      await axios.put(`${API_BASE_URL}/api/user/${userId}`, userData, getAuthHeaders());
+      alert('User updated successfully!');
+      await fetchAllUsers();
+      return true;
+    } catch (err) {
+      handleApiError('update user', err);
+      return false;
+    } finally {
+      setLoading('action', false);
+    }
+  }, [getAuthHeaders, handleApiError, fetchAllUsers, setLoading]);
+
+  const deleteUser = useCallback(async (userId, username) => {
+    if (window.confirm(`Are you sure you want to delete user: ${username}?`)) {
+      setLoading('action', true);
+      setError(null);
+      try {
+        await axios.delete(`${API_BASE_URL}/api/user/${userId}`, getAuthHeaders());
+        alert('User deleted successfully!');
+        await fetchAllUsers();
+      } catch (err) {
+        handleApiError('delete user', err);
+      } finally {
+        setLoading('action', false);
+      }
+    }
+  }, [getAuthHeaders, handleApiError, fetchAllUsers, setLoading]);
+
+  const updateDonationStatus = useCallback(async (donationId, status) => {
+    setLoading('action', true);
+    setError(null);
+    try {
+      await axios.put(`${API_BASE_URL}/api/donations/${donationId}/status`, { status }, getAuthHeaders());
+      fetchDonations(pageInfo.donations.page, ITEMS_PER_PAGE, searchTerm);
+    } catch (err) {
+      handleApiError(`update donation status to ${status}`, err);
+    } finally {
+      setLoading('action', false);
+    }
+  }, [getAuthHeaders, handleApiError, fetchDonations, setLoading, pageInfo.donations.page, searchTerm]);
+
+  const createAdmin = useCallback(async (data) => {
+    setLoading('action', true);
+    console.log("Mock Create Admin:", data);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const newAdmin = {
+      id: `mock-${Date.now()}`,
+      ...data,
+      lastLogin: null,
+      isActive: true,
+    };
+    setAdminAccounts(prev => [...prev, newAdmin]);
+    alert('Admin account created successfully (mock)!');
+    setLoading('action', false);
+    return true;
+  }, [setLoading]);
+
+  const updateAdmin = useCallback(async (adminId, data) => {
+    setLoading('action', true);
+    console.log("Mock Update Admin:", adminId, data);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setAdminAccounts(prev => prev.map(admin =>
+      admin.id === adminId ? { ...admin, ...data } : admin
+    ));
+    alert('Admin account updated successfully (mock)!');
+    setLoading('action', false);
+    return true;
+  }, [setLoading]);
+
+  const deleteAdmin = useCallback(async (adminId, username) => {
+    if (window.confirm(`Are you sure you want to delete admin: ${username}?`)) {
+      setLoading('action', true);
+      console.log("Mock Delete Admin:", adminId);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setAdminAccounts(prev => prev.filter(admin => admin.id !== adminId));
+      alert('Admin account deleted successfully (mock)!');
+      setLoading('action', false);
+    }
+  }, [setLoading]);
+
+  // --- Effects ---
   useEffect(() => {
     const checkAdminStatus = async () => {
+      setLoading('global', true);
       const token = localStorage.getItem('token');
-      const isAdminFlag = localStorage.getItem('isAdmin') === 'true';
-      
+      const isAdminStored = localStorage.getItem('isAdmin') === 'true';
+
       if (!token) {
         navigate('/login');
         return;
       }
-      
-      // Use cached admin status if available
-      if (isAdminFlag) {
-        setIsAdmin(true);
-        loadAdminData();
-        return;
-      }
-      
-      // Otherwise verify with the server
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}/admin/verify`,
-          { headers: { Authorization: `Bearer ${token}` }}
-        );
-        
-        if (response.data && response.data.success) {
-          localStorage.setItem('isAdmin', 'true');
-          localStorage.setItem('userRole', response.data.role || 'admin');
-          setIsAdmin(true);
-          loadAdminData();
-        } else {
-          throw new Error('Not authorized as admin');
+
+      let adminVerified = isAdminStored;
+      if (!isAdminStored) {
+        try {
+          const response = await axios.get(`${API_BASE_URL}/api/admin/verify`, { headers: { Authorization: `Bearer ${token}` } });
+          if (response.data?.success) {
+            localStorage.setItem('isAdmin', 'true');
+            localStorage.setItem('userRole', response.data.role || ROLES.ADMIN);
+            adminVerified = true;
+          } else {
+            throw new Error('Not authorized');
+          }
+        } catch (err) {
+          console.error('Admin verification failed:', err);
+          localStorage.removeItem('isAdmin');
+          localStorage.removeItem('userRole');
+          navigate('/login');
+          return;
         }
-      } catch (err) {
-        console.error('Admin verification failed:', err);
-        navigate('/login');
       }
+
+      setIsAdmin(adminVerified);
+      if (adminVerified) {
+        fetchStats();
+      }
+      setLoading('global', false);
     };
-    
-    // Helper function to load all admin data
-    const loadAdminData = () => {
-      fetchStats();
-      fetchUsers();
-      fetchDonations();
-      fetchHospitals();
-    };
-    
+
     checkAdminStatus();
-    
-    // Apply dark mode from localStorage
+
     const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
     setIsDarkMode(darkModeEnabled);
     document.body.classList.toggle('dark-theme', darkModeEnabled);
-  }, [navigate]);
+  }, [navigate, fetchStats, setLoading]);
 
   useEffect(() => {
     if (isAdmin) {
+      if (['users', 'donations', 'adminManagement'].includes(activeTab)) {
+        setSearchTerm('');
+        if (activeTab === 'users') {
+          setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: 1 } }));
+        }
+      }
+
       switch (activeTab) {
         case 'dashboard':
           fetchStats();
           break;
         case 'users':
-          fetchUsers(pageInfo.page, 10, searchTerm);
+          fetchAllUsers();
           break;
         case 'donations':
-          fetchDonations(pageInfo.page, 10, searchTerm);
+          fetchDonations(1, ITEMS_PER_PAGE, '');
+          break;
+        case 'adminManagement':
+          fetchAdminAccounts();
           break;
         default:
           break;
       }
     }
-  }, [activeTab, isAdmin]);
+  }, [activeTab, isAdmin, fetchStats, fetchAllUsers, fetchDonations, fetchAdminAccounts]);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (activeTab === 'users') {
-        fetchUsers(1, 10, searchTerm);
-      } else if (activeTab === 'donations') {
-        fetchDonations(1, 10, searchTerm);
-      }
-    }, 500);
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
-
-  // Enhanced create, update, and delete user functions
-  const createUser = async (userData) => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `${API_BASE_URL}/user/create`,
-        userData,
-        getAuthHeaders()
-      );
-      
-      // Show success message
-      setError(null);
-      alert('User created successfully!');
-      
-      // Refresh user list
-      fetchUsers(pageInfo.page, 10, searchTerm);
-      return response.data;
-    } catch (err) {
-      console.error('Error creating user:', err);
-      setError(err.response?.data?.message || err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateUser = async (userId, userData) => {
-    try {
-      setLoading(true);
-      const response = await axios.put(
-        `${API_BASE_URL}/user/${userId}`,
-        userData,
-        getAuthHeaders()
-      );
-      
-      // Show success message
-      setError(null);
-      alert('User updated successfully!');
-      
-      // Refresh user list
-      fetchUsers(pageInfo.page, 10, searchTerm);
-      return response.data;
-    } catch (err) {
-      console.error('Error updating user:', err);
-      setError(err.response?.data?.message || err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteUser = async (userId) => {
-    try {
-      setLoading(true);
-      await axios.delete(
-        `${API_BASE_URL}/user/${userId}`,
-        getAuthHeaders()
-      );
-      
-      // Show success message
-      setError(null);
-      alert('User deleted successfully!');
-      
-      // Refresh user list
-      fetchUsers(pageInfo.page, 10, searchTerm);
-      return true;
-    } catch (err) {
-      console.error('Error deleting user:', err);
-      setError(err.response?.data?.message || err.message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFormChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-  };
-
-  const handleUserSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (selectedUser) {
-        await updateUser(selectedUser._id, formData);
-      } else {
-        await createUser(formData);
-      }
-      setShowUserModal(false);
-      setFormData({
-        username: '',
-        email: '',
-        role: 'user',
-        bloodType: '',
-        isDonor: false,
-        isActive: true
-      });
-      setSelectedUser(null);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  const openUserModal = (user = null) => {
-    if (user) {
-      setSelectedUser(user);
-      setFormData({
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        bloodType: user.bloodType || '',
-        isDonor: user.isDonor || false,
-        isActive: user.isActive !== false
-      });
-    } else {
-      setSelectedUser(null);
-      setFormData({
-        username: '',
-        email: '',
-        role: 'user',
-        bloodType: '',
-        isDonor: false,
-        isActive: true
-      });
-    }
-    setShowUserModal(true);
-  };
-
-  const approveDonation = async (donationId) => {
-    try {
-      await axios.put(
-        `${API_BASE_URL}/donations/${donationId}/status`,
-        { status: 'Completed' },
-        getAuthHeaders()
-      );
-      fetchDonations(pageInfo.page, 10, searchTerm);
-    } catch (err) {
-      console.error('Error approving donation:', err);
-      setError(err.message);
-    }
-  };
-
-  const rejectDonation = async (donationId) => {
-    try {
-      await axios.put(
-        `${API_BASE_URL}/donations/${donationId}/status`,
-        { status: 'Cancelled' },
-        getAuthHeaders()
-      );
-      fetchDonations(pageInfo.page, 10, searchTerm);
-    } catch (err) {
-      console.error('Error rejecting donation:', err);
-      setError(err.message);
-    }
-  };
-
-  const exportToCSV = async (type) => {
-    try {
-      let endpoint, filename;
-      if (type === 'users') {
-        endpoint = '/user/export';
-        filename = 'users-export.csv';
-      } else if (type === 'donations') {
-        endpoint = '/donations/export';
-        filename = 'donations-export.csv';
-      } else {
-        throw new Error('Invalid export type');
-      }
-      const response = await axios.get(
-        `${API_BASE_URL}${endpoint}`,
-        { 
-          ...getAuthHeaders(), 
-          responseType: 'blob'
+    if (!loadingStates.global && isAdmin) {
+      const handler = setTimeout(() => {
+        if (activeTab === 'donations') {
+          fetchDonations(1, ITEMS_PER_PAGE, searchTerm);
         }
-      );
+      }, DEBOUNCE_DELAY);
+
+      if (activeTab === 'users') {
+        setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: 1 } }));
+      }
+
+      return () => clearTimeout(handler);
+    }
+  }, [searchTerm, activeTab, isAdmin, loadingStates.global, fetchDonations]);
+
+  // --- Event Handlers ---
+  const handleSearchChange = useCallback((e) => {
+    setSearchTerm(e.target.value);
+    if (activeTab === 'users') {
+      setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: 1 } }));
+    }
+  }, [activeTab]);
+
+  const handlePageChange = useCallback((type, newPage) => {
+    if (type === 'users') {
+      setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: newPage } }));
+    } else if (type === 'donations') {
+      fetchDonations(newPage, ITEMS_PER_PAGE, searchTerm);
+    }
+  }, [fetchDonations, searchTerm]);
+
+  const openModal = useCallback((type, data = null) => {
+    setError(null);
+    setModalState({ isOpen: true, type, data });
+    if (type === MODAL_TYPE.USER) {
+      setUserFormData(data ? {
+        username: data.username,
+        email: data.email,
+        role: data.role,
+        bloodType: data.bloodType || '',
+        isDonor: data.isDonor || false,
+        isActive: data.isActive !== false,
+      } : INITIAL_USER_FORM_DATA);
+    } else if (type === MODAL_TYPE.ADMIN) {
+      setAdminFormData(data ? {
+        username: data.username,
+        email: data.email,
+        role: data.role,
+        permissions: { ...INITIAL_ADMIN_FORM_DATA.permissions, ...data.permissions },
+      } : INITIAL_ADMIN_FORM_DATA);
+    }
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalState({ isOpen: false, type: null, data: null });
+    setUserFormData(INITIAL_USER_FORM_DATA);
+    setAdminFormData(INITIAL_ADMIN_FORM_DATA);
+  }, []);
+
+  const handleUserFormChange = useCallback((e) => {
+    const { name, value, type, checked } = e.target;
+    setUserFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  }, []);
+
+  const handleAdminFormChange = useCallback((e) => {
+    const { name, value, type, checked } = e.target;
+    if (name.startsWith('permission_')) {
+      const permission = name.replace('permission_', '');
+      setAdminFormData(prev => ({
+        ...prev,
+        permissions: { ...prev.permissions, [permission]: checked }
+      }));
+    } else {
+      setAdminFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
+  }, []);
+
+  const handleUserSubmit = useCallback(async (e) => {
+    e.preventDefault();
+    let success = false;
+    if (modalState.data) {
+      success = await updateUser(modalState.data._id, userFormData);
+    } else {
+      success = await createUser(userFormData);
+    }
+    if (success) {
+      closeModal();
+    }
+  }, [modalState.data, userFormData, updateUser, createUser, closeModal]);
+
+  const handleAdminSubmit = useCallback(async (e) => {
+    e.preventDefault();
+    let success = false;
+    if (modalState.data) {
+      success = await updateAdmin(modalState.data.id, adminFormData);
+    } else {
+      success = await createAdmin(adminFormData);
+    }
+    if (success) {
+      closeModal();
+    }
+  }, [modalState.data, adminFormData, updateAdmin, createAdmin, closeModal]);
+
+  const exportToCSV = useCallback(async (type) => {
+    let endpoint, filename;
+    if (type === 'users') {
+      endpoint = '/user/export';
+      filename = 'users-export.csv';
+    } else if (type === 'donations') {
+      endpoint = '/donations/export';
+      filename = 'donations-export.csv';
+    } else {
+      handleApiError('export data', new Error('Invalid export type'));
+      return;
+    }
+
+    setLoading('action', true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api${endpoint}`, {
+        ...getAuthHeaders(),
+        responseType: 'blob'
+      });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      link.remove();
+      window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error(`Error exporting ${type}:`, err);
-      setError(err.message);
+      handleApiError(`export ${type} data`, err);
+    } finally {
+      setLoading('action', false);
     }
-  };
+  }, [getAuthHeaders, handleApiError, setLoading]);
 
-  const handlePageChange = (newPage) => {
-    if (activeTab === 'users') {
-      fetchUsers(newPage, 10, searchTerm);
-    } else if (activeTab === 'donations') {
-      fetchDonations(newPage, 10, searchTerm);
-    }
-  };
-
-  const renderDashboard = () => {
-    const t = translations[language];
+  // --- Render Functions ---
+  const renderDashboard = useCallback(() => {
     return (
       <div className="admin-dashboard">
         <h2>{t.dashboardOverview}</h2>
-        
-        <div className="dashboard-metrics">
-          <div className="metric-card">
-            <div className="metric-icon">
-              <FontAwesomeIcon icon={faUsers} />
+        {loadingStates.dashboard ? (
+          <LoadingIndicator message={t.loadingData} />
+        ) : (
+          <>
+            <div className="dashboard-metrics">
+              <div className="metric-card">
+                <div className="metric-icon"><FontAwesomeIcon icon={faUsers} /></div>
+                <div className="metric-data"><h3>{t.totalUsers}</h3><p>{stats.totalUsers}</p></div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-icon"><FontAwesomeIcon icon={faUserShield} /></div>
+                <div className="metric-data"><h3>{t.totalDonors}</h3><p>{stats.totalDonors}</p></div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-icon"><FontAwesomeIcon icon={faTint} /></div>
+                <div className="metric-data"><h3>{t.totalDonations}</h3><p>{stats.totalDonations}</p></div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-icon"><FontAwesomeIcon icon={faBell} /></div>
+                <div className="metric-data"><h3>{t.pendingRequests}</h3><p>{stats.pendingRequests}</p></div>
+              </div>
             </div>
-            <div className="metric-data">
-              <h3>{t.totalUsers}</h3>
-              <p>{stats.totalUsers}</p>
-            </div>
-          </div>
-          
-          <div className="metric-card">
-            <div className="metric-icon">
-              <FontAwesomeIcon icon={faTint} />
-            </div>
-            <div className="metric-data">
-              <h3>{t.totalDonations}</h3>
-              <p>{stats.totalDonations}</p>
-            </div>
-          </div>
-          
-          <div className="metric-card">
-            <div className="metric-icon">
-              <FontAwesomeIcon icon={faUserShield} />
-            </div>
-            <div className="metric-data">
-              <h3>{t.totalDonors}</h3>
-              <p>{stats.totalDonors}</p>
-            </div>
-          </div>
-          
-          <div className="metric-card">
-            <div className="metric-icon">
-              <FontAwesomeIcon icon={faBell} />
-            </div>
-            <div className="metric-data">
-              <h3>{t.pendingRequests}</h3>
-              <p>{stats.pendingRequests}</p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Blood Supply Overview - Fixed layout */}
-        <div className="blood-supply-section">
-          <h3>{t.bloodTypeAvailability}</h3>
-          <div className="blood-types-grid">
-            {Object.entries(stats.bloodSupply || {}).length > 0 ? (
-              Object.entries(stats.bloodSupply).map(([type, status]) => (
-                <div key={type} className={`blood-type-card ${status}`}>
-                  <h4>{type}</h4>
-                  <span>{t[status] || status}</span>
-                </div>
-              ))
-            ) : (
-              // Fallback if blood supply data is missing
-              <>
-                {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(type => (
-                  <div key={type} className="blood-type-card low">
-                    <h4>{type}</h4>
-                    <span>{t.low}</span>
+
+            <div className="blood-supply-section">
+              <h3>{t.bloodTypeAvailability}</h3>
+              <div className="blood-types-grid">
+                {stats.bloodSupplyUnavailable ? (
+                  <div className="blood-supply-unavailable">
+                    <FontAwesomeIcon icon={faExclamationTriangle} />
+                    <p>{t.noBloodSupplyData}</p>
                   </div>
-                ))}
-              </>
-            )}
-          </div>
-        </div>
-        
-        {/* Recent Activity Section - Separate from blood types */}
-        <div className="recent-activity-section">
-          <h3>{t.recentActivity}</h3>
-          <div className="activity-list">
-            <div className="activity-item">
-              <span className="activity-time">{new Date().toLocaleTimeString()} - {new Date().toLocaleDateString()}</span>
-              <span className="activity-desc">Admin logged in</span>
+                ) : Object.keys(stats.bloodSupply || {}).length > 0 ? (
+                  Object.entries(stats.bloodSupply).map(([type, status]) => (
+                    <div key={type} className={`blood-type-card ${status}`}>
+                      <h4>{type}</h4>
+                      <span>{t[status] || status}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-blood-data">
+                    <FontAwesomeIcon icon={faExclamationTriangle} />
+                    <p>{t.noBloodSupplyData}</p>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="activity-item">
-              <span className="activity-time">{new Date().toLocaleTimeString()} - {new Date().toLocaleDateString()}</span>
-              <span className="activity-desc">System stats updated</span>
+
+            <div className="recent-activity-section">
+              <h3>{t.recentActivity}</h3>
+              <div className="activity-list">
+                <div className="activity-item">
+                  <span className="activity-time">{new Date().toLocaleTimeString()} - {new Date().toLocaleDateString()}</span>
+                  <span className="activity-desc">Admin logged in</span>
+                </div>
+                <div className="activity-item">
+                  <span className="activity-time">{new Date().toLocaleTimeString()} - {new Date().toLocaleDateString()}</span>
+                  <span className="activity-desc">System stats updated</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     );
-  };
+  }, [t, stats, loadingStates.dashboard]);
 
-  const renderUsers = () => {
-    const t = translations[language];
-    
+  const renderUsers = useCallback(() => {
+    const displayUsers = filteredAndPaginatedUsers.paginatedUsers;
+    const currentPageInfo = filteredAndPaginatedUsers.calculatedPageInfo;
+
     return (
       <div className="admin-users">
         <h2>{t.userManagement}</h2>
-        
         <div className="controls">
           <div className="search-container">
             <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input 
-              type="text" 
-              placeholder={t.searchUsers} 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <input type="text" placeholder={t.searchUsers} value={searchTerm} onChange={handleSearchChange} />
           </div>
-          
           <div className="action-buttons">
-            <button className="control-button" onClick={() => exportToCSV('users')}>
-              <FontAwesomeIcon icon={faDownload} /> {t.exportData}
+            <button className="control-button" onClick={() => exportToCSV('users')} disabled={loadingStates.action}>
+              <FontAwesomeIcon icon={faDownload} /> {loadingStates.action ? 'Exporting...' : t.exportData}
             </button>
-            <button className="control-button">
-              <FontAwesomeIcon icon={faFilter} /> {t.filterData}
-            </button>
-            <button className="add-button" onClick={() => openUserModal()}>
+            <button className="add-button" onClick={() => openModal(MODAL_TYPE.USER)}>
               <FontAwesomeIcon icon={faUserPlus} /> {t.addNewUser}
             </button>
           </div>
         </div>
-        
+
         <div className="table-container">
-          {loading ? (
-            <div className="loading-indicator">
-              <div className="spinner"></div>
-              <p>{t.loadingData}</p>
-            </div>
-          ) : users.length === 0 ? (
-            <div className="no-data-message">
-              <p>No users found</p>
-            </div>
+          {loadingStates.users && allUsers.length === 0 ? (
+            <LoadingIndicator message={t.loadingData} />
+          ) : displayUsers.length === 0 ? (
+            <EmptyStateMessage type="user" message={searchTerm ? 'No users match search.' : (allUsers.length === 0 ? 'No users found.' : 'No users match search.')} />
           ) : (
             <table className="data-table">
               <thead>
@@ -875,7 +1017,6 @@ const AdminPage = () => {
                   <th>{t.id}</th>
                   <th>{t.name}</th>
                   <th>{t.email}</th>
-                  <th>{t.role}</th>
                   <th>{t.bloodType}</th>
                   <th>{t.location}</th>
                   <th>{t.status}</th>
@@ -883,36 +1024,17 @@ const AdminPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map(user => (
-                  <tr key={user._id || user.id}>
-                    <td>{user._id || user.id}</td>
-                    <td>{user.username || user.name}</td>
+                {displayUsers.map(user => (
+                  <tr key={user._id}>
+                    <td>{user._id.slice(-6)}</td>
+                    <td>{user.username}</td>
                     <td>{user.email}</td>
-                    <td>{user.role}</td>
-                    <td>{user.bloodType || 'N/A'}</td>
-                    <td>{user.location || 'N/A'}</td>
-                    <td>
-                      <span className={`status-badge ${(user.status || 'active').toLowerCase()}`}>
-                        {user.status || 'Active'}
-                      </span>
-                    </td>
+                    <td>{user.bloodType}</td>
+                    <td>{user.location}</td>
+                    <td><StatusBadge isDonor={user.isDonor} /></td>
                     <td className="actions">
-                      <button 
-                        className="action-btn edit"
-                        onClick={() => openUserModal(user)}
-                      >
-                        <FontAwesomeIcon icon={faEdit} />
-                      </button>
-                      <button 
-                        className="action-btn delete"
-                        onClick={() => {
-                          if (window.confirm(`Are you sure you want to delete user: ${user.username || user.name}?`)) {
-                            deleteUser(user._id || user.id);
-                          }
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
+                      <ActionButton type="edit" onClick={() => openModal(MODAL_TYPE.USER, user)} />
+                      <ActionButton type="delete" onClick={() => deleteUser(user._id, user.username)} />
                     </td>
                   </tr>
                 ))}
@@ -920,68 +1042,36 @@ const AdminPage = () => {
             </table>
           )}
         </div>
-        
-        {pageInfo.totalPages > 1 && (
-          <div className="pagination">
-            <button 
-              onClick={() => handlePageChange(pageInfo.page - 1)}
-              disabled={pageInfo.page === 1}
-            >
-              Previous
-            </button>
-            <span className="page-info">
-              Page {pageInfo.page} of {pageInfo.totalPages}
-            </span>
-            <button 
-              onClick={() => handlePageChange(pageInfo.page + 1)}
-              disabled={pageInfo.page === pageInfo.totalPages}
-            >
-              Next
-            </button>
-          </div>
-        )}
+        <Pagination
+          currentPage={currentPageInfo.page}
+          totalPages={currentPageInfo.totalPages}
+          onPageChange={(newPage) => handlePageChange('users', newPage)}
+        />
       </div>
     );
-  };
+  }, [t, filteredAndPaginatedUsers, loadingStates.users, loadingStates.action, searchTerm, allUsers, handleSearchChange, exportToCSV, openModal, deleteUser, handlePageChange]);
 
-  const renderDonations = () => {
-    const t = translations[language];
-    
+  const renderDonations = useCallback(() => {
     return (
       <div className="admin-donations">
         <h2>{t.donationManagement}</h2>
-        
         <div className="controls">
           <div className="search-container">
             <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input 
-              type="text" 
-              placeholder={t.searchDonations} 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <input type="text" placeholder={t.searchDonations} value={searchTerm} onChange={handleSearchChange} />
           </div>
-          
           <div className="action-buttons">
-            <button className="control-button" onClick={() => exportToCSV('donations')}>
-              <FontAwesomeIcon icon={faDownload} /> {t.exportData}
-            </button>
-            <button className="control-button">
-              <FontAwesomeIcon icon={faFilter} /> {t.filterData}
+            <button className="control-button" onClick={() => exportToCSV('donations')} disabled={loadingStates.action}>
+              <FontAwesomeIcon icon={faDownload} /> {loadingStates.action ? 'Exporting...' : t.exportData}
             </button>
           </div>
         </div>
-        
+
         <div className="table-container">
-          {loading ? (
-            <div className="loading-indicator">
-              <div className="spinner"></div>
-              <p>{t.loadingData}</p>
-            </div>
-          ) : !donations || donations.length === 0 ? (
-            <div className="no-data-message">
-              <p>No donations found</p>
-            </div>
+          {loadingStates.donations ? (
+            <LoadingIndicator message={t.loadingData} />
+          ) : donations.length === 0 ? (
+            <EmptyStateMessage type="donation" message={searchTerm ? 'No donations match search.' : 'No donations found.'} />
           ) : (
             <table className="data-table">
               <thead>
@@ -997,40 +1087,100 @@ const AdminPage = () => {
               </thead>
               <tbody>
                 {donations.map(donation => (
-                  <tr key={donation._id || donation.id}>
-                    <td>{donation._id || donation.id}</td>
-                    <td>{donation.donorName}</td>
+                  <tr key={donation._id}>
+                    <td>{donation._id.slice(-6)}</td>
+                    <td>{donation.donorName || 'N/A'}</td>
                     <td>{donation.bloodType}</td>
                     <td>{new Date(donation.date).toLocaleDateString()}</td>
                     <td>{donation.location}</td>
-                    <td>
-                      <span className={`status-badge ${(donation.status || '').toLowerCase()}`}>
-                        {donation.status}
-                      </span>
-                    </td>
+                    <td><StatusBadge status={donation.status} /></td>
                     <td className="actions">
-                      {donation.status === 'Pending' && (
+                      {donation.status === STATUS.PENDING && (
                         <>
-                          <button 
-                            className="action-btn approve"
-                            onClick={() => approveDonation(donation._id || donation.id)}
-                          >
-                            <FontAwesomeIcon icon={faCheck} />
-                          </button>
-                          <button 
-                            className="action-btn reject"
-                            onClick={() => rejectDonation(donation._id || donation.id)}
-                          >
-                            <FontAwesomeIcon icon={faTimes} />
-                          </button>
+                          <ActionButton type="approve" onClick={() => updateDonationStatus(donation._id, STATUS.COMPLETED)} />
+                          <ActionButton type="reject" onClick={() => updateDonationStatus(donation._id, STATUS.CANCELLED)} />
                         </>
                       )}
-                      <button 
-                        className="action-btn edit"
-                        onClick={() => console.log('Edit donation', donation._id || donation.id)}
-                      >
-                        <FontAwesomeIcon icon={faEdit} />
-                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        <Pagination
+          currentPage={pageInfo.donations.page}
+          totalPages={pageInfo.donations.totalPages}
+          onPageChange={(newPage) => handlePageChange('donations', newPage)}
+        />
+      </div>
+    );
+  }, [t, donations, loadingStates.donations, loadingStates.action, searchTerm, pageInfo.donations, handleSearchChange, exportToCSV, updateDonationStatus, handlePageChange]);
+
+  const renderAdminManagement = useCallback(() => {
+    const filteredAdmins = adminAccounts.filter(admin =>
+      (admin.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (admin.email || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+      <div className="admin-management">
+        <h2>{t.adminAccountsManagement}</h2>
+        <div className="controls">
+          <div className="search-container">
+            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+            <input type="text" placeholder="Search admins..." value={searchTerm} onChange={handleSearchChange} />
+          </div>
+          <div className="action-buttons">
+            <button className="add-button" onClick={() => openModal(MODAL_TYPE.ADMIN)}>
+              <FontAwesomeIcon icon={faUserPlus} /> {t.addNewAdmin}
+            </button>
+          </div>
+        </div>
+
+        <div className="table-container">
+          {loadingStates.admins ? (
+            <LoadingIndicator message={t.loadingData} />
+          ) : adminAccounts.length === 0 ? (
+            <EmptyStateMessage type="admin account" message="No admin accounts found." />
+          ) : filteredAdmins.length === 0 && searchTerm ? (
+            <EmptyStateMessage type="admin account" message="No admins match search." />
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Permissions</th>
+                  <th>Last Login</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredAdmins.map(admin => (
+                  <tr key={admin.id}>
+                    <td>{typeof admin.id === 'string' ? admin.id.slice(-6) : admin.id}</td>
+                    <td>{admin.username}</td>
+                    <td>{admin.email}</td>
+                    <td>
+                      <span className={`status-badge ${admin.role === ROLES.SUPERADMIN ? 'active' : ''}`}>
+                        {admin.role === ROLES.SUPERADMIN ? 'Super Admin' : 'Admin'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="permission-badges">
+                        {admin.permissions.manageUsers && <span title="Users" className="permission-badge">👥</span>}
+                        {admin.permissions.manageDonations && <span title="Donations" className="permission-badge">🩸</span>}
+                        {admin.permissions.manageContent && <span title="Content" className="permission-badge">📄</span>}
+                        {admin.permissions.manageSettings && <span title="Settings" className="permission-badge">⚙️</span>}
+                      </div>
+                    </td>
+                    <td>{admin.lastLogin ? new Date(admin.lastLogin).toLocaleString() : 'Never'}</td>
+                    <td className="actions">
+                      <ActionButton type="edit" onClick={() => openModal(MODAL_TYPE.ADMIN, admin)} />
+                      <ActionButton type="delete" onClick={() => deleteAdmin(admin.id, admin.username)} />
                     </td>
                   </tr>
                 ))}
@@ -1040,22 +1190,16 @@ const AdminPage = () => {
         </div>
       </div>
     );
-  };
+  }, [t, adminAccounts, loadingStates.admins, searchTerm, handleSearchChange, openModal, deleteAdmin]);
 
-  const renderContent = () => {
-    const t = translations[language];
-    
+  const renderContent = useCallback(() => {
     return (
       <div className="admin-content">
         <h2>{t.contentManagement}</h2>
-        
         <div className="content-sections-container">
-          {/* Homepage Banner Section */}
           <div className="content-section">
             <div className="section-header">
-              <div className="section-icon">
-                <FontAwesomeIcon icon={faNewspaper} />
-              </div>
+              <div className="section-icon"><FontAwesomeIcon icon={faNewspaper} /></div>
               <div className="section-content">
                 <h3>{t.homepageBanner}</h3>
                 <div className="content-status published">Published</div>
@@ -1063,20 +1207,14 @@ const AdminPage = () => {
                 <p className="content-description">{t.urgentNeedDesc}</p>
                 <div className="content-footer">
                   <span className="last-modified">Last modified: {new Date().toLocaleDateString()}</span>
-                  <button className="control-button">
-                    <FontAwesomeIcon icon={faEdit} /> Edit
-                  </button>
+                  <button className="control-button"><FontAwesomeIcon icon={faEdit} /> Edit</button>
                 </div>
               </div>
             </div>
           </div>
-          
-          {/* About Us Page Section */}
           <div className="content-section">
             <div className="section-header">
-              <div className="section-icon">
-                <FontAwesomeIcon icon={faUsers} />
-              </div>
+              <div className="section-icon"><FontAwesomeIcon icon={faUsers} /></div>
               <div className="section-content">
                 <h3>{t.aboutUsPage}</h3>
                 <div className="content-status published">Published</div>
@@ -1084,20 +1222,14 @@ const AdminPage = () => {
                 <p className="content-description">{t.aboutUsDesc}</p>
                 <div className="content-footer">
                   <span className="last-modified">Last modified: {new Date().toLocaleDateString()}</span>
-                  <button className="control-button">
-                    <FontAwesomeIcon icon={faEdit} /> Edit
-                  </button>
+                  <button className="control-button"><FontAwesomeIcon icon={faEdit} /> Edit</button>
                 </div>
               </div>
             </div>
           </div>
-          
-          {/* Contact Information Section */}
           <div className="content-section">
             <div className="section-header">
-              <div className="section-icon">
-                <FontAwesomeIcon icon={faMapMarkerAlt} />
-              </div>
+              <div className="section-icon"><FontAwesomeIcon icon={faMapMarkerAlt} /></div>
               <div className="section-content">
                 <h3>{t.contactInformation}</h3>
                 <div className="content-status published">Published</div>
@@ -1105,9 +1237,7 @@ const AdminPage = () => {
                 <p className="content-description">Address: 123 Main St, Algiers<br />Phone: +213 123 456 789<br />Email: contact@redhope.dz</p>
                 <div className="content-footer">
                   <span className="last-modified">Last modified: {new Date().toLocaleDateString()}</span>
-                  <button className="control-button">
-                    <FontAwesomeIcon icon={faEdit} /> Edit
-                  </button>
+                  <button className="control-button"><FontAwesomeIcon icon={faEdit} /> Edit</button>
                 </div>
               </div>
             </div>
@@ -1115,205 +1245,66 @@ const AdminPage = () => {
         </div>
       </div>
     );
-  };
+  }, [t]);
 
-  const renderSettings = () => {
-    const t = translations[language];
-    
+  const renderSettings = useCallback(() => {
     return (
       <div className="admin-settings">
         <h2>{t.systemSettings}</h2>
-        
         <div className="settings-grid">
           <div className="settings-card">
             <div className="card-content">
-              <div className="card-icon">
-                <FontAwesomeIcon icon={faUserShield} />
-              </div>
-              <h3>{t.adminAccounts}</h3>
-              <p>{t.adminAccountsDesc}</p>
-              <button className="control-button">
-                <FontAwesomeIcon icon={faUsers} />
-                {t.manageAdmins}
-              </button>
-            </div>
-          </div>
-          
-          <div className="settings-card">
-            <div className="card-content">
-              <div className="card-icon">
-                <FontAwesomeIcon icon={faBell} />
-              </div>
+              <div className="card-icon"><FontAwesomeIcon icon={faBell} /></div>
               <h3>{t.notificationSettings}</h3>
               <p>{t.notificationSettingsDesc}</p>
-              <button className="control-button">
-                <FontAwesomeIcon icon={faCog} />
-                {t.configure}
-              </button>
+              <button className="control-button"><FontAwesomeIcon icon={faCog} /> {t.configure}</button>
             </div>
           </div>
-          
           <div className="settings-card">
             <div className="card-content">
-              <div className="card-icon">
-                <FontAwesomeIcon icon={faDatabase} />
-              </div>
+              <div className="card-icon"><FontAwesomeIcon icon={faDatabase} /></div>
               <h3>{t.systemBackup}</h3>
               <p>{t.systemBackupDesc}</p>
-              <button className="control-button">
-                <FontAwesomeIcon icon={faDownload} />
-                {t.backupNow}
-              </button>
+              <button className="control-button"><FontAwesomeIcon icon={faDownload} /> {t.backupNow}</button>
             </div>
           </div>
-          
           <div className="settings-card">
             <div className="card-content">
-              <div className="card-icon">
-                <FontAwesomeIcon icon={faServer} />
-              </div>
+              <div className="card-icon"><FontAwesomeIcon icon={faServer} /></div>
               <h3>{t.apiIntegration}</h3>
               <p>{t.apiIntegrationDesc}</p>
-              <button className="control-button">
-                <FontAwesomeIcon icon={faEdit} />
-                {t.viewAPIs}
-              </button>
+              <button className="control-button"><FontAwesomeIcon icon={faEdit} /> {t.viewAPIs}</button>
             </div>
           </div>
         </div>
-        
         <div className="system-info">
-          <h3>
-            <FontAwesomeIcon icon={faChartLine} />
-            {t.systemInformation}
-          </h3>
+          <h3><FontAwesomeIcon icon={faChartLine} /> {t.systemInformation}</h3>
           <div className="info-grid">
-            <div className="info-item">
-              <span className="info-label">{t.version}</span>
-              <span className="info-value">1.0.0</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">{t.lastUpdate}</span>
-              <span className="info-value">{new Date().toLocaleDateString()}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">{t.databaseStatus}</span>
-              <span className="info-value status-ok">{t.connected}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">{t.serverStatus}</span>
-              <span className="info-value status-ok">{t.online}</span>
-            </div>
+            <div className="info-item"><span className="info-label">{t.version}</span><span className="info-value">1.0.0</span></div>
+            <div className="info-item"><span className="info-label">{t.lastUpdate}</span><span className="info-value">{new Date().toLocaleDateString()}</span></div>
+            <div className="info-item"><span className="info-label">{t.databaseStatus}</span><span className="info-value status-ok">{t.connected}</span></div>
+            <div className="info-item"><span className="info-label">{t.serverStatus}</span><span className="info-value status-ok">{t.online}</span></div>
           </div>
         </div>
       </div>
     );
-  };
+  }, [t]);
 
-  const UserModal = () => {
-    const t = translations[language];
-    
-    if (!showUserModal) return null;
-    
+  const ModalWrapper = ({ title, isOpen, onClose, onSubmit, children, isSubmitting }) => {
+    if (!isOpen) return null;
     return (
       <div className="modal-overlay">
         <div className="user-modal">
           <div className="modal-header">
-            <h3>{selectedUser ? `Edit User: ${selectedUser.username || selectedUser.name}` : t.addNewUser}</h3>
-            <button className="close-btn" onClick={() => setShowUserModal(false)}>×</button>
+            <h3>{title}</h3>
+            <button className="close-btn" onClick={onClose} disabled={isSubmitting}>×</button>
           </div>
-          <form onSubmit={handleUserSubmit}>
-            <div className="modal-body">
-              <div className="form-group">
-                <label htmlFor="username">Username</label>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleFormChange}
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleFormChange}
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="role">Role</label>
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleFormChange}
-                >
-                  <option value="user">User</option>
-                  <option value="donor">Donor</option>
-                  <option value="admin">Admin</option>
-                  <option value="superadmin">Super Admin</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="bloodType">Blood Type</label>
-                <select
-                  id="bloodType"
-                  name="bloodType"
-                  value={formData.bloodType}
-                  onChange={handleFormChange}
-                >
-                  <option value="">Select Blood Type</option>
-                  <option value="A+">A+</option>
-                  <option value="A-">A-</option>
-                  <option value="B+">B+</option>
-                  <option value="B-">B-</option>
-                  <option value="AB+">AB+</option>
-                  <option value="AB-">AB-</option>
-                  <option value="O+">O+</option>
-                  <option value="O-">O-</option>
-                </select>
-              </div>
-              
-              <div className="form-group checkbox-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="isDonor"
-                    checked={formData.isDonor}
-                    onChange={handleFormChange}
-                  />
-                  Registered as Donor
-                </label>
-              </div>
-              
-              <div className="form-group checkbox-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive}
-                    onChange={handleFormChange}
-                  />
-                  Active Account
-                </label>
-              </div>
-            </div>
-            
+          <form onSubmit={onSubmit}>
+            <div className="modal-body">{children}</div>
             <div className="modal-footer">
-              <button type="button" className="btn-cancel" onClick={() => setShowUserModal(false)}>
-                Cancel
-              </button>
-              <button type="submit" className="btn-save">
-                {selectedUser ? 'Update' : 'Create'}
+              <button type="button" className="btn-cancel" onClick={onClose} disabled={isSubmitting}>Cancel</button>
+              <button type="submit" className="btn-save" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : (modalState.data ? 'Update' : 'Create')}
               </button>
             </div>
           </form>
@@ -1322,18 +1313,107 @@ const AdminPage = () => {
     );
   };
 
+  const FormGroup = ({ label, htmlFor, children }) => (
+    <div className="form-group">
+      <label htmlFor={htmlFor}>{label}</label>
+      {children}
+    </div>
+  );
+  const CheckboxGroup = ({ label, name, checked, onChange }) => (
+    <div className="form-group checkbox-group">
+      <label>
+        <input type="checkbox" name={name} checked={checked} onChange={onChange} /> {label}
+      </label>
+    </div>
+  );
+
+  const UserModal = useCallback(() => (
+    <ModalWrapper
+      title={modalState.data ? `Edit User: ${modalState.data.username}` : t.addNewUser}
+      isOpen={modalState.isOpen && modalState.type === MODAL_TYPE.USER}
+      onClose={closeModal}
+      onSubmit={handleUserSubmit}
+      isSubmitting={loadingStates.action}
+    >
+      <FormGroup label="Username" htmlFor="username">
+        <input type="text" id="username" name="username" value={userFormData.username} onChange={handleUserFormChange} required />
+      </FormGroup>
+      <FormGroup label="Email" htmlFor="email">
+        <input type="email" id="email" name="email" value={userFormData.email} onChange={handleUserFormChange} required />
+      </FormGroup>
+      <FormGroup label="Role" htmlFor="role">
+        <select id="role" name="role" value={userFormData.role} onChange={handleUserFormChange}>
+          {Object.values(ROLES).map(role => <option key={role} value={role}>{role}</option>)}
+        </select>
+      </FormGroup>
+      <FormGroup label="Blood Type" htmlFor="bloodType">
+        <select id="bloodType" name="bloodType" value={userFormData.bloodType} onChange={handleUserFormChange}>
+          <option value="">Select Blood Type</option>
+          {BLOOD_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
+        </select>
+      </FormGroup>
+      <CheckboxGroup label="Registered as Donor" name="isDonor" checked={userFormData.isDonor} onChange={handleUserFormChange} />
+      <CheckboxGroup label="Active Account" name="isActive" checked={userFormData.isActive} onChange={handleUserFormChange} />
+    </ModalWrapper>
+  ), [t, modalState, userFormData, handleUserFormChange, handleUserSubmit, closeModal, loadingStates.action]);
+
+  const AdminModal = useCallback(() => (
+    <ModalWrapper
+      title={modalState.data ? `Edit Admin: ${modalState.data.username}` : t.addNewAdmin}
+      isOpen={modalState.isOpen && modalState.type === MODAL_TYPE.ADMIN}
+      onClose={closeModal}
+      onSubmit={handleAdminSubmit}
+      isSubmitting={loadingStates.action}
+    >
+      <FormGroup label="Username" htmlFor="username">
+        <input type="text" id="username" name="username" value={adminFormData.username} onChange={handleAdminFormChange} required />
+      </FormGroup>
+      <FormGroup label="Email" htmlFor="email">
+        <input type="email" id="email" name="email" value={adminFormData.email} onChange={handleAdminFormChange} required />
+      </FormGroup>
+      <FormGroup label="Role" htmlFor="role">
+        <select id="role" name="role" value={adminFormData.role} onChange={handleAdminFormChange}>
+          <option value={ROLES.ADMIN}>Admin</option>
+          <option value={ROLES.SUPERADMIN}>Super Admin</option>
+        </select>
+      </FormGroup>
+      <FormGroup label="Permissions">
+        <CheckboxGroup label="Manage Users" name="permission_manageUsers" checked={adminFormData.permissions.manageUsers} onChange={handleAdminFormChange} />
+        <CheckboxGroup label="Manage Donations" name="permission_manageDonations" checked={adminFormData.permissions.manageDonations} onChange={handleAdminFormChange} />
+        <CheckboxGroup label="Manage Content" name="permission_manageContent" checked={adminFormData.permissions.manageContent} onChange={handleAdminFormChange} />
+        <CheckboxGroup label="Manage Settings" name="permission_manageSettings" checked={adminFormData.permissions.manageSettings} onChange={handleAdminFormChange} />
+      </FormGroup>
+    </ModalWrapper>
+  ), [t, modalState, adminFormData, handleAdminFormChange, handleAdminSubmit, closeModal, loadingStates.action]);
+
+  if (loadingStates.global) {
+    return <LoadingIndicator message="Verifying access..." />;
+  }
+
   if (!isAdmin) {
     return (
       <>
         <Navbar />
         <div className="admin-unauthorized">
-          <h2>{translations[language].unauthorizedAccess}</h2>
-          <p>{translations[language].noPermission}</p>
-          <button onClick={() => navigate('/')}>{translations[language].returnToHome}</button>
+          <h2>{t.unauthorizedAccess}</h2>
+          <p>{t.noPermission}</p>
+          <button onClick={() => navigate('/')}>{t.returnToHome}</button>
         </div>
       </>
     );
   }
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'dashboard': return renderDashboard();
+      case 'users': return renderUsers();
+      case 'adminManagement': return renderAdminManagement();
+      case 'donations': return renderDonations();
+      case 'content': return renderContent();
+      case 'settings': return renderSettings();
+      default: return <p>Unknown tab selected.</p>;
+    }
+  };
 
   return (
     <div className="admin-wrapper">
@@ -1349,110 +1429,82 @@ const AdminPage = () => {
         <div className="admin-container">
           <div className="admin-sidebar">
             <div className="admin-profile">
-              <div className="admin-avatar">
-                <FontAwesomeIcon icon={faUserShield} />
-              </div>
+              <div className="admin-avatar"><FontAwesomeIcon icon={faUserShield} /></div>
               <div className="admin-info">
                 <h3>Admin User</h3>
-                <p>{translations[language].superAdministrator}</p>
+                <p>{t.superAdministrator}</p>
               </div>
             </div>
             <ul className="admin-menu">
-              <li 
-                className={activeTab === 'dashboard' ? 'active' : ''} 
-                onClick={() => setActiveTab('dashboard')}
-              >
-                <FontAwesomeIcon icon={faChartLine} />
-                <span>{translations[language].dashboard}</span>
+              <li className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>
+                <FontAwesomeIcon icon={faChartLine} /><span>{t.dashboard}</span>
               </li>
-              <li 
-                className={activeTab === 'users' ? 'active' : ''} 
-                onClick={() => setActiveTab('users')}
-              >
-                <FontAwesomeIcon icon={faUsers} />
-                <span>{translations[language].userManagement}</span>
+              <li className={activeTab === 'users' ? 'active' : ''} onClick={() => setActiveTab('users')}>
+                <FontAwesomeIcon icon={faUsers} /><span>{t.userManagement}</span>
               </li>
-              <li 
-                className={activeTab === 'donations' ? 'active' : ''} 
-                onClick={() => setActiveTab('donations')}
-              >
-                <FontAwesomeIcon icon={faTint} />
-                <span>{translations[language].donations}</span>
+              <li className={activeTab === 'adminManagement' ? 'active' : ''} onClick={() => setActiveTab('adminManagement')}>
+                <FontAwesomeIcon icon={faUserShield} /><span>{t.adminManagement}</span>
               </li>
-              <li 
-                className={activeTab === 'content' ? 'active' : ''} 
-                onClick={() => setActiveTab('content')}
-              >
-                <FontAwesomeIcon icon={faNewspaper} />
-                <span>{translations[language].content}</span>
+              <li className={activeTab === 'donations' ? 'active' : ''} onClick={() => setActiveTab('donations')}>
+                <FontAwesomeIcon icon={faTint} /><span>{t.donations}</span>
               </li>
-              <li 
-                className={activeTab === 'settings' ? 'active' : ''} 
-                onClick={() => setActiveTab('settings')}
-              >
-                <FontAwesomeIcon icon={faCog} />
-                <span>{translations[language].settings}</span>
+              <li className={activeTab === 'content' ? 'active' : ''} onClick={() => setActiveTab('content')}>
+                <FontAwesomeIcon icon={faNewspaper} /><span>{t.content}</span>
+              </li>
+              <li className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>
+                <FontAwesomeIcon icon={faCog} /><span>{t.settings}</span>
               </li>
             </ul>
           </div>
+
           <div className="admin-content-area">
-            {loading && activeTab === 'dashboard' ? (
-              <div className="admin-loading">
-                <div className="spinner"></div>
-                <p>{translations[language].loadingData}</p>
-              </div>
-            ) : (
-              <>
-                {activeTab === 'dashboard' && renderDashboard()}
-                {activeTab === 'users' && renderUsers()}
-                {activeTab === 'donations' && renderDonations()}
-                {activeTab === 'content' && renderContent()}
-                {activeTab === 'settings' && renderSettings()}
-              </>
-            )}
+            {renderTabContent()}
           </div>
         </div>
       </div>
-      
-      {showUserModal && <UserModal />}
+
+      <UserModal />
+      <AdminModal />
     </div>
   );
 };
 
-// Add axios interceptor to handle token expiration
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    if (error.response && 
-        error.response.status === 401 && 
-        error.response.data.message === 'jwt expired' && 
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    if (refreshToken &&
+        error.response?.status === 401 &&
+        error.response?.data?.message === 'jwt expired' &&
         !originalRequest._retry) {
-      
+
       originalRequest._retry = true;
-      
+
       try {
-        const refreshResponse = await axios.post('http://localhost:3000/api/refresh-token', {
-          refreshToken: localStorage.getItem('refreshToken')
-        });
-        
-        const { token, refreshToken } = refreshResponse.data;
+        const refreshResponse = await axios.post(`${API_BASE_URL}/api/refresh-token`, { refreshToken });
+
+        const { token, refreshToken: newRefreshToken } = refreshResponse.data;
+
         localStorage.setItem('token', token);
-        localStorage.setItem('refreshToken', refreshToken);
-        
+        localStorage.setItem('refreshToken', newRefreshToken);
+
         originalRequest.headers['Authorization'] = `Bearer ${token}`;
-        
+
         return axios(originalRequest);
+
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('isAdmin');
+        localStorage.removeItem('userRole');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

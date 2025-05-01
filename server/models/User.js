@@ -22,6 +22,10 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     required: [true, 'Please enter your date of birth']
   },
+  location: {
+    type: String,
+    required: [true, 'Please enter your location']
+  },
   bloodType: {
     type: String,
     required: [true, 'Please select your blood type'],
@@ -57,25 +61,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-  // Keep the location object for geo features
-  location: {
-    type: {
-      type: String,
-      enum: ['Point'],
-      default: 'Point'
-    },
-    coordinates: {
-      type: [Number], // [longitude, latitude]
-      default: [0, 0]
-    }
-  },
-  
-  // Add a textual address field
-  address: {
-    type: String,
-    default: ''
-  },
-  
   // Add lastCityUpdate timestamp to track when city was last determined
   lastCityUpdate: {
     type: Date,

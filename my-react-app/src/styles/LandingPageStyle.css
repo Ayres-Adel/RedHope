@@ -185,7 +185,7 @@
 
 /* Blur effect for non-hovered cards */
 .flex_Container_03:hover > div:not(:hover) {
-    filter: blur(5px); /* Blur effect */
+    filter: blur(2px); /* Blur effect */
     opacity: 0.8; /* Optional: Reduce opacity for a faded look */
 }
 

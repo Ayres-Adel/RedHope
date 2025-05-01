@@ -131,4 +131,414 @@ router.get('/blood-supply', requireAuth || fallbackAuth, (req, res) => {
   }
 });
 
+// Get all admin accounts with pagination, filtering and sorting
+router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
+  try {
+    console.log('Admin accounts API endpoint called');
+    
+    // Extract query parameters
+    const { 
+      page = 1, 
+      limit = 10, 
+      search = '', 
+      sortBy = 'createdAt', 
+      sortOrder = -1,
+      role = '' 
+    } = req.query;
+    
+    // Get the Admin model properly
+    const Admin = mongoose.model('Admin');
+    
+    if (!Admin) {
+      console.error('Admin model not found in mongoose models');
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Admin model not registered' 
+      });
+    }
+    
+    // Build query filters
+    const filter = {};
+    
+    // Search by username, email, or name if search term provided
+    if (search) {
+      filter.$or = [
+        { username: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // Filter by role if specified
+    if (role) {
+      filter.role = role;
+    }
+    
+    // Count total matching documents for pagination
+    const totalAdmins = await Admin.countDocuments(filter);
+    const totalPages = Math.ceil(totalAdmins / limit);
+    const skip = (page - 1) * limit;
+    
+    // Execute query with pagination and sorting
+    const admins = await Admin.find(filter)
+      .select('-password')
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    console.log(`Found ${admins.length} admin accounts matching query`);
+    
+    // Format admin accounts for response
+    const formattedAdmins = admins.map(admin => ({
+      id: admin._id,
+      username: admin.username || `${admin.firstName || ''} ${admin.lastName || ''}`.trim() || 'Unknown Admin',
+      email: admin.email || 'No email',
+      role: admin.role || 'admin',
+      permissions: admin.permissions || {
+        manageUsers: true,
+        manageDonations: true,
+        manageContent: admin.role === 'superadmin',
+        manageSettings: admin.role === 'superadmin'
+      },
+      lastLogin: admin.lastLogin || null,
+      isActive: admin.isActive !== false
+    }));
+    
+    // Return success response with pagination data
+    res.status(200).json({
+      success: true,
+      admins: formattedAdmins,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalItems: totalAdmins,
+        totalPages
+      }
+    });
+    
+  } catch (err) {
+    console.error('Error in /admin/accounts endpoint:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error fetching admin accounts', 
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined 
+    });
+  }
+});
+
+// Get a single admin by ID
+router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Get Admin model
+    const Admin = mongoose.model('Admin');
+    
+    if (!Admin) {
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Admin model not registered' 
+      });
+    }
+    
+    // Find the admin by ID
+    const admin = await Admin.findById(id).select('-password');
+    
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+    
+    // Format and return the admin data
+    res.status(200).json({
+      success: true,
+      admin: {
+        id: admin._id,
+        username: admin.username,
+        email: admin.email,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        role: admin.role,
+        permissions: admin.permissions,
+        lastLogin: admin.lastLogin,
+        isActive: admin.isActive,
+        createdAt: admin.createdAt
+      }
+    });
+    
+  } catch (err) {
+    console.error('Error fetching admin by ID:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching admin details',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
+// Create a new admin account
+router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
+  try {
+    // Extract admin data from request body
+    const { username, email, firstName, lastName, password, role, permissions } = req.body;
+    
+    // Validate required fields
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username, email, and password are required'
+      });
+    }
+    
+    // Get Admin model
+    const Admin = mongoose.model('Admin');
+    
+    // Check if email already exists
+    const existingAdmin = await Admin.findOne({ email });
+    
+    if (existingAdmin) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already in use'
+      });
+    }
+    
+    // Create new admin
+    const newAdmin = new Admin({
+      username,
+      email,
+      firstName: firstName || '',
+      lastName: lastName || '',
+      password, // Will be hashed by pre-save hook in model
+      role: role || 'admin',
+      permissions: permissions || {
+        manageUsers: true,
+        manageDonations: true,
+        manageContent: role === 'superadmin',
+        manageSettings: role === 'superadmin'
+      }
+    });
+    
+    // Save to database
+    await newAdmin.save();
+    
+    // Return success without password
+    res.status(201).json({
+      success: true,
+      message: 'Admin account created successfully',
+      admin: {
+        id: newAdmin._id,
+        username: newAdmin.username,
+        email: newAdmin.email,
+        role: newAdmin.role
+      }
+    });
+    
+  } catch (err) {
+    console.error('Error creating admin account:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error creating admin account',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
+// Update an admin account
+router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { username, email, firstName, lastName, role, isActive, permissions } = req.body;
+    
+    // Get Admin model
+    const Admin = mongoose.model('Admin');
+    
+    // Find admin to update
+    const admin = await Admin.findById(id);
+    
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+    
+    // Check if email is being changed and already exists
+    if (email && email !== admin.email) {
+      const existingAdmin = await Admin.findOne({ email, _id: { $ne: id } });
+      
+      if (existingAdmin) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email is already in use by another admin'
+        });
+      }
+    }
+    
+    // Update fields if provided
+    if (username) admin.username = username;
+    if (email) admin.email = email;
+    if (firstName !== undefined) admin.firstName = firstName;
+    if (lastName !== undefined) admin.lastName = lastName;
+    if (role) admin.role = role;
+    if (isActive !== undefined) admin.isActive = isActive;
+    if (permissions) admin.permissions = { ...admin.permissions, ...permissions };
+    
+    // Save changes
+    await admin.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Admin account updated successfully',
+      admin: {
+        id: admin._id,
+        username: admin.username,
+        email: admin.email,
+        role: admin.role,
+        isActive: admin.isActive,
+        permissions: admin.permissions
+      }
+    });
+    
+  } catch (err) {
+    console.error('Error updating admin account:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating admin account',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
+// Delete an admin account
+router.delete('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Get Admin model
+    const Admin = mongoose.model('Admin');
+    
+    // Find and delete admin
+    const admin = await Admin.findByIdAndDelete(id);
+    
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Admin account deleted successfully',
+      deletedAdminId: id
+    });
+    
+  } catch (err) {
+    console.error('Error deleting admin account:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting admin account',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
+// Update admin permissions specifically
+router.patch('/accounts/:id/permissions', requireAuth || fallbackAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { permissions } = req.body;
+    
+    if (!permissions || typeof permissions !== 'object') {
+      return res.status(400).json({
+        success: false,
+        message: 'Permissions object is required'
+      });
+    }
+    
+    // Get Admin model
+    const Admin = mongoose.model('Admin');
+    
+    // Find the admin
+    const admin = await Admin.findById(id);
+    
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+    
+    // Update permissions
+    admin.permissions = { ...admin.permissions, ...permissions };
+    await admin.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Admin permissions updated successfully',
+      permissions: admin.permissions
+    });
+    
+  } catch (err) {
+    console.error('Error updating admin permissions:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating admin permissions',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+});
+
+// Debug endpoint to check Admin model registration
+router.get('/check-model', (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const modelNames = Object.keys(mongoose.models);
+    
+    // Check if Admin model is registered
+    const adminModel = mongoose.models.Admin;
+    const isAdminRegistered = !!adminModel;
+    
+    // Get registered models count
+    const adminCount = isAdminRegistered ? 
+      'Counting admins...' : 
+      'Cannot count, Admin model not registered';
+      
+    // Try to count admins if model exists
+    let countPromise = Promise.resolve(0);
+    if (isAdminRegistered) {
+      countPromise = adminModel.countDocuments();
+    }
+    
+    // Return the count when ready
+    countPromise.then(count => {
+      res.json({
+        success: true,
+        registeredModels: modelNames,
+        isAdminModelRegistered: isAdminRegistered,
+        adminModelName: isAdminRegistered ? adminModel.modelName : null,
+        adminCount: isAdminRegistered ? count : null
+      });
+    }).catch(err => {
+      res.status(500).json({
+        success: false,
+        message: 'Error counting admins',
+        error: err.message
+      });
+    });
+    
+  } catch (err) {
+    console.error('Error checking Admin model:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error checking Admin model',
+      error: err.message
+    });
+  }
+});
+
 module.exports = router;

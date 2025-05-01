@@ -6,6 +6,7 @@ import { faSignOutAlt, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
 import '../styles/Search.css';
 import Navbar from './Navbar';
+import { API_BASE_URL } from '../config';
 
 
 export default function Search() {
@@ -179,7 +180,7 @@ export default function Search() {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:3000/nearby', {
+      const res = await axios.get(`${API_BASE_URL}/nearby`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -272,7 +273,7 @@ export default function Search() {
         return;
       }
       try {
-        const res = await axios.get('http://localhost:3000/dashboard', {
+        const res = await axios.get(`${API_BASE_URL}/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

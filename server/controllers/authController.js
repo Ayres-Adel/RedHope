@@ -144,7 +144,20 @@ exports.login = async (req, res) => {
 // Register controller
 exports.register = async (req, res) => {
   try {
-    const { username, email, password, firstName, lastName, bloodType, isDonor } = req.body;
+    console.log('Registration attempt with data:', req.body);
+    const { 
+      username, 
+      email, 
+      password, 
+      firstName, 
+      lastName, 
+      bloodType, 
+      isDonor,
+      dateOfBirth,
+      location,
+      gender,
+      phoneNumber 
+    } = req.body;
     
     // Validation
     if (!username || !email || !password) {
@@ -163,7 +176,7 @@ exports.register = async (req, res) => {
       });
     }
     
-    // Create new user
+    // Create new user with all required fields
     const user = await User.create({
       username,
       email,
@@ -172,7 +185,12 @@ exports.register = async (req, res) => {
       lastName: lastName || '',
       bloodType: bloodType || 'Unknown',
       role: 'user',
-      isDonor: isDonor || false
+      isDonor: isDonor || false,
+      // Include the required fields
+      dateOfBirth,
+      location,
+      gender,
+      phoneNumber
     });
     
     // Generate token
@@ -245,6 +263,3 @@ exports.refreshToken = async (req, res) => {
     });
   }
 };
-
-
-

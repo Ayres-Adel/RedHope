@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/CitySelect.css';
+import { API_BASE_URL } from '../config';
 
 const CitySelector = ({ onLocationChange, isDarkMode, includeAllCities = false }) => {
   // Set the default value to 'all' instead of an empty string
@@ -13,20 +14,20 @@ const CitySelector = ({ onLocationChange, isDarkMode, includeAllCities = false }
     const fetchCities = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:3000/api/wilaya/all');
+        const response = await fetch(`${API_BASE_URL}/api/wilaya/all`);
         
         if (!response.ok) {
           if (response.status === 404) {
             console.log("Cities endpoint not found, trying to seed data...");
             // Try to seed the database if no cities exist
-            const seedResponse = await fetch('http://localhost:3000/api/wilaya/seed', {
+            const seedResponse = await fetch(`${API_BASE_URL}/api/wilaya/seed`, {
               method: 'POST'
             });
             
             if (seedResponse.ok) {
               console.log("Successfully seeded cities data");
               // Retry fetching cities after seeding
-              const retryResponse = await fetch('http://localhost:3000/api/wilaya/all');
+              const retryResponse = await fetch(`${API_BASE_URL}/api/wilaya/all`);
               if (retryResponse.ok) {
                 const retryData = await retryResponse.json();
                 console.log('Cities loaded after seeding:', retryData.data?.length || 0);
