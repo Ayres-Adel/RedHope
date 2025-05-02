@@ -65,8 +65,8 @@ export default function LandingPage() {
             </h1>
             <p>
               {language === "fr"
-                ? "Notre plateforme vous aide à trouver des donneurs de sang à proximité à tout moment..."
-                : "Our platform helps you locate blood donors nearby anytime..."}
+                ? "Notre plateforme vous aide à trouver des donneurs de sang à proximité à tout moment. Que vous ayez un besoin urgent ou que vous planifiez un don futur, nous vous mettons en relation avec des donneurs disponibles près de chez vous pour un soutien rapide."
+                : "Our platform helps you locate blood donors nearby anytime. Whether you're in urgent need or planning for a future donation, we connect you with available donors near your location for timely support."}
             </p>
           </div>
         </FadeInSection>
@@ -103,36 +103,36 @@ export default function LandingPage() {
                 titleEn: "Search for Donors",
                 titleFr: "Recherchez des donneurs",
                 descEn:
-                  "Use our platform to search for blood donors near your location...",
+                  "Use our platform to search for blood donors near your location. We make it easy to find compatible donors in real-time, ensuring quick and efficient support when you need it most.",
                 descFr:
-                  "Utilisez notre plateforme pour rechercher des donneurs de sang à proximité...",
+                  "Utilisez notre plateforme pour rechercher des donneurs de sang à proximité. Nous facilitons la recherche de donneurs compatibles en temps réel pour un soutien rapide.",
               },
               {
                 icon: faSuitcaseMedical,
                 titleEn: "Check Donor Profiles",
                 titleFr: "Vérifiez les profils des donneurs",
                 descEn:
-                  "Review detailed profiles of potential donors, including blood type...",
+                  "Review detailed profiles of potential donors, including blood type, donation history, and availability, to find the best match for your needs.",
                 descFr:
-                  "Consultez les profils détaillés des donneurs potentiels...",
+                  "Consultez les profils détaillés des donneurs potentiels, incluant le groupe sanguin, l'historique de dons et la disponibilité, pour trouver la meilleure correspondance.",
               },
               {
                 icon: faBusinessTime,
                 titleEn: "Schedule a Donation",
                 titleFr: "Planifiez un don",
                 descEn:
-                  "Quickly schedule a blood donation at a time and place convenient...",
+                  "Quickly schedule a blood donation at a time and place convenient for both you and the donor. Our scheduling feature ensures a seamless donation process.",
                 descFr:
-                  "Planifiez rapidement un don de sang à un moment et dans un lieu...",
+                  "Planifiez rapidement un don de sang à un moment et dans un lieu qui conviennent à la fois au donneur et à vous. Notre fonctionnalité de planification assure un processus de don fluide.",
               },
               {
                 icon: faHeart,
                 titleEn: "Save Lives",
                 titleFr: "Sauvez des vies",
                 descEn:
-                  "Every successful donation helps save lives...",
+                  "Every successful donation helps save lives. By connecting with nearby donors, you're making a difference in your community and beyond.",
                 descFr:
-                  "Chaque don réussi contribue à sauver des vies...",
+                  "Chaque don réussi contribue à sauver des vies. En vous connectant avec des donneurs à proximité, vous faites une différence dans votre communauté et au-delà.",
               },
             ].map((step, i) => (
               <div className="card" key={i}>
@@ -154,20 +154,20 @@ export default function LandingPage() {
               {
                 titleEn: "Blood Donation Drives",
                 titleFr: "Campagnes de don de sang",
-                descEn: "We organize regular blood donation drives...",
-                descFr: "Nous organisons régulièrement des campagnes de don de sang...",
+                descEn: "We organize regular blood donation drives to help ensure a steady supply of blood for those in need.",
+                descFr: "Nous organisons régulièrement des campagnes de don de sang pour garantir un approvisionnement constant en sang pour ceux dans le besoin.",
               },
               {
                 titleEn: "Donor Matching",
                 titleFr: "Appariement des donneurs",
-                descEn: "We provide advanced matching algorithms...",
-                descFr: "Nous proposons des algorithmes avancés...",
+                descEn: "We provide advanced matching algorithms to connect patients with suitable blood donors based on compatibility.",
+                descFr: "Nous proposons des algorithmes avancés pour connecter les patients aux donneurs compatibles, selon leur groupe sanguin et leurs disponibilités.",
               },
               {
                 titleEn: "Emergency Services",
                 titleFr: "Services d’urgence",
-                descEn: "Our platform is available 24/7 for emergencies...",
-                descFr: "Notre plateforme est disponible 24h/24 et 7j/7...",
+                descEn: "Our platform is available 24/7 for emergencies, ensuring that blood is always accessible when needed.",
+                descFr: "Notre plateforme est disponible 24h/24 et 7j/7 en cas d'urgence, assurant ainsi l'accès au sang quand vous en avez besoin.",
               },
             ].map((service, i) => (
               <div key={i}>
@@ -188,8 +188,8 @@ export default function LandingPage() {
             <div className="about-content">
               <p>
                 {language === "fr"
-                  ? "Chez RedHope, nous nous engageons à combler le fossé entre les donneurs..."
-                  : "At RedHope we are dedicated to bridging the gap between blood donors..."}
+                  ? "Chez RedHope, nous nous engageons à combler le fossé entre les donneurs de sang et ceux qui en ont besoin. Notre mission est de sauver des vies en facilitant le don de sang pour tous. Nous croyons que chaque goutte compte, et ensemble, nous pouvons faire la différence."
+                  : "At RedHope we are dedicated to bridging the gap between blood donors and those in need. Our mission is to save lives by making blood donation easier and more accessible for everyone. We believe that every drop counts, and together, we can make a difference."}
               </p>
             </div>
             <div className="flip-card-container">
