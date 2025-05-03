@@ -30,7 +30,7 @@ console.log(`Database connection string format check: ${dbUriParts.length > 2 ? 
 console.log(`Database host: ${dbUriParts.length > 2 ? dbUriParts[2].split('@')[1].split('/')[0] : 'Missing'}`);
 
 // Apply middleware
-app.use(cors());
+app.use(cors({ origin: 'https://redhope-frontend.onrender.com' }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
