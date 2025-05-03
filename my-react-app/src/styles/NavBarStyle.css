@@ -55,7 +55,7 @@ nav {
   transition: all 0.3s ease;
 }
 
-.RedHope img {
+.nav-logo img, .RedHope img {
   width: 75px;
   height: 75px;
   margin-top: -8px;
@@ -64,24 +64,25 @@ nav {
   transition: transform 0.3s ease;
 }
 
-.RedHope img:hover {
+.nav-logo img:hover, .RedHope img:hover {
   transform: scale(1.05);
 }
 
-.RedHope {
+.nav-logo, .RedHope {
   display: flex;
   align-items: center;
+  flex-direction: row; /* Ensure logo and text are in a row */
 }
 
-.dark-theme .RedHope {
+.dark-theme .nav-logo, .dark-theme .RedHope {
   mix-blend-mode: hard-light;
 }
 
-.dark-theme .RedHope span {
+.dark-theme .nav-logo span {
   color: #ff4747; /* Keep "Red" red */
 }
 
-.dark-theme .RedHope h1 {
+.dark-theme .nav-logo h1 {
   color: #e0e0e0; /* Make the base h1 text light (this applies to "Hope") */
 }
 
@@ -133,10 +134,12 @@ nav {
   color: #e0e0e0;
 }
 
-.RedHope > a {
+.nav-logo > a, .RedHope > a {
   color: var(--Primary_blue);
   margin-left: -10px;
   margin-top: 8px;
+  display: flex; /* Ensure flexbox layout */
+  align-items: center;
 }
 
 nav > a > h1 {
@@ -442,7 +445,7 @@ input[type="checkbox"]:focus-visible + label.display {
     padding: 0 20px;
   }
 
-  .RedHope {
+  .nav-logo, .RedHope {
     margin: 0 auto; /* Center the logo */
     z-index: 1001; /* Keep logo above mobile menu */
   }
@@ -545,7 +548,7 @@ input[type="checkbox"]:focus-visible + label.display {
     right: 10px; /* Closer to edge */
   }
   
-  .RedHope img {
+  .nav-logo img, .RedHope img {
     width: 65px; /* Slightly smaller logo */
     height: 65px;
   }

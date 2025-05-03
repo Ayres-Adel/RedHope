@@ -225,19 +225,13 @@
     width: 750px;
 }
 
-
 .grid_Container_04 {
     display: grid;
 }
 
-
-
 .grid_Container_04 > p > label {
     margin-left: 40px;
 }
-
-
-
 
 .heartbeat {
     display: flex;
@@ -247,9 +241,7 @@
 }
 
 .Container_04 {
-    margin-left: -15px;
-    width: 1490px;
-    height: 700px;
+    height: fit-content;
     background-color: var(--NeutralLight_grayish_red);
     margin-bottom: 150px;
  }
@@ -267,6 +259,7 @@
     display: grid;
     justify-content: center;
     gap: 1.5rem; /* Space between grid items */
+    padding-bottom: 3rem;
   } 
 
   .grid_Container_04 > div > h2 {
@@ -275,7 +268,7 @@
   }
   
   .grid_Container_04 div {
-    padding: 1.5rem; /* Increased padding for a spacious feel */
+    padding: 2.5rem; /* Increased padding for a spacious feel */
     background-color: #ffffff; /* White background for service boxes */
     border: 1px solid var(--NeutralLight_grayish_red); /* Light border for definition */
     border-radius: 12px; /* Rounded corners */

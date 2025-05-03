@@ -497,8 +497,6 @@ tbody tr:hover {
   top: -5px;
 }
 
-
-
 @media (max-width: 1200px) {
   .hamburger {
     display: flex; /* Show hamburger menu */

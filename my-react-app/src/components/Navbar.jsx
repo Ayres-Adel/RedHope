@@ -199,9 +199,9 @@ export default function Navbar() {
   return (
     <header>
       <nav className={isMenuOpen ? 'expanded' : ''}>
-        <div className="RedHope">
+        <div className="nav-logo">
+        <a href="/">
           <img src="./src/assets/images/RedHope_Logo.png" alt="RedHope Logo" />
-          <a href="/">
             <h1>
               <span>Red</span>Hope
             </h1>

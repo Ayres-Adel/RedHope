@@ -780,7 +780,7 @@ section h2 {
 }
 
 /* Responsive styles - Mobile-first approach */
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
   .settings-wrapper {
     flex-direction: column;
     padding: 15px;
@@ -822,7 +822,7 @@ section h2 {
   }
 
   .admin-avatar {
-    margin: 0 auto 15px;
+    margin: 0 0 15px 0 !important;
   }
 
   .admin-info {
