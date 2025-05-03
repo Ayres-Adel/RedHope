@@ -18,6 +18,7 @@ import {
   faEyeSlash, 
   faPhone 
 } from '@fortawesome/free-solid-svg-icons'; // Import necessary icons
+import { API_BASE_URL } from '../config';
 
 // Import images
 import redHopeLogo from '../assets/images/RedHope_Logo.png';
@@ -169,7 +170,7 @@ export default function Sign() {
     });
   
     try {
-      const response = await fetch('http://localhost:3000/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

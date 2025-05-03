@@ -1,6 +1,6 @@
 // Application Configuration
 
-// API base URL - change this when deploying
+// API base URL - production backend URL for deployment
 export const API_BASE_URL = 'https://redhope-backend.onrender.com';
 
 // Other configuration constants can be added here
