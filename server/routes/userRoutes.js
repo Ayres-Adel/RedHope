@@ -413,4 +413,88 @@ router.get('/test', async (req, res) => {
   }
 });
 
+// Get paginated users with search and filters
+router.get('/paginated', async (req, res) => {
+  try {
+    // Extract query parameters with defaults
+    const { 
+      page = 1, 
+      limit = 10, 
+      search = '', 
+      sortBy = 'createdAt', 
+      sortOrder = -1, 
+      role = '', 
+      bloodType = '',
+      isDonor
+    } = req.query;
+    
+    // Build query filters
+    const filter = {};
+    
+    // Search by username, email if search term provided
+    if (search) {
+      filter.$or = [
+        { username: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { bloodType: { $regex: search, $options: 'i' } },
+        { location: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // Filter by role if specified
+    if (role) {
+      filter.role = role;
+    }
+    
+    // Filter by blood type if specified
+    if (bloodType) {
+      filter.bloodType = bloodType;
+    }
+    
+    // Filter by donor status if specified
+    if (isDonor !== undefined) {
+      filter.isDonor = isDonor === 'true';
+    }
+    
+    // Convert page and limit to numbers
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+    
+    // Validate sortOrder
+    const sortOrderNum = parseInt(sortOrder, 10);
+    const finalSortOrder = (sortOrderNum === 1 || sortOrderNum === -1) ? sortOrderNum : -1;
+
+    // Count total matching documents for pagination
+    const totalUsers = await User.countDocuments(filter);
+    const totalPages = Math.ceil(totalUsers / limitNum);
+    
+    // Execute query with pagination and sorting
+    const users = await User.find(filter)
+      .select('-password')
+      .sort({ [sortBy]: finalSortOrder })
+      .skip(skip)
+      .limit(limitNum);
+    
+    // Return success response with pagination data
+    return res.status(200).json({
+      success: true,
+      users,
+      pagination: {
+        currentPage: pageNum,
+        totalPages,
+        totalItems: totalUsers,
+        itemsPerPage: limitNum
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching paginated users:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching paginated users',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 module.exports = router;

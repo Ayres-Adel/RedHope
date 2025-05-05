@@ -200,19 +200,21 @@ export default function LandingPage() {
 
         <FadeInSection className="footer">
           <div className="grid_footer">
-            <h1>RedHope</h1>
-            <p>
-              {language === "fr"
-                ? "Accompagner votre parcours santé à chaque étape"
-                : "Empowering Your Health Journey Every Step of the Way"}
-            </p>
-          </div>
-          <div className="flex_footer">
-            {[faSquareFacebook, faInstagram, faTwitterSquare].map((icon, i) => (
-              <p key={i}>
-                <FontAwesomeIcon icon={icon} style={{ color: "#ffffff" }} size="2x" />
+            <div>
+              <h1>RedHope</h1>
+              <p>
+                {language === "fr"
+                  ? "Accompagner votre parcours santé à chaque étape"
+                  : "Empowering Your Health Journey Every Step of the Way"}
               </p>
-            ))}
+            </div>
+            <div className="flex_footer">
+              {[faSquareFacebook, faInstagram, faTwitterSquare].map((icon, i) => (
+                <p key={i}>
+                  <FontAwesomeIcon icon={icon} style={{ color: "#ffffff" }} size="2x" />
+                </p>
+              ))}
+            </div>
           </div>
         </FadeInSection>
 

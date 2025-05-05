@@ -136,13 +136,13 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
   try {
     console.log('Admin accounts API endpoint called');
     
-    // Extract query parameters
+    // Extract query parameters with defaults
     const { 
       page = 1, 
-      limit = 10, 
+      limit = 10, // Default limit
       search = '', 
       sortBy = 'createdAt', 
-      sortOrder = -1,
+      sortOrder = -1, // Default descending order
       role = '' 
     } = req.query;
     
@@ -175,19 +175,27 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       filter.role = role;
     }
     
+    // Convert page and limit to numbers
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+    
+    // Validate sortOrder
+    const sortOrderNum = parseInt(sortOrder, 10);
+    const finalSortOrder = (sortOrderNum === 1 || sortOrderNum === -1) ? sortOrderNum : -1;
+
     // Count total matching documents for pagination
     const totalAdmins = await Admin.countDocuments(filter);
-    const totalPages = Math.ceil(totalAdmins / limit);
-    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(totalAdmins / limitNum);
     
     // Execute query with pagination and sorting
     const admins = await Admin.find(filter)
       .select('-password')
-      .sort({ [sortBy]: sortOrder })
+      .sort({ [sortBy]: finalSortOrder })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(limitNum);
     
-    console.log(`Found ${admins.length} admin accounts matching query`);
+    console.log(`Found ${admins.length} admin accounts matching query on page ${pageNum}`);
     
     // Format admin accounts for response
     const formattedAdmins = admins.map(admin => ({
@@ -210,8 +218,8 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       success: true,
       admins: formattedAdmins,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: pageNum,
+        limit: limitNum,
         totalItems: totalAdmins,
         totalPages
       }

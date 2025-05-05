@@ -12,6 +12,8 @@ import Navbar from './Navbar';
 import '../styles/AdminPage.css';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
+import adminService from '../services/adminService';
+import userService from '../services/userService';
 
 // --- Constants ---
 const ITEMS_PER_PAGE = 10;
@@ -52,12 +54,14 @@ const INITIAL_USER_FORM_DATA = {
   bloodType: '',
   isDonor: false,
   isActive: true,
+  password: '', // Add password field
 };
 
 const INITIAL_ADMIN_FORM_DATA = {
   username: '',
   email: '',
   role: ROLES.ADMIN,
+  password: '', // Add password field
   permissions: {
     manageUsers: true,
     manageDonations: true,
@@ -466,76 +470,53 @@ const AdminPage = () => {
     }
   }, [getAuthHeaders, handleApiError, fetchBloodSupply, fetchStatsFromDatabase, setLoading]);
 
-  const fetchAllUsers = useCallback(async () => {
+  const fetchAllUsers = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
     setLoading('users', true);
     setError(null);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/user/all`, {
-        ...getAuthHeaders(),
-      });
+      console.log('Fetching users with params:', { page, limit, searchQuery });
+      const response = await userService.getAllUsers(page, limit, searchQuery);
+      console.log('User API response:', response);
 
-      const responseData = response.data || {};
-      const userData = responseData.users || [];
+      if (response.data && (response.data.success || response.data.users)) {
+        const userData = response.data.users || [];
+        console.log('User data extracted:', userData);
 
-      const normalizedUsers = userData.map(user => ({
-        _id: user._id || user.id,
-        username: user.username || user.name || 'Unknown',
-        email: user.email || 'No email',
-        role: user.role || ROLES.USER,
-        bloodType: user.bloodType || 'N/A',
-        location: user.location || 'N/A',
-        isDonor: Boolean(user.isDonor),
-        isActive: user.isActive !== false,
-      }));
+        const normalizedUsers = userData.map(user => ({
+          _id: user._id || user.id,
+          username: user.username || user.name || 'Unknown',
+          email: user.email || 'No email',
+          role: user.role || ROLES.USER,
+          bloodType: user.bloodType || 'N/A',
+          location: user.location || 'N/A',
+          isDonor: Boolean(user.isDonor),
+          isActive: user.isActive !== false,
+        }));
 
-      setAllUsers(normalizedUsers);
-
+        setAllUsers(normalizedUsers);
+        
+        // Update page info based on server response
+        setPageInfo(prev => ({
+          ...prev,
+          users: {
+            page: response.data.pagination?.currentPage || page,
+            totalPages: response.data.pagination?.totalPages || 1,
+            totalItems: response.data.pagination?.totalItems || userData.length
+          }
+        }));
+      } else {
+        console.error('Invalid user API response format:', response.data);
+        throw new Error(response.data?.message || 'Invalid response format');
+      }
     } catch (err) {
+      console.error('User fetch error details:', err);
       handleApiError('retrieve all users', err);
       setAllUsers([]);
+      setPageInfo(prev => ({ ...prev, users: { page: 1, totalPages: 1, totalItems: 0 } }));
     } finally {
       setLoading('users', false);
     }
-  }, [getAuthHeaders, handleApiError, setLoading]);
-
-  const filteredAndPaginatedUsers = useMemo(() => {
-    const lowerSearchTerm = searchTerm.toLowerCase();
-
-    const filtered = allUsers.filter(user =>
-      (user.username?.toLowerCase() || '').includes(lowerSearchTerm) ||
-      (user.email?.toLowerCase() || '').includes(lowerSearchTerm) ||
-      (user._id?.toLowerCase() || '').includes(lowerSearchTerm)
-    );
-
-    const totalItems = filtered.length;
-    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-    const currentPage = Math.max(1, Math.min(pageInfo.users.page, totalPages));
-
-    const calculatedPageInfo = {
-      page: currentPage,
-      totalPages: totalPages,
-      totalItems: totalItems
-    };
-
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const paginated = filtered.slice(startIndex, endIndex);
-
-    return { paginatedUsers: paginated, calculatedPageInfo };
-
-  }, [allUsers, searchTerm, pageInfo.users.page]);
-
-  useEffect(() => {
-    setUsers(filteredAndPaginatedUsers.paginatedUsers);
-    if (pageInfo.users.page !== filteredAndPaginatedUsers.calculatedPageInfo.page ||
-      pageInfo.users.totalPages !== filteredAndPaginatedUsers.calculatedPageInfo.totalPages ||
-      pageInfo.users.totalItems !== filteredAndPaginatedUsers.calculatedPageInfo.totalItems) {
-      setPageInfo(prev => ({
-        ...prev,
-        users: filteredAndPaginatedUsers.calculatedPageInfo
-      }));
-    }
-  }, [filteredAndPaginatedUsers, pageInfo.users]);
+  }, [handleApiError, setLoading]);
 
   const fetchDonations = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
     setLoading('donations', true);
@@ -563,83 +544,104 @@ const AdminPage = () => {
     }
   }, [getAuthHeaders, handleApiError, setLoading]);
 
-  const fetchAdminAccounts = useCallback(async () => {
+  const fetchAdminAccounts = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
     setLoading('admins', true);
     setError(null);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/accounts`, getAuthHeaders());
-      if (response.data?.success) {
+      console.log('Fetching admin accounts with params:', { page, limit, searchQuery });
+      const response = await adminService.getAllAdmins(page, limit, searchQuery);
+      console.log('Admin accounts API response:', response);
+      
+      if (response.data && (response.data.success || response.data.admins)) {
         const adminData = response.data.admins || [];
+        console.log('Admin data extracted:', adminData);
+        
         const normalizedAdmins = adminData.map(admin => ({
           id: admin.id || admin._id,
           username: admin.username || 'Unknown Admin',
           email: admin.email || 'No email',
           role: admin.role || ROLES.ADMIN,
-          permissions: admin.permissions || { ...INITIAL_ADMIN_FORM_DATA.permissions, manageSettings: admin.role === ROLES.SUPERADMIN },
+          permissions: admin.permissions || { 
+            ...INITIAL_ADMIN_FORM_DATA.permissions, 
+            manageSettings: admin.role === ROLES.SUPERADMIN 
+          },
           lastLogin: admin.lastLogin || null,
           isActive: admin.isActive !== false,
         }));
         setAdminAccounts(normalizedAdmins);
       } else {
-        throw new Error('Invalid response format');
+        console.error('Invalid admin API response format:', response.data);
+        throw new Error(response.data?.message || 'Invalid response format');
       }
     } catch (err) {
+      console.error('Admin accounts fetch error details:', err);
       handleApiError('retrieve admin accounts', err);
       setAdminAccounts([]);
     } finally {
       setLoading('admins', false);
     }
-  }, [getAuthHeaders, handleApiError, setLoading]);
+  }, [handleApiError, setLoading]);
 
   // --- CRUD Operations ---
   const createUser = useCallback(async (userData) => {
     setLoading('action', true);
     setError(null);
     try {
-      await axios.post(`${API_BASE_URL}/api/user/create`, userData, getAuthHeaders());
-      alert('User created successfully!');
-      await fetchAllUsers();
-      setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: 1 } }));
-      return true;
+      const response = await userService.createUser(userData);
+      if (response.data?.success) {
+        alert('User created successfully!');
+        await fetchAllUsers(pageInfo.users.page, ITEMS_PER_PAGE, searchTerm);
+        return true;
+      } else {
+        throw new Error(response.data?.message || 'Failed to create user');
+      }
     } catch (err) {
       handleApiError('create user', err);
       return false;
     } finally {
       setLoading('action', false);
     }
-  }, [getAuthHeaders, handleApiError, fetchAllUsers, setLoading]);
+  }, [handleApiError, fetchAllUsers, pageInfo.users.page, searchTerm, setLoading]);
 
   const updateUser = useCallback(async (userId, userData) => {
     setLoading('action', true);
     setError(null);
     try {
-      await axios.put(`${API_BASE_URL}/api/user/${userId}`, userData, getAuthHeaders());
-      alert('User updated successfully!');
-      await fetchAllUsers();
-      return true;
+      const response = await userService.updateUser(userId, userData);
+      if (response.data?.success) {
+        alert('User updated successfully!');
+        await fetchAllUsers(pageInfo.users.page, ITEMS_PER_PAGE, searchTerm);
+        return true;
+      } else {
+        throw new Error(response.data?.message || 'Failed to update user');
+      }
     } catch (err) {
       handleApiError('update user', err);
       return false;
     } finally {
       setLoading('action', false);
     }
-  }, [getAuthHeaders, handleApiError, fetchAllUsers, setLoading]);
+  }, [handleApiError, fetchAllUsers, pageInfo.users.page, searchTerm, setLoading]);
 
   const deleteUser = useCallback(async (userId, username) => {
     if (window.confirm(`Are you sure you want to delete user: ${username}?`)) {
       setLoading('action', true);
       setError(null);
       try {
-        await axios.delete(`${API_BASE_URL}/api/user/${userId}`, getAuthHeaders());
-        alert('User deleted successfully!');
-        await fetchAllUsers();
+        const response = await userService.deleteUser(userId);
+        if (response.data?.success) {
+          alert('User deleted successfully!');
+          await fetchAllUsers(pageInfo.users.page, ITEMS_PER_PAGE, searchTerm);
+        } else {
+          throw new Error(response.data?.message || 'Failed to delete user');
+        }
       } catch (err) {
         handleApiError('delete user', err);
       } finally {
         setLoading('action', false);
       }
     }
-  }, [getAuthHeaders, handleApiError, fetchAllUsers, setLoading]);
+  }, [handleApiError, fetchAllUsers, pageInfo.users.page, searchTerm, setLoading]);
 
   const updateDonationStatus = useCallback(async (donationId, status) => {
     setLoading('action', true);
@@ -656,42 +658,63 @@ const AdminPage = () => {
 
   const createAdmin = useCallback(async (data) => {
     setLoading('action', true);
-    console.log("Mock Create Admin:", data);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const newAdmin = {
-      id: `mock-${Date.now()}`,
-      ...data,
-      lastLogin: null,
-      isActive: true,
-    };
-    setAdminAccounts(prev => [...prev, newAdmin]);
-    alert('Admin account created successfully (mock)!');
-    setLoading('action', false);
-    return true;
-  }, [setLoading]);
+    setError(null);
+    try {
+      const response = await adminService.createAdmin(data);
+      if (response.data?.success) {
+        alert('Admin created successfully!');
+        await fetchAdminAccounts();
+        return true;
+      } else {
+        throw new Error(response.data?.message || 'Failed to create admin');
+      }
+    } catch (err) {
+      handleApiError('create admin', err);
+      return false;
+    } finally {
+      setLoading('action', false);
+    }
+  }, [handleApiError, fetchAdminAccounts, setLoading]);
 
   const updateAdmin = useCallback(async (adminId, data) => {
     setLoading('action', true);
-    console.log("Mock Update Admin:", adminId, data);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setAdminAccounts(prev => prev.map(admin =>
-      admin.id === adminId ? { ...admin, ...data } : admin
-    ));
-    alert('Admin account updated successfully (mock)!');
-    setLoading('action', false);
-    return true;
-  }, [setLoading]);
-
-  const deleteAdmin = useCallback(async (adminId, username) => {
-    if (window.confirm(`Are you sure you want to delete admin: ${username}?`)) {
-      setLoading('action', true);
-      console.log("Mock Delete Admin:", adminId);
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setAdminAccounts(prev => prev.filter(admin => admin.id !== adminId));
-      alert('Admin account deleted successfully (mock)!');
+    setError(null);
+    try {
+      const response = await adminService.updateAdmin(adminId, data);
+      if (response.data?.success) {
+        alert('Admin updated successfully!');
+        await fetchAdminAccounts();
+        return true;
+      } else {
+        throw new Error(response.data?.message || 'Failed to update admin');
+      }
+    } catch (err) {
+      handleApiError('update admin', err);
+      return false;
+    } finally {
       setLoading('action', false);
     }
-  }, [setLoading]);
+  }, [handleApiError, fetchAdminAccounts, setLoading]);
+
+  const deleteAdmin = useCallback(async (adminId, adminUsername) => {
+    if (window.confirm(`Are you sure you want to delete admin "${adminUsername}"? This action cannot be undone.`)) {
+      setLoading('action', true);
+      setError(null);
+      try {
+        const response = await adminService.deleteAdmin(adminId);
+        if (response.data?.success) {
+          alert('Admin account deleted successfully!');
+          await fetchAdminAccounts();
+        } else {
+          throw new Error(response.data?.message || 'Failed to delete admin');
+        }
+      } catch (err) {
+        handleApiError('delete admin', err);
+      } finally {
+        setLoading('action', false);
+      }
+    }
+  }, [handleApiError, fetchAdminAccounts, setLoading]);
 
   // --- Effects ---
   useEffect(() => {
@@ -743,9 +766,6 @@ const AdminPage = () => {
     if (isAdmin) {
       if (['users', 'donations', 'adminManagement'].includes(activeTab)) {
         setSearchTerm('');
-        if (activeTab === 'users') {
-          setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: 1 } }));
-        }
       }
 
       switch (activeTab) {
@@ -753,7 +773,7 @@ const AdminPage = () => {
           fetchStats();
           break;
         case 'users':
-          fetchAllUsers();
+          fetchAllUsers(1, ITEMS_PER_PAGE, '');
           break;
         case 'donations':
           fetchDonations(1, ITEMS_PER_PAGE, '');
@@ -767,38 +787,28 @@ const AdminPage = () => {
     }
   }, [activeTab, isAdmin, fetchStats, fetchAllUsers, fetchDonations, fetchAdminAccounts]);
 
-  useEffect(() => {
-    if (!loadingStates.global && isAdmin) {
+  const handleSearchChange = useCallback((e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    if (activeTab === 'users') {
+      // Add debounce for search
       const handler = setTimeout(() => {
-        if (activeTab === 'donations') {
-          fetchDonations(1, ITEMS_PER_PAGE, searchTerm);
-        }
+        fetchAllUsers(1, ITEMS_PER_PAGE, value);
       }, DEBOUNCE_DELAY);
-
-      if (activeTab === 'users') {
-        setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: 1 } }));
-      }
-
       return () => clearTimeout(handler);
     }
-  }, [searchTerm, activeTab, isAdmin, loadingStates.global, fetchDonations]);
-
-  // --- Event Handlers ---
-  const handleSearchChange = useCallback((e) => {
-    setSearchTerm(e.target.value);
-    if (activeTab === 'users') {
-      setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: 1 } }));
-    }
-  }, [activeTab]);
+  }, [activeTab, fetchAllUsers]);
 
   const handlePageChange = useCallback((type, newPage) => {
     if (type === 'users') {
-      setPageInfo(prev => ({ ...prev, users: { ...prev.users, page: newPage } }));
+      fetchAllUsers(newPage, ITEMS_PER_PAGE, searchTerm);
     } else if (type === 'donations') {
       fetchDonations(newPage, ITEMS_PER_PAGE, searchTerm);
     }
-  }, [fetchDonations, searchTerm]);
+  }, [fetchAllUsers, fetchDonations, searchTerm]);
 
+  // --- Event Handlers ---
   const openModal = useCallback((type, data = null) => {
     setError(null);
     setModalState({ isOpen: true, type, data });
@@ -810,12 +820,14 @@ const AdminPage = () => {
         bloodType: data.bloodType || '',
         isDonor: data.isDonor || false,
         isActive: data.isActive !== false,
+        password: data.password || '',
       } : INITIAL_USER_FORM_DATA);
     } else if (type === MODAL_TYPE.ADMIN) {
       setAdminFormData(data ? {
         username: data.username,
         email: data.email,
         role: data.role,
+        password: data.password || '',
         permissions: { ...INITIAL_ADMIN_FORM_DATA.permissions, ...data.permissions },
       } : INITIAL_ADMIN_FORM_DATA);
     }
@@ -867,7 +879,7 @@ const AdminPage = () => {
   const handleAdminSubmit = useCallback(async (e) => {
     e.preventDefault();
     let success = false;
-    if (modalState.data) {
+    if (modalState.data && modalState.data.id) {
       success = await updateAdmin(modalState.data.id, adminFormData);
     } else {
       success = await createAdmin(adminFormData);
@@ -878,25 +890,26 @@ const AdminPage = () => {
   }, [modalState.data, adminFormData, updateAdmin, createAdmin, closeModal]);
 
   const exportToCSV = useCallback(async (type) => {
-    let endpoint, filename;
-    if (type === 'users') {
-      endpoint = '/user/export';
-      filename = 'users-export.csv';
-    } else if (type === 'donations') {
-      endpoint = '/donations/export';
-      filename = 'donations-export.csv';
-    } else {
-      handleApiError('export data', new Error('Invalid export type'));
-      return;
-    }
-
     setLoading('action', true);
     setError(null);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api${endpoint}`, {
-        ...getAuthHeaders(),
-        responseType: 'blob'
-      });
+      let response;
+      let filename;
+      
+      if (type === 'users') {
+        response = await userService.exportUserData('csv');
+        filename = 'users-export.csv';
+      } else if (type === 'donations') {
+        // Keep existing donation export logic
+        response = await axios.get(`${API_BASE_URL}/api/donations/export`, {
+          ...getAuthHeaders(),
+          responseType: 'blob'
+        });
+        filename = 'donations-export.csv';
+      } else {
+        throw new Error('Invalid export type');
+      }
+      
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -984,16 +997,18 @@ const AdminPage = () => {
   }, [t, stats, loadingStates.dashboard]);
 
   const renderUsers = useCallback(() => {
-    const displayUsers = filteredAndPaginatedUsers.paginatedUsers;
-    const currentPageInfo = filteredAndPaginatedUsers.calculatedPageInfo;
-
     return (
       <div className="admin-users">
         <h2>{t.userManagement}</h2>
         <div className="controls">
           <div className="search-container">
             <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input type="text" placeholder={t.searchUsers} value={searchTerm} onChange={handleSearchChange} />
+            <input 
+              type="text" 
+              placeholder={t.searchUsers} 
+              value={searchTerm} 
+              onChange={handleSearchChange} 
+            />
           </div>
           <div className="action-buttons">
             <button className="control-button" onClick={() => exportToCSV('users')} disabled={loadingStates.action}>
@@ -1006,10 +1021,10 @@ const AdminPage = () => {
         </div>
 
         <div className="table-container">
-          {loadingStates.users && allUsers.length === 0 ? (
+          {loadingStates.users ? (
             <LoadingIndicator message={t.loadingData} />
-          ) : displayUsers.length === 0 ? (
-            <EmptyStateMessage type="user" message={searchTerm ? 'No users match search.' : (allUsers.length === 0 ? 'No users found.' : 'No users match search.')} />
+          ) : allUsers.length === 0 ? (
+            <EmptyStateMessage type="user" message={searchTerm ? 'No users match search.' : 'No users found.'} />
           ) : (
             <table className="data-table">
               <thead>
@@ -1024,7 +1039,7 @@ const AdminPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {displayUsers.map(user => (
+                {allUsers.map(user => (
                   <tr key={user._id}>
                     <td>{user._id.slice(-6)}</td>
                     <td>{user.username}</td>
@@ -1043,13 +1058,13 @@ const AdminPage = () => {
           )}
         </div>
         <Pagination
-          currentPage={currentPageInfo.page}
-          totalPages={currentPageInfo.totalPages}
+          currentPage={pageInfo.users.page}
+          totalPages={pageInfo.users.totalPages}
           onPageChange={(newPage) => handlePageChange('users', newPage)}
         />
       </div>
     );
-  }, [t, filteredAndPaginatedUsers, loadingStates.users, loadingStates.action, searchTerm, allUsers, handleSearchChange, exportToCSV, openModal, deleteUser, handlePageChange]);
+  }, [t, allUsers, loadingStates.users, loadingStates.action, searchTerm, pageInfo.users, handleSearchChange, exportToCSV, openModal, deleteUser, handlePageChange]);
 
   const renderDonations = useCallback(() => {
     return (
@@ -1129,7 +1144,7 @@ const AdminPage = () => {
         <div className="controls">
           <div className="search-container">
             <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input type="text" placeholder="Search admins..." value={searchTerm} onChange={handleSearchChange} />
+            <input type="text" placeholder="Search admins by username or email..." value={searchTerm} onChange={handleSearchChange} />
           </div>
           <div className="action-buttons">
             <button className="add-button" onClick={() => openModal(MODAL_TYPE.ADMIN)}>
@@ -1166,7 +1181,7 @@ const AdminPage = () => {
                     <td>{admin.email}</td>
                     <td>
                       <span className={`status-badge ${admin.role === ROLES.SUPERADMIN ? 'active' : ''}`}>
-                        {admin.role === ROLES.SUPERADMIN ? 'Super Admin' : 'Admin'}
+                        {admin.role === ROLES.SUPERADMIN ? t.superAdministrator : 'Admin'}
                       </span>
                     </td>
                     <td>
@@ -1290,11 +1305,14 @@ const AdminPage = () => {
     );
   }, [t]);
 
-  const ModalWrapper = ({ title, isOpen, onClose, onSubmit, children, isSubmitting }) => {
+  const ModalWrapper = useCallback(({ title, isOpen, onClose, onSubmit, children, isSubmitting }) => {
     if (!isOpen) return null;
     return (
-      <div className="modal-overlay">
-        <div className="user-modal">
+      <div className="modal-overlay" onClick={(e) => {
+        // Close modal when clicking the overlay (not the modal itself)
+        if (e.target.className === 'modal-overlay') onClose();
+      }}>
+        <div className="user-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
             <h3>{title}</h3>
             <button className="close-btn" onClick={onClose} disabled={isSubmitting}>×</button>
@@ -1311,21 +1329,22 @@ const AdminPage = () => {
         </div>
       </div>
     );
-  };
+  }, [modalState.data]);
 
-  const FormGroup = ({ label, htmlFor, children }) => (
+  const FormGroup = useCallback(({ label, htmlFor, children }) => (
     <div className="form-group">
       <label htmlFor={htmlFor}>{label}</label>
       {children}
     </div>
-  );
-  const CheckboxGroup = ({ label, name, checked, onChange }) => (
+  ), []);
+
+  const CheckboxGroup = useCallback(({ label, name, checked, onChange }) => (
     <div className="form-group checkbox-group">
       <label>
         <input type="checkbox" name={name} checked={checked} onChange={onChange} /> {label}
       </label>
     </div>
-  );
+  ), []);
 
   const UserModal = useCallback(() => (
     <ModalWrapper
@@ -1341,6 +1360,9 @@ const AdminPage = () => {
       <FormGroup label="Email" htmlFor="email">
         <input type="email" id="email" name="email" value={userFormData.email} onChange={handleUserFormChange} required />
       </FormGroup>
+      <FormGroup label="Password" htmlFor="password">
+        <input type="password" id="password" name="password" value={userFormData.password} onChange={handleUserFormChange} required />
+      </FormGroup>
       <FormGroup label="Role" htmlFor="role">
         <select id="role" name="role" value={userFormData.role} onChange={handleUserFormChange}>
           {Object.values(ROLES).map(role => <option key={role} value={role}>{role}</option>)}
@@ -1352,8 +1374,10 @@ const AdminPage = () => {
           {BLOOD_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
         </select>
       </FormGroup>
+      <FormGroup>
       <CheckboxGroup label="Registered as Donor" name="isDonor" checked={userFormData.isDonor} onChange={handleUserFormChange} />
       <CheckboxGroup label="Active Account" name="isActive" checked={userFormData.isActive} onChange={handleUserFormChange} />
+      </FormGroup>
     </ModalWrapper>
   ), [t, modalState, userFormData, handleUserFormChange, handleUserSubmit, closeModal, loadingStates.action]);
 
@@ -1370,6 +1394,9 @@ const AdminPage = () => {
       </FormGroup>
       <FormGroup label="Email" htmlFor="email">
         <input type="email" id="email" name="email" value={adminFormData.email} onChange={handleAdminFormChange} required />
+      </FormGroup>
+      <FormGroup label="Password" htmlFor="password">
+        <input type="password" id="password" name="password" value={adminFormData.password} onChange={handleAdminFormChange} required />
       </FormGroup>
       <FormGroup label="Role" htmlFor="role">
         <select id="role" name="role" value={adminFormData.role} onChange={handleAdminFormChange}>

@@ -338,21 +338,58 @@
   box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.1);
 }
 
-.add-button {
-  background-color: rgb(255, 71, 71);
-  color: white;
-  border: none;
+/* Improved action buttons */
+.action-button {
   padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: 5px;
+  border: none;
+  font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.action-button svg {
+  font-size: 1rem;
+}
+
+.action-button.primary {
+  background-color: #ff4747;
+  color: white;
+}
+
+.action-button.primary:hover {
+  background-color: #e03a3a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(224, 58, 58, 0.2);
+}
+
+.action-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Make the add-button class use the new styling for backward compatibility */
+.add-button {
+  background-color: #ff4747;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   transition: all 0.2s ease;
 }
 
 .add-button:hover {
-  background-color: #e00d27;
+  background-color: #e03a3a;
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(224, 58, 58, 0.2);
 }
 
 /* Table Styles - Updated */
@@ -1111,6 +1148,267 @@
 
 .checkbox-group input[type="checkbox"] {
   margin-right: 8px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.user-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s ease;
+}
+
+/* Modal Header */
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f7f7f7;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: 700;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #ff4747;
+  background-color: #f0f0f0;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Form Group */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group select {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #ff4747;
+  box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.1);
+  outline: none;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  accent-color: #ff4747;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 18px 24px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #f7f7f7;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.btn-cancel {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-save {
+  background-color: #ff4747;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.btn-save:hover {
+  background-color: #f03a3a;
+  box-shadow: 0 4px 8px rgba(255, 71, 71, 0.2);
+}
+
+.btn-save:disabled,
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark Theme Support */
+.dark-theme .user-modal {
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+}
+
+.dark-theme .modal-header,
+.dark-theme .modal-footer {
+  background-color: #222;
+  border-color: #333;
+}
+
+.dark-theme .modal-header h3 {
+  color: #e0e0e0;
+}
+
+.dark-theme .close-btn {
+  color: #aaa;
+}
+
+.dark-theme .close-btn:hover {
+  color: #ff6b6b;
+  background-color: #333;
+}
+
+.dark-theme .form-group label {
+  color: #e0e0e0;
+}
+
+.dark-theme .form-group input[type="text"],
+.dark-theme .form-group input[type="email"],
+.dark-theme .form-group input[type="password"],
+.dark-theme .form-group select {
+  background-color: #333;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.dark-theme .form-group input:focus,
+.dark-theme .form-group select:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.dark-theme .btn-cancel {
+  background-color: #333;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-theme .btn-save {
+  background-color: #ff6b6b;
+}
+
+.dark-theme .btn-cancel:hover {
+  background-color: #444;
+}
+
+.dark-theme .btn-save:hover {
+  background-color: #ff5252;
 }
 
 /* Dark Theme Styles */

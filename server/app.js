@@ -49,6 +49,7 @@ app.use('/api/wilaya', wilayaRoutes);
 app.use('/api/donation', donationRoutes);
 app.use('/api/donation-request', donationRequestRoutes);
 app.use('/api/notification', notificationRoutes);
+// Use the admin routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/stats', statsRoutes);
 // Add map routes
