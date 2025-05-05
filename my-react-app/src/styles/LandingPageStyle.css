@@ -1,70 +1,54 @@
+/* Core animations */
 @keyframes moveUpDown {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-20px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
 }
 
 @keyframes slideFromRight {
-    0% {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    0% { opacity: 0; transform: translateX(100%); }
+    100% { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-/* Add scroll section anchor styling for proper scroll positioning */
+/* Layout fundamentals */
 .scroll-section-anchor {
     position: relative;
-    top: -80px; /* Offset for fixed navbar */
+    top: -80px;
     visibility: hidden;
     height: 0;
     margin: 0;
     padding: 0;
 }
 
-/* Homepage container adjustments */
 .homepage {
     scroll-behavior: smooth;
-    scroll-padding-top: 80px; /* Padding to account for fixed navbar */
+    scroll-padding-top: 80px;
 }
 
+/* Typography base */
+h1 { font-size: 2.5rem; }
+h2 { font-size: 1.5rem; }
+
+/* Core containers */
 .Container_01 {
-    font-size: 20px;
-    font-weight: bolder;
     display: flex;
     justify-content: center;
-    margin: 150px 120px;
-    gap: 150px;
-    padding-top: 20px; /* Add space at the top for better visual appearance */
+    align-items: center;
+    font-size: 20px;
+    font-weight: bolder;
+    margin: 130px 50px;
+    gap: 120px;
+    padding-top: 20px;
 }
 
 .img_undraw_medicine {
     animation: moveUpDown 3s ease-in-out infinite alternate;
     width: 450px;
-}
-
-/* Base Heading Styles */
-h1 {
-    font-size: 2.5rem; /* Base size for main titles */
-}
-
-h2 {
-    font-size: 1.5rem; /* Base size for sub-titles/card titles */
+    max-width: 100%;
 }
 
 .Container_01 > div > h1 {
@@ -75,58 +59,77 @@ h2 {
                  0px 0px 20px var(--NeutralLight_grayish_red),
                  0px 0px 40px var(--NeutralLight_grayish_red),
                  0px 0px 80px var(--NeutralLight_grayish_red);
-    font-size: 2.5rem; /* Apply base h1 size */
 }
 
 .Container_01 > div > p {
     margin-top: 30px;
     width: 550px;
+    max-width: 100%;
     color: var(--black);
     animation: slideFromRight 1s ease forwards;
 }
 
-.img_heartbeat  {
+/* Heartbeat section - Infinite scroll */
+.heartbeat {
+    display: flex;
+    justify-content: center;
+    margin-top: -280px;
+    padding-top: 20px;
+}
+
+.img_heartbeat {
     animation: fadeIn 1s forwards;
     height: 200px;
     width: 500px;
-    margin-bottom: 30px;
-    margin-top: 30px;
+    max-width: 100%;
+    margin: 30px 0;
 }
 
+/* Stats section */
 .Container_02 {
     display: flex;
     justify-content: center;
-    gap: clamp(30px, 6vw, 80px); /* Responsive gap */
+    gap: clamp(30px, 6vw, 80px);
     text-align: center;
-    align-items: center ;
+    align-items: center;
     font-size: 30px;
     color: white;
     font-weight: bolder;
-    border-top: 1px solid var(--NeutralLight_grayish_red); /* Use border-top */
-    border-bottom: 1px solid var(--NeutralLight_grayish_red); /* Use border-bottom */
+    border-top: 1px solid var(--NeutralLight_grayish_red);
+    border-bottom: 1px solid var(--NeutralLight_grayish_red);
     background-color: var(--NeutralLight_grayish_red);
-    width: 100%; /* Use full width */
-    box-sizing: border-box; /* Include padding/border in width */
-    height: auto; /* Allow height to adjust */
-    padding: 40px 20px; /* Add vertical padding */
-    flex-wrap: wrap; /* Allow items to wrap */
+    width: 100%;
+    box-sizing: border-box;
+    height: auto;
+    padding: 40px 20px;
+    flex-wrap: wrap;
     transition: 0.3s;
     opacity: 0;
     animation: fadeIn 2s forwards;
 }
 
 .Container_02:hover {
-    cursor:default;
-    cursor: url("./RedCursorHope.cur") , auto;
     transform: scale(1.03);
     background-color: transparent;
     color: var(--NeutralLight_grayish_red);
 }
 
 .stat {
-    flex: 1 1 180px; /* Allow flex grow/shrink with a base size */
-    max-width: 220px; /* Limit max width */
-    text-align: center; /* Ensure text is centered */
+    flex: 1 1 180px;
+    max-width: 220px;
+    text-align: center;
+}
+
+/* 4 Steps section */
+.Container_03 > h1 {
+    text-align: center;
+    font-weight: bolder;
+    margin-top: 90px;
+    color: white;
+    text-shadow: 0px 0px 10px var(--NeutralLight_grayish_red),
+                0px 0px 20px var(--NeutralLight_grayish_red),
+                0px 0px 40px var(--NeutralLight_grayish_red),
+                0px 0px 80px var(--NeutralLight_grayish_red);
 }
 
 .flex_Container_03 {
@@ -140,17 +143,13 @@ h2 {
 
 .flex_Container_03 > div {
     text-align: left;
-    padding: 20px 20px;
+    padding: 20px;
     box-shadow: 4px 4px 10px 0 rgb(94, 1, 9);
     border-radius: 10px;
     border: 2px solid var(--NeutralLight_grayish_red);
     width: 260px;
     transition: 0.5s;
-    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
-}
-
-.flex_Container_03 > h1 {
-    font-size: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .flex_Container_03 > div > p {
@@ -160,59 +159,20 @@ h2 {
 
 .flex_Container_03 > div > h2 {
     color: var(--NeutralLight_grayish_red);
-    font-size: 1.5rem; /* Apply base h2 size */
 }
 
-.Container_03 > h1 {
-    text-align: center;
-    align-items: center;
-    font-weight: bolder;
-    margin-top: 90px;
-    color: white;
-    text-shadow: 0px 0px 10px var(--NeutralLight_grayish_red),
-                0px 0px 20px var(--NeutralLight_grayish_red),
-                0px 0px 40px var(--NeutralLight_grayish_red),
-                0px 0px 80px var(--NeutralLight_grayish_red);
-    font-size: 2.5rem; /* Apply base h1 size */
-}
-
-/* Blur effect for non-hovered cards */
+/* Card hover effects */
 .flex_Container_03:hover > div:not(:hover) {
-    filter: blur(2px); /* Blur effect */
-    opacity: 0.8; /* Optional: Reduce opacity for a faded look */
+    filter: blur(2px);
+    opacity: 0.8;
 }
 
-/* Scale up the hovered card */
 .flex_Container_03 > div:hover {
     transform: scale(1.05);
     box-shadow: 0 0 30px rgba(255, 71, 71, 0.8);
 }
 
-.Container_04 > h1 {
-    padding-bottom: 20px;
-    padding-top: 30px;
-    color: white;
-    text-align: center; /* Center text horizontally */
-    margin-left: 0; /* Remove the negative margin */
-    font-size: 2.5rem; /* Apply base h1 size */
-}
-
-.grid_Container_04 {
-    display: grid;
-    justify-content: center;
-    gap: 1.5rem; /* Space between grid items */
-    padding-bottom: 3rem;
-    width: 100%; /* Ensure grid container takes full width */
-    box-sizing: border-box;
-}
-
-.heartbeat {
-    display: flex;
-    justify-content: center;
-    margin-top:-260px;
-    padding-top: 50px;
-}
-
+/* Services section */
 .Container_04 {
     height: fit-content;
     background-color: var(--NeutralLight_grayish_red);
@@ -220,47 +180,57 @@ h2 {
     margin-bottom: 150px;
 }
 
+.Container_04 > h1 {
+    padding: 30px 0 20px;
+    color: white;
+    text-align: center;
+    margin-left: 0;
+}
+
+.grid_Container_04 {
+    display: grid;
+    justify-content: center;
+    gap: 1.5rem;
+    padding-bottom: 3rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .grid_Container_04 > div > h2 {
     color: var(--NeutralLight_grayish_red);
-    font-size: 1.5rem; /* Apply base h2 size */
 }
 
 .grid_Container_04 div {
-    padding: 2.5rem; /* Increased padding for a spacious feel */
-    background-color: #ffffff; /* White background for service boxes */
-    border: 1px solid var(--NeutralLight_grayish_red); /* Light border for definition */
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
-    transition: transform 0.2s; /* Smooth transition for hover effect */
-    width: 90%; /* Responsive width */
-    max-width: 1100px; /* Set a max-width */
-    margin: 0 auto; /* Center the div within the grid cell */
+    padding: 2.5rem;
+    background-color: #ffffff;
+    border: 1px solid var(--NeutralLight_grayish_red);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
     box-sizing: border-box;
 }
 
 .grid_Container_04 div:hover {
-    transform: translateY(-5px); /* Slight lift on hover */
+    transform: translateY(-5px);
 }
 
+/* About us section */
 .Container_05 {
     justify-content: center;
     text-align: center;
-    align-items: center ;
+    align-items: center;
     color: black;
     font-weight: bolder;
-    height: auto; /* Allow height to adjust */
-    padding: 0 40px; /* Increased base padding */
+    height: auto;
+    padding: 0 40px;
     box-sizing: border-box;
 }
 
-.dark-theme .flip-card-container{
-    padding-top: 140px;
-    height: 550px;
-}
-
 .Container_05 > h1 {
-    font-size: 2.5rem; /* Apply base h1 size */
-    margin-bottom: 20px; /* Further reduced space below title */
+    margin-bottom: 20px;
 }
 
 .Container_05 > div {
@@ -268,507 +238,380 @@ h2 {
     font-weight: bolder;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align items to the top */
-    margin: 0 auto; /* Center the div */
-    gap: 60px; /* Reduced gap */
-    max-width: 1100px; /* Slightly reduced max width */
+    align-items: flex-start;
+    margin: 0 auto;
+    gap: 60px;
+    max-width: 1100px;
 }
 
 .img_heartbroken {
     width: 450px;
+    max-width: 100%;
     filter: drop-shadow(0px 0px 12px rgb(243, 0, 0));
-    margin-bottom: 30px; /* Add space below image */
+    margin-bottom: 30px;
 }
 
 .flip-card {
-    flex-shrink: 0; /* Prevent flip card from shrinking */
+    flex-shrink: 0;
 }
 
 .about-content {
-    flex-grow: 1; /* Allow text content to take available space */
-    text-align: left; /* Align text to the left */
-    max-width: 600px; /* Add max-width to prevent text stretching */
-    padding-top: 75px; /* Increased padding to better align with card content start */
+    flex-grow: 1;
+    text-align: left;
+    max-width: 600px;
+    padding-top: 75px;
 }
 
 #about > p {
-   margin-top: 0; /* Remove fixed top margin */
-   line-height: 1.6;
+    margin-top: 0;
+    line-height: 1.6;
 }
 
+/* Footer */
 .footer {
-    border-top: 1px solid var(--NeutralLight_grayish_red); /* Use border-top instead */
+    border-top: 1px solid var(--NeutralLight_grayish_red);
     background-color: var(--NeutralLight_grayish_red);
-    width: 100%; /* Use full width */
-    height: auto; /* Allow height to adjust */
-    padding: 50px 40px; /* Adjusted padding */
+    width: 100%;
+    height: auto;
+    padding: 50px 40px;
     box-sizing: border-box;
 }
 
 .grid_footer {
     display: grid;
     text-align: left;
-    align-items: start; /* Align items to the start */
+    align-items: start;
     color: rgb(255, 255, 255);
     font-weight: bolder;
-    max-width: 1200px; /* Limit width */
-    margin: 0 auto; /* Center grid */
-    grid-template-columns: 1fr auto; /* Keep columns */
-    gap: 20px; /* Reduced gap slightly */
+    max-width: 1200px;
+    margin: 0 auto;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
 }
 
-.grid_footer > div:first-child { /* Target the div wrapping text */
+.grid_footer > div:first-child {
     grid-column: 1 / 2;
 }
 
 .grid_footer h1 {
-    font-size: 1.8rem; /* Slightly smaller for footer */
-    margin: 0 0 5px 0; /* Add bottom margin */
+    font-size: 1.8rem;
+    margin: 0 0 5px 0;
 }
 
 .flex_footer {
     display: flex;
-    gap: 25px; /* Adjusted gap */
-    align-items: center; /* Align icons vertically */
-    justify-self: end; /* Align to the end of the grid column */
-    grid-column: 2 / 3; /* Place in the second column */
-    grid-row: 1 / 3; /* Span both rows if needed, or adjust */
-    align-self: center; /* Vertically center icons relative to grid area */
+    gap: 25px;
+    align-items: center;
+    justify-self: end;
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+    align-self: center;
 }
 
-.grid_footer > div:first-child > p { /* Target p within the first div */
-    margin: 0; /* Reset margin */
-    width: auto; /* Allow width to adjust */
-    max-width: 500px; /* Limit width */
-    font-size: 1rem; /* Adjusted font size */
-    /* grid-column removed, handled by parent div */
+.grid_footer > div:first-child > p {
+    margin: 0;
+    width: auto;
+    max-width: 500px;
+    font-size: 1rem;
 }
 
 .rights {
-    margin-top: 10px; /* Reduced margin */
-    height: auto; /* Auto height */
+    margin-top: 10px;
+    height: auto;
     color: var(--NeutralLight_grayish_red);
     text-align: center;
     align-items: center;
-    font-size: 1rem; /* Adjusted font size */
+    font-size: 1rem;
     font-weight: bolder;
 }
 
 /* Dark Theme */
-.dark-theme  {
+.dark-theme {
     background-color: #1E201E;
-    color: #e0e0e0; /* Default light text color for dark theme */
+    color: #e0e0e0;
 }
 
-/* Ensure paragraphs inherit the default light color unless overridden */
 .dark-theme p {
     color: inherit;
 }
 
-/* Ensure specific containers/elements have correct text color */
+/* Text colors in dark mode */
 .dark-theme .Container_01 > div > p,
 .dark-theme .flex_Container_03 > div > p,
-.dark-theme .Container_05, /* Ensure Container_05 base text is light */
-.dark-theme .about-content p { /* Ensure About Us text is light */
-    color: #e0e0e0; /* Use the default light text color */
+.dark-theme .Container_05,
+.dark-theme .about-content p {
+    color: #e0e0e0;
 }
 
 /* Titles in dark theme */
 .dark-theme .Container_01 > div > h1,
 .dark-theme .Container_03 > h1,
-.dark-theme .Container_04 > h1, /* Ensure Our Services title is white */
-.dark-theme .Container_05 > h1 { /* Ensure About Us title is white */
+.dark-theme .Container_04 > h1,
+.dark-theme .Container_05 > h1,
+.dark-theme .Container_05 > h1 > span {
     color: white;
     text-shadow: 0px 0px 8px var(--NeutralLight_grayish_red),
-                 0px 0px 15px var(--NeutralLight_grayish_red); /* Adjusted shadow */
-}
-/* Specific adjustment for About Us title span */
-.dark-theme .Container_05 > h1 > span {
-    color: white; /* Ensure span is also white */
+                 0px 0px 15px var(--NeutralLight_grayish_red);
 }
 
 /* Subtitles in dark theme */
-.dark-theme .flex_Container_03 > div > h2 {
-    color: #ff7f7f; /* Lighter red for subtitles in Container 03 */
-}
-
-/* Container 04 (Our Services) specific dark theme rules */
-.dark-theme .Container_04 {
-    /* Keep the red background from light theme */
-    background-color: var(--NeutralLight_grayish_red);
-}
-.dark-theme .Container_04 > h1 > span {
-    color: #333; /* Darker color for the span inside the title for contrast */
-}
-/* Style the service boxes in Container_04 for dark mode */
-.dark-theme .grid_Container_04 div {
-    background-color: #2a2c2a; /* Dark background for service boxes */
-    border-color: #444; /* Darker border */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Adjusted shadow for dark */
-    color: #e0e0e0; /* Set default text color inside box to light */
-}
-/* Ensure paragraph text inside service boxes is light */
-.dark-theme .grid_Container_04 div p {
-    color: #e0e0e0;
-}
-/* Style subtitle inside service boxes */
+.dark-theme .flex_Container_03 > div > h2,
 .dark-theme .grid_Container_04 > div > h2 {
-     color: #ff7f7f; /* Use lighter red for subtitle */
+    color: #ff7f7f;
 }
 
-/* Ensure Container_02 and footer text remains white */
+/* Container 04 specific dark theme */
+.dark-theme .Container_04,
 .dark-theme .Container_02,
 .dark-theme .footer {
-    color: white;
-    /* Keep red background for these elements */
     background-color: var(--NeutralLight_grayish_red);
+    color: white;
 }
+
 .dark-theme .Container_02:hover {
-    background-color: transparent; /* Keep hover effect */
+    background-color: transparent;
     color: var(--NeutralLight_grayish_red);
 }
+
+.dark-theme .grid_Container_04 div {
+    background-color: #2a2c2a;
+    border-color: #444;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    color: #e0e0e0;
+}
+
+.dark-theme .grid_Container_04 div p,
 .dark-theme .footer p,
 .dark-theme .footer h1 {
-    color: white; /* Ensure text inside footer is white */
+    color: #e0e0e0;
 }
-.dark-theme .flex_footer svg { /* Ensure footer icons are white */
+
+.dark-theme .flex_footer svg {
     color: #ffffff;
 }
 
-/* Adjust .rights color for dark theme */
 .dark-theme .rights {
-    color: #a0a0a0; /* Lighter gray for rights text */
+    color: #a0a0a0;
 }
 
-/* Media Queries for Responsiveness */
+.dark-theme .flip-card-container {
+    padding-top: 140px;
+    height: 550px;
+}
+
+/* Media Queries - Optimized */
 @media (max-width: 1200px) {
     h1 { font-size: 2.3rem; }
     h2 { font-size: 1.4rem; }
-    .grid_footer h1 { font-size: 1.7rem; }
-
-    .Container_01 {
-        margin: 100px 60px !important; /* Adjusted margin */
-        gap: 100px; /* Adjusted gap */
-    }
-
-    .Container_01 > div > h1 {
-        width: 100%; /* Ensure text takes full width */
-        text-align: center; /* Center text */
-    }
-
-    .footer {
-        padding: 45px 30px; /* Adjust padding */
-    }
-
-    .flex_footer {
-       gap: 20px; /* Adjust gap */
-       /* align-self might need adjustment if grid changes */
-    }
-
-    .Container_05 {
-        padding: 0 30px; /* Adjust padding */
-    }
-
-    .Container_05 > div {
-        gap: 50px; /* Adjust gap */
-    }
+    
+    .Container_01 { gap: 80px; }
+    
+    .footer { padding: 45px 30px; }
+    .flex_footer { gap: 20px; }
+    
+    .Container_05 { padding: 0 30px; }
+    .Container_05 > div { gap: 50px; }
 }
 
-@media (max-width: 992px) { /* Adjusted breakpoint for tablet */
+@media (max-width: 992px) {
     h1 { font-size: 2.1rem; }
     h2 { font-size: 1.3rem; }
-    .grid_footer h1 { font-size: 1.6rem; }
-
+    
     .Container_01 {
-        flex-direction: column; /* Stack items vertically */
-        margin: 80px 40px; /* Adjust margin */
-        gap: 40px; /* Reduce gap */
-        text-align: center; /* Center text */
+        flex-direction: column;
+        margin: 60px 40px;
+        gap: 40px;
+        text-align: center;
     }
-
-    .Container_01 > div > h1 {
-        margin-top: 0; /* Remove top margin */
-    }
-
+    
+    .Container_01 > div > h1 { margin-top: 0; }
+    
     .img_undraw_medicine {
-        width: 350px; /* Reduce image size */
-        margin-bottom: 20px; /* Add space below image */
-        display: block; /* Ensure it's a block element */
-        margin-left: auto; /* Center horizontally */
-        margin-right: auto; /* Center horizontally */
+        width: 350px;
+        display: block;
     }
-
+    
     .Container_01 > div > p {
-        margin-top: 15px; /* Adjust top margin */
-        font-size: 1rem; /* Adjust font size */
-        width: 90%; /* Adjust width */
-        margin-left: auto;
-        margin-right: auto;
+        margin: 15px auto 0;
+        font-size: 1rem;
+        width: 90%;
     }
-
-    .heartbeat {
-        margin-top: -150px; /* Adjust spacing */
-    }
-
-    .img_heartbeat {
-        width: 350px; /* Adjust size */
-    }
-
-    .Container_03 > h1 {
-        margin-top: 60px; /* Adjust margin */
-    }
-
+    
+    .heartbeat { margin-top: -180px; }
+    
+    .Container_03 > h1 { margin-top: 60px; }
+    
     .flex_Container_03 {
-        flex-wrap: wrap; /* Allow wrapping */
-        justify-content: center; /* Center items */
-        gap: clamp(20px, 3vw, 25px); /* Responsive gap */
-        margin-top: 40px; /* Adjust margin */
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: clamp(20px, 3vw, 25px);
+        margin-top: 40px;
     }
-
+    
     .flex_Container_03 > div {
-        width: clamp(250px, 30vw, 280px); /* Responsive width */
-        flex: 1 1 250px; /* Adjust flex basis */
-        max-width: 300px; /* Adjust max width */
+        width: clamp(250px, 30vw, 280px);
+        flex: 1 1 250px;
+        max-width: 300px;
     }
-
+    
     .Container_05 > div {
-        flex-direction: column; /* Stack items */
-        align-items: center; /* Center items horizontally */
-        gap: 30px; /* Adjust gap between text and card */
-        margin: 0 auto; /* Reset margin, rely on container padding/margins */
-        width: 100%; /* Ensure the container takes full width */
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        width: 100%;
     }
-
+    
     .about-content {
-        text-align: center; /* Center text */
-        padding-top: 0; /* Reset padding for stacked layout */
-        max-width: 90%; /* Limit width to prevent edge touching */
-        width: 100%; /* Allow it to take available width up to max-width */
-        margin-top: 0; /* Reset margin-top, rely on gap */
-        align-self: auto; /* Reset vertical alignment for stacked layout */
+        text-align: center;
+        padding-top: 0;
+        max-width: 90%;
+        width: 100%;
+        margin-top: 0;
     }
-
-    .flip-card-container {
-        margin-bottom: 0; /* Remove bottom margin if not needed */
-        width: fit-content; /* Adjust width based on card size */
-    }
-
-    /* Optional: Adjust image size within card if needed */
-    .img_heartbroken {
-        width: 100%; /* Make image responsive within its container */
-        max-width: 300px; /* Limit max size */
-        height: auto; /* Maintain aspect ratio */
-        margin-bottom: 0; /* Remove bottom margin if handled by gap */
-    }
+    
+    .flip-card-container { width: fit-content; }
 }
 
 @media (max-width: 768px) {
     h1 { font-size: 1.9rem; }
     h2 { font-size: 1.2rem; }
-    .grid_footer h1 { font-size: 1.5rem; }
-
+    
     .Container_01 {
-        margin: 60px 20px;
+        margin: 40px 20px auto;
         gap: 30px;
     }
-
+    
     .img_undraw_medicine {
         width: 300px;
-        display: block; /* Ensure it's a block element */
-        margin-left: auto; /* Center horizontally */
-        margin-right: auto; /* Center horizontally */
+        margin: 40px auto 20px;
     }
-
-    .Container_01 > div > p {
-        font-size: 0.95rem;
-    }
-
-    .heartbeat {
-        margin-top: -100px;
-    }
-
-    .img_heartbeat {
-        width: 300px;
-    }
-
+    
+    .Container_01 > div > p { font-size: 0.95rem; }
+    
+    .heartbeat { margin-top: -120px; }
+    
     .flex_Container_03 {
-        flex-direction: column; /* Stack cards vertically */
-        align-items: center; /* Center cards */
-        gap: 18px; /* Reduced gap */
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
         margin-top: 30px;
     }
-
+    
     .flex_Container_03 > div {
-        width: 90%; /* Adjust card width */
-        max-width: 380px; /* Slightly reduced max width */
-        padding: 1.2rem; /* Adjust padding */
+        width: 90%;
+        max-width: 380px;
+        padding: 1.2rem;
     }
-
+    
     .Container_04 {
         padding: 25px 15px;
-        margin-top: 60px;
-        margin-bottom: 60px; /* Adjust margin */
+        margin: 60px 0;
     }
-
-     .Container_04 > h1 {
-        padding-bottom: 15px;
-        padding-top: 15px;
-    }
-
+    
+    .Container_04 > h1 { padding: 15px 0; }
+    
     .grid_Container_04 {
         gap: 1.2rem;
         margin-top: 30px;
         padding-bottom: 1.5rem;
     }
-
-    .grid_Container_04 div { /* Keep padding and text-align adjustments */
+    
+    .grid_Container_04 div {
         padding: 1.5rem;
         text-align: center;
     }
-
-    .grid_Container_04 div h2 {
-        margin-bottom: 10px; /* Add margin */
-    }
-
-    .grid_Container_04 div p {
-        font-size: 0.95rem; /* Adjust font size */
-    }
-
-    .Container_05 {
-        padding: 0 15px;
-    }
-
-    .Container_05 > h1 {
-        margin-bottom: 30px; /* Adjust space */
-    }
-
-    .Container_05 > div {
-        gap: 25px; /* Adjust gap */
-    }
-
-    .about-content {
-        max-width: 95%; /* Adjust max-width */
-    }
-
-    .Container_05 p { /* Targeting the text in about-content */
+    
+    .grid_Container_04 div h2 { margin-bottom: 10px; }
+    .grid_Container_04 div p { font-size: 0.95rem; }
+    
+    .Container_05 { padding: 0 15px; }
+    .Container_05 > h1 { margin-bottom: 30px; }
+    .Container_05 > div { gap: 25px; }
+    
+    .about-content { max-width: 95%; }
+    
+    .Container_05 p {
         font-size: 0.95rem;
-        margin: 0 auto; /* Center text block */
+        margin: 0 auto;
         line-height: 1.6;
     }
-
-    /* Optional: Adjust image size within card if needed */
-    .img_heartbroken {
-         max-width: 280px; /* Slightly smaller */
-    }
+    
+    .img_heartbroken { max-width: 280px; }
 }
 
 @media (max-width: 480px) {
     h1 { font-size: 1.7rem; }
     h2 { font-size: 1.1rem; }
-    .grid_footer h1 { font-size: 1.4rem; }
-
+    
     .Container_01 {
-        margin: 40px 15px;
+        margin: 30px 15px auto;
         gap: 20px;
     }
-
-    .img_undraw_medicine {
-        width: 250px; /* Further reduce image size */
-        display: block; /* Ensure it's a block element */
-        margin-left: auto; /* Center horizontally */
-        margin-right: auto; /* Center horizontally */
-        margin-top: 30px;
-    }
-
-    .Container_01 > div > p {
-        font-size: 0.9rem; /* Adjust font size */
-    }
-
-    .heartbeat {
-        margin-top: -80px; /* Adjust spacing */
-    }
-
-    .img_heartbeat {
-        width: 250px; /* Adjust size */
-    }
-
-    .stat h1 {
-        font-size: 1.8rem; /* Keep this specific override for stats */
-    }
-
-    .stat p {
-        font-size: 0.85rem; /* Adjust font size */
-    }
-
+    
+    .Container_01 > div > p { font-size: 0.9rem; }
+    
+    .stat h1 { font-size: 1.8rem; }
+    .stat p { font-size: 0.85rem; }
+    
     .flex_Container_03 {
-        gap: 15px; /* Keep gap consistent */
-        margin-top: 20px; /* Adjust margin */
+        gap: 15px;
+        margin-top: 20px;
     }
-
+    
     .flex_Container_03 > div {
-        width: 95%; /* Adjust card width */
-        padding: 1rem; /* Keep padding consistent */
+        width: 95%;
+        padding: 1rem;
     }
-
-     .flex_Container_03 > div p {
-        font-size: 0.85rem; /* Adjust font size */
-        line-height: 1.5; /* Improve readability */
-     }
-
+    
+    .flex_Container_03 > div p {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+    
     .Container_04 {
         padding: 20px 10px;
-        margin-top: 50px;
-        margin-bottom: 50px;
+        margin: 50px 0;
     }
-
+    
     .grid_Container_04 {
         gap: 1rem;
         margin-top: 25px;
         padding-bottom: 1rem;
     }
-
-    .grid_Container_04 div { /* Keep padding adjustment */
-        padding: 1rem;
+    
+    .grid_Container_04 div { padding: 1rem; }
+    .grid_Container_04 div p { font-size: 0.9rem; }
+    
+    .Container_05 { padding: 0 10px; }
+    .Container_05 > h1 { margin-bottom: 25px; }
+    .Container_05 > div { gap: 20px; }
+    
+    .img_heartbroken { 
+        width: 250px;
+        max-width: 250px;
     }
-
-    .grid_Container_04 div p {
-        font-size: 0.9rem; /* Adjust font size */
-    }
-
-    .Container_05 {
-        padding: 0 10px;
-    }
-
-    .Container_05 > h1 {
-        margin-bottom: 25px; /* Adjust space */
-    }
-
-    .Container_05 > div {
-        gap: 20px; /* Adjust gap */
-    }
-
-     .img_heartbroken {
-        width: 250px; /* Adjust size */
-    }
-
-    .about-content {
-        max-width: 100%; /* Allow full width on smallest screens */
-    }
-
-    .Container_05 p { /* Targeting the text in about-content */
+    
+    .about-content { max-width: 100%; }
+    
+    .Container_05 p {
         font-size: 0.85rem;
-        margin: 0 auto; /* Center text block */
         line-height: 1.6;
     }
-
+    
     .footer {
         padding: 25px 10px;
-        margin-top: 50px; /* Ensure margin */
+        margin-top: 50px;
     }
+}
 
-    /* Optional: Adjust image size within card if needed */
-    .img_heartbroken {
-        max-width: 250px; /* Adjust size */
+@media (max-width: 380px) {
+    .Container_01 {
+        gap: 10px;
+    }
+    
+    .Container_01 > div > p {
+        font-size: 0.85rem;
+        width: 95%;
     }
 }
 

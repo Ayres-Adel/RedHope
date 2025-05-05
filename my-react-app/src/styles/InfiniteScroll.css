@@ -2,13 +2,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 20vh; /* Half viewport height */
     background-color: #ffffff; /* White background */
     width: 100%; /* Full width */
     overflow: hidden; /* Prevent horizontal overflow */
-    margin-top: 100px;
+    margin-top: 130px;
     margin-bottom: 50px;
-    
 }
 
 .tag-list {
