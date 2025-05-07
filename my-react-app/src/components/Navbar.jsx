@@ -92,7 +92,7 @@ export default function Navbar() {
     }
   }, []);
 
-  // Menu management functions
+  // Menu management functionsr
   const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
     // Always ensure hamburger icon returns to default state

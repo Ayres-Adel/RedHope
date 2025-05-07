@@ -1,3 +1,22 @@
+/* 1) Make every element include padding & borders within its width */
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  /* 2) Ensure html/body fill the viewport with no extra scroll */
+  html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  
+  /* 3) Guarantee your root .homepage container never exceeds 100% */
+  .homepage {
+    width: 100%;
+    max-width: 100%;
+  }  
+
 /* Core animations */
 @keyframes moveUpDown {
     0%, 100% { transform: translateY(0); }
