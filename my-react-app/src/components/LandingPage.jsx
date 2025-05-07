@@ -23,9 +23,42 @@ import FadeInSection from "./FadeInSection.jsx";
 import Percentages from "../assets/images/Percentages-removebg-preview.png";
 import "../styles/LandingPageStyle.css";
 
+// Add constant for content types to match AdminPage
+const CONTENT_TYPES = {
+  HOMEPAGE_BANNER: 'homepage_banner',
+  ABOUT_US: 'about_us',
+  CONTACT_INFO: 'contact_info',
+};
+
+const INITIAL_CONTENT_DATA = {
+  [CONTENT_TYPES.HOMEPAGE_BANNER]: {
+    title: 'Urgent Need for O- Donors',
+    description: 'We are currently experiencing a shortage of O- blood type. Please consider donating if you are eligible.',
+    lastModified: new Date().toISOString(),
+    status: 'published',
+  },
+  [CONTENT_TYPES.ABOUT_US]: {
+    title: 'About Us',
+    description: 'At RedHope we are dedicated to bridging the gap between blood donors and those in need. Our mission is to save lives by making blood donation easier and more accessible for everyone. We believe that every drop counts, and together, we can make a difference.',
+    lastModified: new Date().toISOString(),
+    status: 'published',
+  },
+  [CONTENT_TYPES.CONTACT_INFO]: {
+    title: 'Contact Info',
+    description: 'Address: 123 Main St, Algiers\nPhone: +213 123 456 789\nEmail: contact@redhope.dz',
+    lastModified: new Date().toISOString(),
+    status: 'published',
+  },
+};
+
 export default function LandingPage() {
   const [language, setLanguage] = useState(
     localStorage.getItem("language") || "en"
+  );
+  
+  // Add state for content data
+  const [contentData, setContentData] = useState(
+    JSON.parse(localStorage.getItem('redhope_content_data')) || INITIAL_CONTENT_DATA
   );
 
   useEffect(() => {
@@ -45,6 +78,31 @@ export default function LandingPage() {
     };
     toggle.addEventListener("change", handleThemeChange);
     return () => toggle.removeEventListener("change", handleThemeChange);
+  }, []);
+
+  // Add effect to check for content updates
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const updatedContent = localStorage.getItem('redhope_content_data');
+      if (updatedContent) {
+        try {
+          setContentData(JSON.parse(updatedContent));
+        } catch (err) {
+          console.error('Error parsing content data:', err);
+        }
+      }
+    };
+
+    // Listen for storage events (in case admin updates content in another tab)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Check for content updates periodically
+    const interval = setInterval(handleStorageChange, 5000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -188,8 +246,8 @@ export default function LandingPage() {
             <div className="about-content">
               <p>
                 {language === "fr"
-                  ? "Chez RedHope, nous nous engageons à combler le fossé entre les donneurs de sang et ceux qui en ont besoin. Notre mission est de sauver des vies en facilitant le don de sang pour tous. Nous croyons que chaque goutte compte, et ensemble, nous pouvons faire la différence."
-                  : "At RedHope we are dedicated to bridging the gap between blood donors and those in need. Our mission is to save lives by making blood donation easier and more accessible for everyone. We believe that every drop counts, and together, we can make a difference."}
+                  ? contentData[CONTENT_TYPES.ABOUT_US].description
+                  : contentData[CONTENT_TYPES.ABOUT_US].description}
               </p>
             </div>
             <div className="flip-card-container">

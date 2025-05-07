@@ -2,6 +2,9 @@ import api from './api';
 
 const userService = {
   getAllUsers: async (page = 1, limit = 10, search = '', sort = 'createdAt', order = 'desc') => {
+    console.log('Requesting users with params:', { page, limit, search, sort, order });
+    
+    // Remove any isDonor filtering to show all users
     return api.get('/api/user/paginated', {
       params: {
         page, 
@@ -10,6 +13,16 @@ const userService = {
         sortBy: sort,
         sortOrder: order === 'desc' ? -1 : 1
       }
+    }).catch(error => {
+      console.error('Error fetching users:', error);
+      
+      // Fall back to all users endpoint if paginated fails
+      if (error.response?.status === 404 || error.response?.status === 500) {
+        console.log('Falling back to /api/user/all endpoint');
+        return api.get('/api/user/all');
+      }
+      
+      throw error;
     });
   },
 

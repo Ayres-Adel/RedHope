@@ -416,77 +416,105 @@ router.get('/test', async (req, res) => {
 // Get paginated users with search and filters
 router.get('/paginated', async (req, res) => {
   try {
-    // Extract query parameters with defaults
-    const { 
-      page = 1, 
-      limit = 10, 
-      search = '', 
-      sortBy = 'createdAt', 
-      sortOrder = -1, 
-      role = '', 
+    // 1. Extract query params with defaults
+    const {
+      page = '1',
+      limit = '10',
+      search = '',
+      sortBy = 'createdAt',
+      sortOrder = '-1',
+      role = '',
       bloodType = '',
-      isDonor
+      isDonor  // optional string "true" | "false"
     } = req.query;
-    
-    // Build query filters
+
+    // 2. Normalize types
+    const pageNum     = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum    = Math.max(1, parseInt(limit, 10) || 10);
+    const skip        = (pageNum - 1) * limitNum;
+    const sortOrderNum= parseInt(sortOrder, 10) === 1 ? 1 : -1;
+
+    // 3. Build Mongo filter
     const filter = {};
-    
-    // Search by username, email if search term provided
-    if (search) {
+
+    // 3a. Text search across multiple fields - with trimming
+    const trimmedSearch = search.trim();
+    if (trimmedSearch) {
+      // Escape special regex characters to prevent injection
+      const safeSearch = trimmedSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(safeSearch, 'i');
       filter.$or = [
-        { username: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { bloodType: { $regex: search, $options: 'i' } },
-        { location: { $regex: search, $options: 'i' } }
+        { username:  re },
+        { email:     re },
+        { bloodType: re },
+        { location:  re }
       ];
     }
-    
-    // Filter by role if specified
+
+    // 3b. Role filter
     if (role) {
       filter.role = role;
     }
-    
-    // Filter by blood type if specified
+
+    // 3c. Blood-type filter
     if (bloodType) {
       filter.bloodType = bloodType;
     }
-    
-    // Filter by donor status if specified
-    if (isDonor !== undefined) {
-      filter.isDonor = isDonor === 'true';
-    }
-    
-    // Convert page and limit to numbers
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
-    
-    // Validate sortOrder
-    const sortOrderNum = parseInt(sortOrder, 10);
-    const finalSortOrder = (sortOrderNum === 1 || sortOrderNum === -1) ? sortOrderNum : -1;
 
-    // Count total matching documents for pagination
-    const totalUsers = await User.countDocuments(filter);
-    const totalPages = Math.ceil(totalUsers / limitNum);
-    
-    // Execute query with pagination and sorting
+    // 3d. Boolean isDonor filter (only if valid)
+    let isDonorBool;
+    if (isDonor === 'true')  isDonorBool = true;
+    if (isDonor === 'false') isDonorBool = false;
+    if (typeof isDonorBool === 'boolean') {
+      filter.isDonor = isDonorBool;
+    }
+
+    // 4. Get counts for pagination
+    const totalMatching = await User.countDocuments(filter);
+    const totalPages = Math.ceil(totalMatching / limitNum);
+
+    // 5. Fetch with stable sorting to avoid duplicates
+    const sortSpec = {
+      [sortBy]: sortOrderNum,
+      _id:      sortOrderNum // Secondary sort for stability
+    };
+
     const users = await User.find(filter)
       .select('-password')
-      .sort({ [sortBy]: finalSortOrder })
+      .sort(sortSpec)
       .skip(skip)
-      .limit(limitNum);
-    
-    // Return success response with pagination data
-    return res.status(200).json({
+      .limit(limitNum)
+      .lean(); // Convert to plain JS objects for better performance
+
+    // 6. Prepare response
+    const response = {
       success: true,
       users,
       pagination: {
-        currentPage: pageNum,
+        currentPage:  pageNum,
         totalPages,
-        totalItems: totalUsers,
+        totalItems:   totalMatching,
         itemsPerPage: limitNum
       }
-    });
+    };
+
+    // Add debug info in development mode
+    if (process.env.NODE_ENV === 'development') {
+      const totalInDb      = await User.countDocuments({});
+      const totalDonors    = await User.countDocuments({ isDonor: true });
+      const totalNonDonors = await User.countDocuments({ isDonor: false });
+      
+      response.debug = {
+        totalInDb,
+        totalDonors,
+        totalNonDonors,
+        totalMatching,
+        appliedFilter: filter,
+        sortSpec
+      };
+    }
+
+    return res.status(200).json(response);
   } catch (error) {
     console.error('Error fetching paginated users:', error);
     return res.status(500).json({

@@ -865,8 +865,4 @@ section h2 {
   .modal-buttons {
     flex-direction: column;
   }
-
-  .control-button {
-    width: 100%;
-  }
 }

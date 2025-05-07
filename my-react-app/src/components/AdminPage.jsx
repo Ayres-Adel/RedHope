@@ -1,19 +1,26 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUsers, faTint, faNewspaper, faCog, faBell,
-  faSearch, faEdit, faTrash, faCheck, faTimes,
-  faChartLine, faUserShield, faCalendarAlt, faMapMarkerAlt,
-  faDownload, faFilter, faLanguage, faMoon, faSun,
-  faExclamationTriangle, faUserPlus, faServer, faDatabase
-} from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import Navbar from './Navbar';
 import '../styles/AdminPage.css';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import adminService from '../services/adminService';
 import userService from '../services/userService';
+import ActionButton from './ui/ActionButton';
+import StatusBadge from './ui/StatusBadge';
+// Import the components
+import DashboardMetrics from './admin/DashboardMetrics';
+import BloodSupplySection from './admin/BloodSupplySection';
+import RecentActivitySection from './admin/RecentActivitySection';
+import AdminSidebar from './admin/AdminSidebar';
+import ContentManagement from './admin/ContentManagement';
+import SystemSettings from './admin/SystemSettings';
+import UserManagement from './admin/UserManagement';
+import DonationManagement from './admin/DonationManagement';
+import AdminManagement from './admin/AdminManagement';
+import AdminModals from './admin/AdminModals';
 
 // --- Constants ---
 const ITEMS_PER_PAGE = 10;
@@ -54,14 +61,14 @@ const INITIAL_USER_FORM_DATA = {
   bloodType: '',
   isDonor: false,
   isActive: true,
-  password: '', // Add password field
+  password: '',
 };
 
 const INITIAL_ADMIN_FORM_DATA = {
   username: '',
   email: '',
   role: ROLES.ADMIN,
-  password: '', // Add password field
+  password: '',
   permissions: {
     manageUsers: true,
     manageDonations: true,
@@ -104,27 +111,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   );
 };
 
-const ActionButton = ({ type, onClick, title }) => {
-  const icons = { edit: faEdit, delete: faTrash, approve: faCheck, reject: faTimes };
-  return (
-    <button className={`action-btn ${type}`} onClick={onClick} title={title || type}>
-      <FontAwesomeIcon icon={icons[type]} />
-    </button>
-  );
-};
-
-const StatusBadge = ({ status, isDonor }) => {
-  let badgeClass = (status || '').toLowerCase();
-  let text = status;
-
-  if (typeof isDonor !== 'undefined') {
-    badgeClass = isDonor ? 'active' : 'cancelled'; // Reusing styles
-    text = isDonor ? 'Donor' : 'Non-Donor';
-  }
-
-  return <span className={`status-badge ${badgeClass}`}>{text}</span>;
-};
-
 // --- Main Component ---
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -144,6 +130,7 @@ const AdminPage = () => {
     totalDonations: 0,
     pendingRequests: 0,
     bloodSupply: {},
+    bloodCounts: {}, // Add bloodCounts to state
     bloodSupplyUnavailable: false,
   });
 
@@ -208,6 +195,7 @@ const AdminPage = () => {
       status: 'Status',
       actions: 'Actions',
       donorName: 'Donor Name',
+      donorEmail: 'Donor Email',
       date: 'Date',
       homepageBanner: 'Homepage Banner',
       announcements: 'Announcements',
@@ -281,6 +269,7 @@ const AdminPage = () => {
       status: 'Statut',
       actions: 'Actions',
       donorName: 'Nom du donneur',
+      donorEmail: 'Email du donneur',
       date: 'Date',
       homepageBanner: 'Bannière de la page d\'accueil',
       announcements: 'Annonces',
@@ -349,32 +338,42 @@ const AdminPage = () => {
       if (response.data?.success) {
         const bloodData = response.data.data?.bloodTypes || {};
         const supply = {};
+        const bloodCounts = {}; // Store the actual counts
+        
         Object.entries(bloodData).forEach(([type, count]) => {
+          // Determine status based on count
           if (count >= 10) supply[type] = BLOOD_SUPPLY_STATUS.STABLE;
           else if (count >= 5) supply[type] = BLOOD_SUPPLY_STATUS.LOW;
           else supply[type] = BLOOD_SUPPLY_STATUS.CRITICAL;
+          
+          // Store the count
+          bloodCounts[type] = count;
         });
-        setStats(prev => ({ ...prev, bloodSupply: supply, bloodSupplyUnavailable: false }));
+        
+        setStats(prev => ({ 
+          ...prev, 
+          bloodSupply: supply, 
+          bloodCounts: bloodCounts, // Add counts to stats
+          bloodSupplyUnavailable: false 
+        }));
       } else {
         throw new Error('Invalid response format');
       }
     } catch (err) {
       handleApiError('retrieve blood supply', err);
-      setStats(prev => ({ ...prev, bloodSupply: {}, bloodSupplyUnavailable: true }));
+      setStats(prev => ({ 
+        ...prev, 
+        bloodSupply: {}, 
+        bloodCounts: {}, // Clear counts on error
+        bloodSupplyUnavailable: true 
+      }));
     }
   }, [getAuthHeaders, handleApiError]);
 
   const fetchStatsFromDatabase = useCallback(async () => {
     try {
-      const mockUsers = [
-        { _id: 1, username: 'John Doe', email: 'john@example.com', role: 'Donor', bloodType: 'A+', status: 'Active', location: 'New York', isDonor: true },
-        { _id: 2, username: 'Jane Smith', email: 'jane@example.com', role: 'Recipient', bloodType: 'O-', status: 'Active', location: 'Los Angeles', isDonor: false },
-        { _id: 3, username: 'Robert Johnson', email: 'robert@example.com', role: 'Donor', bloodType: 'B+', status: 'Inactive', location: 'Chicago', isDonor: true },
-        { _id: 4, username: 'Sarah Williams', email: 'sarah@example.com', role: 'Admin', bloodType: 'AB+', status: 'Active', location: 'Miami', isDonor: false },
-        { _id: 5, username: 'Michael Brown', email: 'michael@example.com', role: 'Donor', bloodType: 'A-', status: 'Active', location: 'Seattle', isDonor: true },
-        { _id: 6, username: 'Emily Davis', email: 'emily@example.com', role: 'Donor', bloodType: 'O+', status: 'Active', location: 'Boston', isDonor: true }
-      ];
-
+      setLoading('dashboard', true);
+      
       try {
         const userResponse = await axios.get(`${API_BASE_URL}/api/user/all`, getAuthHeaders());
         const usersData = userResponse.data.users || [];
@@ -396,16 +395,15 @@ const AdminPage = () => {
             isDonor: Boolean(user.isDonor)
           })));
         } else {
-          throw new Error("No users found in API response for fallback");
+          setStats(prev => ({ ...prev, totalUsers: 0, totalDonors: 0 }));
+          setUsers([]);
+          console.warn("No users found in API response");
         }
       } catch (apiError) {
-        console.warn("Fallback user fetch failed, using mock data:", apiError);
-        setStats(prev => ({
-          ...prev,
-          totalUsers: mockUsers.length,
-          totalDonors: mockUsers.filter(u => u.isDonor === true).length,
-        }));
-        setUsers(mockUsers);
+        console.error("User fetch failed:", apiError);
+        handleApiError('retrieve users', apiError);
+        setStats(prev => ({ ...prev, totalUsers: 0, totalDonors: 0 }));
+        setUsers([]);
       }
 
       try {
@@ -423,48 +421,61 @@ const AdminPage = () => {
           setDonations([]);
         }
       } catch (donationError) {
-        handleApiError('retrieve fallback donation stats', donationError);
+        handleApiError('retrieve donation stats', donationError);
         setStats(prev => ({ ...prev, totalDonations: 0, pendingRequests: 0 }));
         setDonations([]);
       }
     } catch (err) {
-      handleApiError('retrieve fallback user/stats data', err);
-      const mockUsers = [
-        { _id: 1, username: 'John Doe', email: 'john@example.com', role: 'Donor', bloodType: 'A+', status: 'Active', location: 'New York', isDonor: true },
-        { _id: 2, username: 'Jane Smith', email: 'jane@example.com', role: 'Recipient', bloodType: 'O-', status: 'Active', location: 'Los Angeles', isDonor: false },
-      ];
-      setUsers(mockUsers);
+      handleApiError('retrieve stats data', err);
       setStats({
-        totalUsers: mockUsers.length,
-        totalDonors: mockUsers.filter(u => u.isDonor === true).length,
-        totalDonations: 8,
-        pendingRequests: 3,
+        totalUsers: 0,
+        totalDonors: 0,
+        totalDonations: 0,
+        pendingRequests: 0,
         bloodSupply: {},
         bloodSupplyUnavailable: true,
       });
+      setUsers([]);
       setDonations([]);
+    } finally {
+      setLoading('dashboard', false);
     }
-  }, [getAuthHeaders, handleApiError]);
+  }, [getAuthHeaders, handleApiError, setLoading]);
 
   const fetchStats = useCallback(async () => {
     setLoading('dashboard', true);
     setError(null);
+    
     try {
+      console.log('Fetching dashboard stats...');
       const response = await axios.get(`${API_BASE_URL}/api/stats/dashboard`, getAuthHeaders());
-      if (response.data?.success) {
-        setStats(prev => ({ ...prev, ...response.data.stats, bloodSupplyUnavailable: false }));
+      console.log('Dashboard API response:', response.data);
+      
+      if (response.data && response.data.success) {
+        console.log('Successfully loaded dashboard stats');
+        setStats(prev => ({ 
+          ...prev, 
+          ...(response.data.stats || {}),
+          bloodSupplyUnavailable: prev.bloodSupplyUnavailable
+        }));
       } else {
-        console.warn('Primary stats fetch failed, attempting fallback.');
+        console.warn('Dashboard API returned success:false or invalid format');
         await fetchStatsFromDatabase();
       }
-      await fetchBloodSupply();
     } catch (err) {
-      handleApiError('retrieve dashboard statistics', err);
-      try {
-        await fetchStatsFromDatabase();
-      } catch (fallbackErr) {
-        console.error('Fallback stats fetch also failed:', fallbackErr);
-      }
+      console.error('Error fetching dashboard stats:', err);
+      await fetchStatsFromDatabase();
+    }
+    
+    // Fetch blood supply separately to isolate potential failures
+    try {
+      await fetchBloodSupply();
+    } catch (bloodErr) {
+      console.error('Error fetching blood supply:', bloodErr);
+      setStats(prev => ({
+        ...prev,
+        bloodSupplyUnavailable: true
+      }));
     } finally {
       setLoading('dashboard', false);
     }
@@ -934,62 +945,11 @@ const AdminPage = () => {
           <LoadingIndicator message={t.loadingData} />
         ) : (
           <>
-            <div className="dashboard-metrics">
-              <div className="metric-card">
-                <div className="metric-icon"><FontAwesomeIcon icon={faUsers} /></div>
-                <div className="metric-data"><h3>{t.totalUsers}</h3><p>{stats.totalUsers}</p></div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-icon"><FontAwesomeIcon icon={faUserShield} /></div>
-                <div className="metric-data"><h3>{t.totalDonors}</h3><p>{stats.totalDonors}</p></div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-icon"><FontAwesomeIcon icon={faTint} /></div>
-                <div className="metric-data"><h3>{t.totalDonations}</h3><p>{stats.totalDonations}</p></div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-icon"><FontAwesomeIcon icon={faBell} /></div>
-                <div className="metric-data"><h3>{t.pendingRequests}</h3><p>{stats.pendingRequests}</p></div>
-              </div>
-            </div>
-
-            <div className="blood-supply-section">
-              <h3>{t.bloodTypeAvailability}</h3>
-              <div className="blood-types-grid">
-                {stats.bloodSupplyUnavailable ? (
-                  <div className="blood-supply-unavailable">
-                    <FontAwesomeIcon icon={faExclamationTriangle} />
-                    <p>{t.noBloodSupplyData}</p>
-                  </div>
-                ) : Object.keys(stats.bloodSupply || {}).length > 0 ? (
-                  Object.entries(stats.bloodSupply).map(([type, status]) => (
-                    <div key={type} className={`blood-type-card ${status}`}>
-                      <h4>{type}</h4>
-                      <span>{t[status] || status}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="no-blood-data">
-                    <FontAwesomeIcon icon={faExclamationTriangle} />
-                    <p>{t.noBloodSupplyData}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="recent-activity-section">
-              <h3>{t.recentActivity}</h3>
-              <div className="activity-list">
-                <div className="activity-item">
-                  <span className="activity-time">{new Date().toLocaleTimeString()} - {new Date().toLocaleDateString()}</span>
-                  <span className="activity-desc">Admin logged in</span>
-                </div>
-                <div className="activity-item">
-                  <span className="activity-time">{new Date().toLocaleTimeString()} - {new Date().toLocaleDateString()}</span>
-                  <span className="activity-desc">System stats updated</span>
-                </div>
-              </div>
-            </div>
+            <DashboardMetrics stats={stats} translations={t} />
+            
+            <BloodSupplySection stats={stats} translations={t} />
+            
+            <RecentActivitySection translations={t} />
           </>
         )}
       </div>
@@ -998,420 +958,73 @@ const AdminPage = () => {
 
   const renderUsers = useCallback(() => {
     return (
-      <div className="admin-users">
-        <h2>{t.userManagement}</h2>
-        <div className="controls">
-          <div className="search-container">
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input 
-              type="text" 
-              placeholder={t.searchUsers} 
-              value={searchTerm} 
-              onChange={handleSearchChange} 
-            />
-          </div>
-          <div className="action-buttons">
-            <button className="control-button" onClick={() => exportToCSV('users')} disabled={loadingStates.action}>
-              <FontAwesomeIcon icon={faDownload} /> {loadingStates.action ? 'Exporting...' : t.exportData}
-            </button>
-            <button className="add-button" onClick={() => openModal(MODAL_TYPE.USER)}>
-              <FontAwesomeIcon icon={faUserPlus} /> {t.addNewUser}
-            </button>
-          </div>
-        </div>
-
-        <div className="table-container">
-          {loadingStates.users ? (
-            <LoadingIndicator message={t.loadingData} />
-          ) : allUsers.length === 0 ? (
-            <EmptyStateMessage type="user" message={searchTerm ? 'No users match search.' : 'No users found.'} />
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>{t.id}</th>
-                  <th>{t.name}</th>
-                  <th>{t.email}</th>
-                  <th>{t.bloodType}</th>
-                  <th>{t.location}</th>
-                  <th>{t.status}</th>
-                  <th>{t.actions}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allUsers.map(user => (
-                  <tr key={user._id}>
-                    <td>{user._id.slice(-6)}</td>
-                    <td>{user.username}</td>
-                    <td>{user.email}</td>
-                    <td>{user.bloodType}</td>
-                    <td>{user.location}</td>
-                    <td><StatusBadge isDonor={user.isDonor} /></td>
-                    <td className="actions">
-                      <ActionButton type="edit" onClick={() => openModal(MODAL_TYPE.USER, user)} />
-                      <ActionButton type="delete" onClick={() => deleteUser(user._id, user.username)} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        <Pagination
-          currentPage={pageInfo.users.page}
-          totalPages={pageInfo.users.totalPages}
-          onPageChange={(newPage) => handlePageChange('users', newPage)}
-        />
-      </div>
+      <UserManagement
+        users={allUsers}
+        loading={loadingStates.users}
+        actionLoading={loadingStates.action}
+        searchTerm={searchTerm}
+        pageInfo={pageInfo.users}
+        translations={t}
+        onSearchChange={handleSearchChange}
+        onExportCSV={exportToCSV}
+        onOpenModal={openModal}
+        onDeleteUser={deleteUser}
+        onPageChange={handlePageChange}
+        modalType={MODAL_TYPE.USER}
+        EmptyStateMessage={EmptyStateMessage}
+        Pagination={Pagination}
+        LoadingIndicator={LoadingIndicator}
+      />
     );
   }, [t, allUsers, loadingStates.users, loadingStates.action, searchTerm, pageInfo.users, handleSearchChange, exportToCSV, openModal, deleteUser, handlePageChange]);
 
   const renderDonations = useCallback(() => {
     return (
-      <div className="admin-donations">
-        <h2>{t.donationManagement}</h2>
-        <div className="controls">
-          <div className="search-container">
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input type="text" placeholder={t.searchDonations} value={searchTerm} onChange={handleSearchChange} />
-          </div>
-          <div className="action-buttons">
-            <button className="control-button" onClick={() => exportToCSV('donations')} disabled={loadingStates.action}>
-              <FontAwesomeIcon icon={faDownload} /> {loadingStates.action ? 'Exporting...' : t.exportData}
-            </button>
-          </div>
-        </div>
-
-        <div className="table-container">
-          {loadingStates.donations ? (
-            <LoadingIndicator message={t.loadingData} />
-          ) : donations.length === 0 ? (
-            <EmptyStateMessage type="donation" message={searchTerm ? 'No donations match search.' : 'No donations found.'} />
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>{t.id}</th>
-                  <th>{t.donorName}</th>
-                  <th>{t.bloodType}</th>
-                  <th>{t.date}</th>
-                  <th>{t.location}</th>
-                  <th>{t.status}</th>
-                  <th>{t.actions}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {donations.map(donation => (
-                  <tr key={donation._id}>
-                    <td>{donation._id.slice(-6)}</td>
-                    <td>{donation.donorName || 'N/A'}</td>
-                    <td>{donation.bloodType}</td>
-                    <td>{new Date(donation.date).toLocaleDateString()}</td>
-                    <td>{donation.location}</td>
-                    <td><StatusBadge status={donation.status} /></td>
-                    <td className="actions">
-                      {donation.status === STATUS.PENDING && (
-                        <>
-                          <ActionButton type="approve" onClick={() => updateDonationStatus(donation._id, STATUS.COMPLETED)} />
-                          <ActionButton type="reject" onClick={() => updateDonationStatus(donation._id, STATUS.CANCELLED)} />
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        <Pagination
-          currentPage={pageInfo.donations.page}
-          totalPages={pageInfo.donations.totalPages}
-          onPageChange={(newPage) => handlePageChange('donations', newPage)}
-        />
-      </div>
+      <DonationManagement
+        donations={donations}
+        loading={loadingStates.donations}
+        actionLoading={loadingStates.action}
+        searchTerm={searchTerm}
+        pageInfo={pageInfo.donations}
+        translations={t}
+        onSearchChange={handleSearchChange}
+        onExportCSV={exportToCSV}
+        onUpdateStatus={updateDonationStatus}
+        onPageChange={handlePageChange}
+        EmptyStateMessage={EmptyStateMessage}
+        Pagination={Pagination}
+        LoadingIndicator={LoadingIndicator}
+        STATUS={STATUS}
+      />
     );
   }, [t, donations, loadingStates.donations, loadingStates.action, searchTerm, pageInfo.donations, handleSearchChange, exportToCSV, updateDonationStatus, handlePageChange]);
 
   const renderAdminManagement = useCallback(() => {
-    const filteredAdmins = adminAccounts.filter(admin =>
-      (admin.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (admin.email || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
-      <div className="admin-management">
-        <h2>{t.adminAccountsManagement}</h2>
-        <div className="controls">
-          <div className="search-container">
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input type="text" placeholder="Search admins by username or email..." value={searchTerm} onChange={handleSearchChange} />
-          </div>
-          <div className="action-buttons">
-            <button className="add-button" onClick={() => openModal(MODAL_TYPE.ADMIN)}>
-              <FontAwesomeIcon icon={faUserPlus} /> {t.addNewAdmin}
-            </button>
-          </div>
-        </div>
-
-        <div className="table-container">
-          {loadingStates.admins ? (
-            <LoadingIndicator message={t.loadingData} />
-          ) : adminAccounts.length === 0 ? (
-            <EmptyStateMessage type="admin account" message="No admin accounts found." />
-          ) : filteredAdmins.length === 0 && searchTerm ? (
-            <EmptyStateMessage type="admin account" message="No admins match search." />
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Permissions</th>
-                  <th>Last Login</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredAdmins.map(admin => (
-                  <tr key={admin.id}>
-                    <td>{typeof admin.id === 'string' ? admin.id.slice(-6) : admin.id}</td>
-                    <td>{admin.username}</td>
-                    <td>{admin.email}</td>
-                    <td>
-                      <span className={`status-badge ${admin.role === ROLES.SUPERADMIN ? 'active' : ''}`}>
-                        {admin.role === ROLES.SUPERADMIN ? t.superAdministrator : 'Admin'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="permission-badges">
-                        {admin.permissions.manageUsers && <span title="Users" className="permission-badge">👥</span>}
-                        {admin.permissions.manageDonations && <span title="Donations" className="permission-badge">🩸</span>}
-                        {admin.permissions.manageContent && <span title="Content" className="permission-badge">📄</span>}
-                        {admin.permissions.manageSettings && <span title="Settings" className="permission-badge">⚙️</span>}
-                      </div>
-                    </td>
-                    <td>{admin.lastLogin ? new Date(admin.lastLogin).toLocaleString() : 'Never'}</td>
-                    <td className="actions">
-                      <ActionButton type="edit" onClick={() => openModal(MODAL_TYPE.ADMIN, admin)} />
-                      <ActionButton type="delete" onClick={() => deleteAdmin(admin.id, admin.username)} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
+      <AdminManagement
+        admins={adminAccounts}
+        loading={loadingStates.admins}
+        searchTerm={searchTerm}
+        translations={t}
+        onSearchChange={handleSearchChange}
+        onOpenModal={openModal}
+        onDeleteAdmin={deleteAdmin}
+        modalType={MODAL_TYPE.ADMIN}
+        roles={ROLES}
+        EmptyStateMessage={EmptyStateMessage}
+        LoadingIndicator={LoadingIndicator}
+      />
     );
   }, [t, adminAccounts, loadingStates.admins, searchTerm, handleSearchChange, openModal, deleteAdmin]);
 
+  // Replace the existing render functions with component calls
   const renderContent = useCallback(() => {
-    return (
-      <div className="admin-content">
-        <h2>{t.contentManagement}</h2>
-        <div className="content-sections-container">
-          <div className="content-section">
-            <div className="section-header">
-              <div className="section-icon"><FontAwesomeIcon icon={faNewspaper} /></div>
-              <div className="section-content">
-                <h3>{t.homepageBanner}</h3>
-                <div className="content-status published">Published</div>
-                <h4>{t.urgentNeed}</h4>
-                <p className="content-description">{t.urgentNeedDesc}</p>
-                <div className="content-footer">
-                  <span className="last-modified">Last modified: {new Date().toLocaleDateString()}</span>
-                  <button className="control-button"><FontAwesomeIcon icon={faEdit} /> Edit</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="content-section">
-            <div className="section-header">
-              <div className="section-icon"><FontAwesomeIcon icon={faUsers} /></div>
-              <div className="section-content">
-                <h3>{t.aboutUsPage}</h3>
-                <div className="content-status published">Published</div>
-                <h4>About Us</h4>
-                <p className="content-description">{t.aboutUsDesc}</p>
-                <div className="content-footer">
-                  <span className="last-modified">Last modified: {new Date().toLocaleDateString()}</span>
-                  <button className="control-button"><FontAwesomeIcon icon={faEdit} /> Edit</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="content-section">
-            <div className="section-header">
-              <div className="section-icon"><FontAwesomeIcon icon={faMapMarkerAlt} /></div>
-              <div className="section-content">
-                <h3>{t.contactInformation}</h3>
-                <div className="content-status published">Published</div>
-                <h4>Contact Info</h4>
-                <p className="content-description">Address: 123 Main St, Algiers<br />Phone: +213 123 456 789<br />Email: contact@redhope.dz</p>
-                <div className="content-footer">
-                  <span className="last-modified">Last modified: {new Date().toLocaleDateString()}</span>
-                  <button className="control-button"><FontAwesomeIcon icon={faEdit} /> Edit</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ContentManagement translations={t} />;
   }, [t]);
 
   const renderSettings = useCallback(() => {
-    return (
-      <div className="admin-settings">
-        <h2>{t.systemSettings}</h2>
-        <div className="settings-grid">
-          <div className="settings-card">
-            <div className="card-content">
-              <div className="card-icon"><FontAwesomeIcon icon={faBell} /></div>
-              <h3>{t.notificationSettings}</h3>
-              <p>{t.notificationSettingsDesc}</p>
-              <button className="control-button"><FontAwesomeIcon icon={faCog} /> {t.configure}</button>
-            </div>
-          </div>
-          <div className="settings-card">
-            <div className="card-content">
-              <div className="card-icon"><FontAwesomeIcon icon={faDatabase} /></div>
-              <h3>{t.systemBackup}</h3>
-              <p>{t.systemBackupDesc}</p>
-              <button className="control-button"><FontAwesomeIcon icon={faDownload} /> {t.backupNow}</button>
-            </div>
-          </div>
-          <div className="settings-card">
-            <div className="card-content">
-              <div className="card-icon"><FontAwesomeIcon icon={faServer} /></div>
-              <h3>{t.apiIntegration}</h3>
-              <p>{t.apiIntegrationDesc}</p>
-              <button className="control-button"><FontAwesomeIcon icon={faEdit} /> {t.viewAPIs}</button>
-            </div>
-          </div>
-        </div>
-        <div className="system-info">
-          <h3><FontAwesomeIcon icon={faChartLine} /> {t.systemInformation}</h3>
-          <div className="info-grid">
-            <div className="info-item"><span className="info-label">{t.version}</span><span className="info-value">1.0.0</span></div>
-            <div className="info-item"><span className="info-label">{t.lastUpdate}</span><span className="info-value">{new Date().toLocaleDateString()}</span></div>
-            <div className="info-item"><span className="info-label">{t.databaseStatus}</span><span className="info-value status-ok">{t.connected}</span></div>
-            <div className="info-item"><span className="info-label">{t.serverStatus}</span><span className="info-value status-ok">{t.online}</span></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <SystemSettings translations={t} />;
   }, [t]);
-
-  const ModalWrapper = useCallback(({ title, isOpen, onClose, onSubmit, children, isSubmitting }) => {
-    if (!isOpen) return null;
-    return (
-      <div className="modal-overlay" onClick={(e) => {
-        // Close modal when clicking the overlay (not the modal itself)
-        if (e.target.className === 'modal-overlay') onClose();
-      }}>
-        <div className="user-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-header">
-            <h3>{title}</h3>
-            <button className="close-btn" onClick={onClose} disabled={isSubmitting}>×</button>
-          </div>
-          <form onSubmit={onSubmit}>
-            <div className="modal-body">{children}</div>
-            <div className="modal-footer">
-              <button type="button" className="btn-cancel" onClick={onClose} disabled={isSubmitting}>Cancel</button>
-              <button type="submit" className="btn-save" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : (modalState.data ? 'Update' : 'Create')}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  }, [modalState.data]);
-
-  const FormGroup = useCallback(({ label, htmlFor, children }) => (
-    <div className="form-group">
-      <label htmlFor={htmlFor}>{label}</label>
-      {children}
-    </div>
-  ), []);
-
-  const CheckboxGroup = useCallback(({ label, name, checked, onChange }) => (
-    <div className="form-group checkbox-group">
-      <label>
-        <input type="checkbox" name={name} checked={checked} onChange={onChange} /> {label}
-      </label>
-    </div>
-  ), []);
-
-  const UserModal = useCallback(() => (
-    <ModalWrapper
-      title={modalState.data ? `Edit User: ${modalState.data.username}` : t.addNewUser}
-      isOpen={modalState.isOpen && modalState.type === MODAL_TYPE.USER}
-      onClose={closeModal}
-      onSubmit={handleUserSubmit}
-      isSubmitting={loadingStates.action}
-    >
-      <FormGroup label="Username" htmlFor="username">
-        <input type="text" id="username" name="username" value={userFormData.username} onChange={handleUserFormChange} required />
-      </FormGroup>
-      <FormGroup label="Email" htmlFor="email">
-        <input type="email" id="email" name="email" value={userFormData.email} onChange={handleUserFormChange} required />
-      </FormGroup>
-      <FormGroup label="Password" htmlFor="password">
-        <input type="password" id="password" name="password" value={userFormData.password} onChange={handleUserFormChange} required />
-      </FormGroup>
-      <FormGroup label="Role" htmlFor="role">
-        <select id="role" name="role" value={userFormData.role} onChange={handleUserFormChange}>
-          {Object.values(ROLES).map(role => <option key={role} value={role}>{role}</option>)}
-        </select>
-      </FormGroup>
-      <FormGroup label="Blood Type" htmlFor="bloodType">
-        <select id="bloodType" name="bloodType" value={userFormData.bloodType} onChange={handleUserFormChange}>
-          <option value="">Select Blood Type</option>
-          {BLOOD_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
-        </select>
-      </FormGroup>
-      <FormGroup>
-      <CheckboxGroup label="Registered as Donor" name="isDonor" checked={userFormData.isDonor} onChange={handleUserFormChange} />
-      <CheckboxGroup label="Active Account" name="isActive" checked={userFormData.isActive} onChange={handleUserFormChange} />
-      </FormGroup>
-    </ModalWrapper>
-  ), [t, modalState, userFormData, handleUserFormChange, handleUserSubmit, closeModal, loadingStates.action]);
-
-  const AdminModal = useCallback(() => (
-    <ModalWrapper
-      title={modalState.data ? `Edit Admin: ${modalState.data.username}` : t.addNewAdmin}
-      isOpen={modalState.isOpen && modalState.type === MODAL_TYPE.ADMIN}
-      onClose={closeModal}
-      onSubmit={handleAdminSubmit}
-      isSubmitting={loadingStates.action}
-    >
-      <FormGroup label="Username" htmlFor="username">
-        <input type="text" id="username" name="username" value={adminFormData.username} onChange={handleAdminFormChange} required />
-      </FormGroup>
-      <FormGroup label="Email" htmlFor="email">
-        <input type="email" id="email" name="email" value={adminFormData.email} onChange={handleAdminFormChange} required />
-      </FormGroup>
-      <FormGroup label="Password" htmlFor="password">
-        <input type="password" id="password" name="password" value={adminFormData.password} onChange={handleAdminFormChange} required />
-      </FormGroup>
-      <FormGroup label="Role" htmlFor="role">
-        <select id="role" name="role" value={adminFormData.role} onChange={handleAdminFormChange}>
-          <option value={ROLES.ADMIN}>Admin</option>
-          <option value={ROLES.SUPERADMIN}>Super Admin</option>
-        </select>
-      </FormGroup>
-      <FormGroup label="Permissions">
-        <CheckboxGroup label="Manage Users" name="permission_manageUsers" checked={adminFormData.permissions.manageUsers} onChange={handleAdminFormChange} />
-        <CheckboxGroup label="Manage Donations" name="permission_manageDonations" checked={adminFormData.permissions.manageDonations} onChange={handleAdminFormChange} />
-        <CheckboxGroup label="Manage Content" name="permission_manageContent" checked={adminFormData.permissions.manageContent} onChange={handleAdminFormChange} />
-        <CheckboxGroup label="Manage Settings" name="permission_manageSettings" checked={adminFormData.permissions.manageSettings} onChange={handleAdminFormChange} />
-      </FormGroup>
-    </ModalWrapper>
-  ), [t, modalState, adminFormData, handleAdminFormChange, handleAdminSubmit, closeModal, loadingStates.action]);
 
   if (loadingStates.global) {
     return <LoadingIndicator message="Verifying access..." />;
@@ -1454,35 +1067,11 @@ const AdminPage = () => {
       )}
       <div className="admin-page">
         <div className="admin-container">
-          <div className="admin-sidebar">
-            <div className="admin-profile">
-              <div className="admin-avatar"><FontAwesomeIcon icon={faUserShield} /></div>
-              <div className="admin-info">
-                <h3>Admin User</h3>
-                <p>{t.superAdministrator}</p>
-              </div>
-            </div>
-            <ul className="admin-menu">
-              <li className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>
-                <FontAwesomeIcon icon={faChartLine} /><span>{t.dashboard}</span>
-              </li>
-              <li className={activeTab === 'users' ? 'active' : ''} onClick={() => setActiveTab('users')}>
-                <FontAwesomeIcon icon={faUsers} /><span>{t.userManagement}</span>
-              </li>
-              <li className={activeTab === 'adminManagement' ? 'active' : ''} onClick={() => setActiveTab('adminManagement')}>
-                <FontAwesomeIcon icon={faUserShield} /><span>{t.adminManagement}</span>
-              </li>
-              <li className={activeTab === 'donations' ? 'active' : ''} onClick={() => setActiveTab('donations')}>
-                <FontAwesomeIcon icon={faTint} /><span>{t.donations}</span>
-              </li>
-              <li className={activeTab === 'content' ? 'active' : ''} onClick={() => setActiveTab('content')}>
-                <FontAwesomeIcon icon={faNewspaper} /><span>{t.content}</span>
-              </li>
-              <li className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>
-                <FontAwesomeIcon icon={faCog} /><span>{t.settings}</span>
-              </li>
-            </ul>
-          </div>
+          <AdminSidebar 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            translations={t} 
+          />
 
           <div className="admin-content-area">
             {renderTabContent()}
@@ -1490,8 +1079,21 @@ const AdminPage = () => {
         </div>
       </div>
 
-      <UserModal />
-      <AdminModal />
+      <AdminModals
+        modalState={modalState}
+        userFormData={userFormData}
+        adminFormData={adminFormData}
+        handleUserFormChange={handleUserFormChange}
+        handleAdminFormChange={handleAdminFormChange}
+        handleUserSubmit={handleUserSubmit}
+        handleAdminSubmit={handleAdminSubmit}
+        closeModal={closeModal}
+        loadingAction={loadingStates.action}
+        translations={t}
+        roles={ROLES}
+        bloodTypes={BLOOD_TYPES}
+        modalTypes={MODAL_TYPE}
+      />
     </div>
   );
 };

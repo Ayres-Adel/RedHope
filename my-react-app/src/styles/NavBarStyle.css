@@ -18,9 +18,11 @@
 .active-line {
   position: absolute;
   bottom: 0px;
-  height: 3.2px;
-  background-color: #ff4747; /* Change color as needed */
-  transition: all 0.3s ease; /* Smooth transition */
+  height: 3.5px;
+  background: linear-gradient(90deg, rgb(255, 182, 193), rgb(255, 0, 0), rgb(139, 0, 0));
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(255, 71, 71, 0.2);
+  transition: all 0.3s ease;
 }
 
 body {
@@ -45,14 +47,31 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
-  backdrop-filter: blur(10px); /* Enhanced blur effect */
-  -webkit-backdrop-filter: blur(10px); /* For Safari */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Softer shadow */
+  background-image: linear-gradient(155deg, 
+    rgba(255, 255, 255, 0.5) 0%, 
+    rgba(255, 242, 242, 0.45) 30%,
+    rgba(255, 220, 220, 0.5) 50%, /* Red tint starts at 50% */
+    rgba(255, 180, 180, 0.55) 75%,
+    rgba(255, 160, 160, 0.6) 100%);
+  backdrop-filter: blur(3px); /* Enhanced blur effect */
+  -webkit-backdrop-filter: blur(3px); /* For Safari */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Softer shadow */
   animation: fadeIn 1s forwards;
-  z-index: 1000;
-  height: 70px;
+  z-index: 1;
+  height: 75px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04); /* Subtle border */
   transition: all 0.3s ease;
+}
+
+.dark-theme nav {
+  background-color: rgba(15, 15, 15, 0.4); /* More transparent base */
+  background-image: linear-gradient(155deg, 
+    rgba(20, 20, 25, 0.3) 0%, 
+    rgba(25, 20, 25, 0.3) 30%,
+    rgba(35, 18, 18, 0.35) 50%, /* Red tint starts at 50% */
+    rgba(45, 15, 15, 0.4) 75%, 
+    rgba(50, 10, 10, 0.45) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04); /* Subtle border for dark theme */
 }
 
 .nav-logo img, .RedHope img {
@@ -106,7 +125,6 @@ nav {
   transition: all 0.3s ease;
   font-size: 20px; /* Standardized icon size */
   cursor: pointer;
-  margin-top: 0;
 }
 
 /* Hover effect for icons in dark theme */
@@ -204,7 +222,15 @@ hr {
 
 .HSA:hover {
   color: #ff4747;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  text-shadow: 0 2px 4px rgba(255, 71, 71, 0.1);
+}
+
+.HSA.active {
+  color: #ff4747;
+  font-weight: 600;
+  position: relative;
+  text-shadow: 0 1px 3px rgba(255, 71, 71, 0.15);
 }
 
 .HSA::after {
@@ -222,6 +248,14 @@ hr {
 .HSA:hover::after {
   transform: translateX(-50%) scaleX(1);
   height: 2.5px;
+}
+
+/* Make sure active tabs have visible underlines */
+.HSA.active::after {
+  transform: translateX(-50%) scaleX(1);
+  height: 3px;
+  background: linear-gradient(90deg, rgb(255, 182, 193), rgb(255, 0, 0), rgb(139, 0, 0));
+  box-shadow: 0 1px 3px rgba(255, 71, 71, 0.3);
 }
 
 .Sign-up {
@@ -269,7 +303,7 @@ hr {
   font-size: 20px; /* Standardized icon size */
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 0;
+  margin-top: 0 !important;
 }
 
 .login-icon:hover {
@@ -416,8 +450,8 @@ input[type="checkbox"]:focus-visible + label.display {
   gap: 5px;
   cursor: pointer;
   position: absolute;
-  left: 20px; /* Position on the left */
-  top: 42px;
+  left: 0px !important; /* Position on the left */
+  top: 30px !important;
   margin-left: 25px;
 }
 
@@ -428,14 +462,15 @@ input[type="checkbox"]:focus-visible + label.display {
   transition: all 0.3s ease;
 }
 
+/* Mobile Utility Section styling - Will contain language switcher and dark mode toggle in mobile view */
+.mobile-utility-section {
+  display: none; /* Hidden by default */
+}
+
 /* Media Queries for Responsiveness */
 @media (max-width: 1200px) {
   .hamburger {
     display: flex; /* Show hamburger menu */
-    position: absolute;
-    left: 20px;
-    top: 25px; /* Adjusted for better vertical alignment */
-    z-index: 1001; /* Ensure it stays above the mobile menu */
   }
 
   nav {
@@ -452,6 +487,12 @@ input[type="checkbox"]:focus-visible + label.display {
   
   .nav-links {
     display: none; /* Hide nav links by default */
+  }
+  
+  /* Hide the language switcher and toggle from top nav in mobile */
+  .nav-icons .language-switcher,
+  .nav-icons .toggle-container {
+    display: none !important;
   }
   
   /* Keep these elements visible and position them properly */
@@ -478,23 +519,99 @@ input[type="checkbox"]:focus-visible + label.display {
     position: absolute;
     top: 80px; /* Start below the navbar */
     left: 0;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.95); /* More modern semi-transparent background */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 25px 0;
+    width: 250px;
+    /* More glassy appearance with red starting at 50% */
+    background-image: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.5) 0%, 
+      rgba(255, 242, 242, 0.45) 30%,
+      rgba(255, 220, 220, 0.5) 50%, /* Red tint starts at 50% */
+      rgba(255, 180, 180, 0.55) 75%,
+      rgba(255, 160, 160, 0.6) 100%); /* More subtle gradient overall */
+    backdrop-filter: blur(3px); /* Glassy effect */
+    -webkit-backdrop-filter: blur(3px); /* For Safari */
+    padding-top: 25px;
     z-index: 999;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Softer, spread out shadow */
+    align-items: center;
+    gap: 5px;
+    border-bottom-right-radius: 15px;
+    border: none; /* Remove border completely */
+    border-top: none; /* Explicitly remove top border to merge with navbar */
+  }
+  
+  /* Show mobile utility section inside the hamburger menu */
+  .mobile-utility-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     align-items: center;
     gap: 25px;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
+    position: relative;
+    margin-top: auto; /* Push to bottom */
+    padding: 15px 0;
+    padding-left: 55px;
+    width: 100%;
+    border-radius: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Style utility icons for better alignment */
+  .mobile-utility-section .language-switcher,
+  .mobile-utility-section .toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px; /* Fixed height to prevent shifting */
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none; /* Prevent any transforms */
+  }
+  
+  /* Fix language icon alignment */
+  .mobile-utility-section .language-icon {
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Fix toggle alignment */
+  .mobile-utility-section label.display {
+    margin: 0;
+  }
+  
+  /* Dark theme version with identical positioning */
+  .dark-theme .mobile-utility-section {
+    background-color: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .dark-theme .mobile-utility-section .language-switcher,
+  .dark-theme .mobile-utility-section .toggle-container {
+    top: auto;
+    left: auto;
+    transform: none;
+    height: 24px;
   }
   
   /* Dark theme adjustments for mobile menu */
   .dark-theme .nav-links.active {
-    background-color: rgba(28, 30, 35, 0.95);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    /* Glassier dark appearance with red starting at 50% */
+    background-color: rgba(15, 15, 15, 0.4); /* More transparent base */
+    background-image: linear-gradient(135deg, 
+      rgba(20, 20, 25, 0.3) 0%, 
+      rgba(25, 20, 25, 0.3) 30%,
+      rgba(35, 18, 18, 0.35) 50%, /* Red tint starts at 50% */
+      rgba(45, 15, 15, 0.4) 75%, 
+      rgba(50, 10, 10, 0.45) 100%); /* More subtle red gradient */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); /* Softer shadow with more spread */
+    border: none; /* Remove all borders for seamless look */
+  }
+  
+  /* Ensure hamburger menu is visible in dark theme */
+  .dark-theme .hamburger div {
+    background-color: #e0e0e0; /* Light color for dark theme */
   }
   
   /* When mobile menu is active */
@@ -513,7 +630,7 @@ input[type="checkbox"]:focus-visible + label.display {
   /* Adjust auth items in mobile menu */
   .auth {
     flex-direction: row; /* Keep auth buttons side by side */
-    gap: 10px;
+    gap: 20px;
   }
   
   /* Add animation for mobile menu */
@@ -530,6 +647,61 @@ input[type="checkbox"]:focus-visible + label.display {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  /* Improved mobile nav link styling */
+  .nav-links.active .HSA {
+    width: 85%; /* Make links wider for better touch targets */
+    text-align: center;
+    margin: 5px 0;
+    padding: 12px 20px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.25); /* Subtle background */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    font-weight: 700;
+    border-left: 3px solid transparent; /* Prepare for active state */
+  }
+
+  .dark-theme .nav-links.active .HSA {
+    backdrop-filter: blur(8px); /* Glassy effect */
+    -webkit-backdrop-filter: blur(8px); /* For Safari */
+  }
+
+  /* Enhanced hover effect for mobile */
+  .nav-links.active .HSA:hover {
+    background-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Active state styling for mobile */
+  .nav-links.active .HSA.active {
+    background-color: rgba(255, 71, 71, 0.15);
+    border-left: 3px solid #ff4747;
+    font-weight: 800;
+  }
+
+  /* Remove underline effect on mobile (we use border-left instead) */
+  .nav-links.active .HSA::after {
+    display: none;
+  }
+
+  /* Dark theme mobile menu link styles */
+  .dark-theme .nav-links.active .HSA {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .dark-theme .nav-links.active .HSA:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .dark-theme .nav-links.active .HSA.active {
+    background-color: rgba(255, 71, 71, 0.2);
+    border-left: 3px solid #ff4747;
   }
 }
 
@@ -557,6 +729,8 @@ input[type="checkbox"]:focus-visible + label.display {
   @media (max-width: 400px) {
     .auth {
       flex-direction: column;
+      margin-top: -10px;
+      gap: 12px;
     }
   }
 }
