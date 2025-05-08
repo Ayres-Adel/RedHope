@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/FlipCard.css';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaEnvelope, FaGlobe } from 'react-icons/fa'; // React Icons
-import Search from './Search';
-import RedHopeLogo from '../assets/images/RedHope_Logo.png'; // Import your logo image
+import RedHopeLogo from '../assets/images/RedHope_Logo.png';
 
 const FlipCard = () => {
   const [isFlipped, setIsFlipped] = useState(false);

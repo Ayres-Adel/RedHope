@@ -2,55 +2,112 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 95vh;
-    margin-left: 0; /* Remove fixed margin for responsiveness */
-    padding: 0 20px; /* Add padding for smaller screens */
+    height: 100vh; /* Full viewport height */
+    padding: 0 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #ffffff;
 }
 
-.logo_loading img {
-    width: 100%; /* Make image responsive */
-    max-width: 200px; /* Limit maximum size */
-    height: auto; /* Maintain aspect ratio */
-    margin-top: 0; /* Remove fixed margin */
+body.dark-theme .loading {
+    background-color: #1E201E;
 }
 
 .logo_loading {
     display: flex;
-    flex-direction: column; /* Stack logo and text vertically on smaller screens */
-    align-items: center; /* Center items horizontally */
-    text-align: center; /* Center text */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: fadeIn 1s ease-in-out;
 }
 
-span {
-    color: rgb(255, 71, 71);
+.logo_loading img {
+    width: 100%;
+    max-width: 180px; /* Slightly smaller */
+    height: auto;
+    margin-bottom: 8px; /* Reduced space between logo and text */
+    transition: filter 0.3s ease;
+}
+
+body.dark-theme .logo_loading img {
+    filter: brightness(1.1) contrast(1.1);
 }
 
 .logo_loading > a {
     color: var(--Primary_blue);
-    margin-left: 0; /* Remove fixed margin */
-    margin-top: -45px;
-    font-size: 24px; /* Reduce font size for smaller screens */
-    text-decoration: none; /* Remove underline from link */
+    font-size: 26px; /* Slightly smaller */
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+    margin-top: 5px; /* Reduced space above text */
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .logo_loading > a {
+    color: #e0e0e0;
+}
+
+.logo_loading span {
+    color: rgb(255, 71, 71);
+    transition: color 0.3s ease;
+}
+
+body.dark-theme .logo_loading span {
+    color: rgb(255, 0, 0);
+}
+
+/* Loading spinner animation */
+.loading-spinner {
+    margin-top: 20px; /* Reduced space above spinner */
+    width: 35px; /* Slightly smaller */
+    height: 35px; /* Slightly smaller */
+    border: 3px solid rgba(255, 71, 71, 0.2);
+    border-top-color: rgb(255, 71, 71);
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+}
+
+body.dark-theme .loading-spinner {
+    border: 3px solid rgba(255, 107, 107, 0.2);
+    border-top-color: #ff6b6b;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
     .logo_loading img {
-        max-width: 150px; /* Adjust image size for tablets */
+        max-width: 150px;
     }
 
     .logo_loading > a {
-        font-size: 20px; /* Adjust font size for tablets */
+        font-size: 24px;
+    }
+    
+    .loading-spinner {
+        width: 35px;
+        height: 35px;
     }
 }
 
 @media (max-width: 480px) {
     .logo_loading img {
-        max-width: 100px; /* Adjust image size for mobile */
+        max-width: 120px;
     }
 
     .logo_loading > a {
-        font-size: 18px; /* Adjust font size for mobile */
-        margin-top: -30px;
+        font-size: 20px;
+    }
+    
+    .loading-spinner {
+        width: 30px;
+        height: 30px;
     }
 }
