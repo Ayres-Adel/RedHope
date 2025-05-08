@@ -128,8 +128,6 @@ nav {
 .dark-theme .language-icon {
   color: #e0e0e0;
   transition: all 0.3s ease;
-  font-size: 20px;
-  cursor: pointer;
 }
 
 .dark-theme .login-icon:hover,
@@ -288,7 +286,7 @@ hr {
 /* Login Icon */
 .login-icon {
   color: #5f5f61;
-  font-size: 20px;
+  font-size: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -406,7 +404,7 @@ input[type="checkbox"]:focus-visible + label.display {
 }
 
 .language-icon {
-  font-size: 20px;
+  font-size: 25px;
   color: #5f5f61;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -636,6 +634,7 @@ input[type="checkbox"]:focus-visible + label.display {
   .auth {
     flex-direction: column; /* Stack for very small screens */
     gap: 8px; /* Smaller gap for very small screens */
+    margin-right: 7px;
   }
 
   .notLoggedIn-icon{
