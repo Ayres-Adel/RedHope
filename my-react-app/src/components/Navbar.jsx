@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, memo } from "react";
+import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -32,18 +32,42 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Page detection constants
-  const isHomePage = location.pathname === "/";
-  const isMapPage = location.pathname === "/map";
-  const isSignPage = location.pathname === "/sign";
-  const isLoginPage = location.pathname === "/login";
-  const isUserPage = location.pathname === "/user";
-  const isAdminPage = location.pathname === "/admin";
-  const isUnrelatedPage = !isHomePage && !isMapPage && !isAdminPage;
+  // Page detection constants - memoized to prevent recalculation
+  const pageDetection = useMemo(() => {
+    const isHomePage = location.pathname === "/";
+    const isMapPage = location.pathname === "/map";
+    const isSignPage = location.pathname === "/sign";
+    const isLoginPage = location.pathname === "/login";
+    const isUserPage = location.pathname === "/user";
+    const isAdminPage = location.pathname === "/admin";
+    const isUnrelatedPage = !isHomePage && !isMapPage && !isAdminPage;
+    
+    return {
+      isHomePage,
+      isMapPage,
+      isSignPage,
+      isLoginPage,
+      isUserPage,
+      isAdminPage,
+      isUnrelatedPage
+    };
+  }, [location.pathname]);
+  
+  const { isHomePage, isMapPage, isSignPage, isLoginPage, isUserPage, isAdminPage, isUnrelatedPage } = pageDetection;
 
-  // Authentication state
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Authentication state - with optimized check
+  const [authState, setAuthState] = useState(() => {
+    const hasToken = !!localStorage.getItem("token");
+    const isAdmin = hasToken && (
+      localStorage.getItem("userRole") === "admin" || 
+      localStorage.getItem("isAdmin") === "true"
+    );
+    
+    return { isLoggedIn: hasToken, isAdmin };
+  });
+  
+  // Destructure auth state for easier access
+  const { isLoggedIn, isAdmin } = authState;
 
   // Navigation state
   const { jump, activeSection: hookActiveSection } = useJumpToSection();
@@ -52,72 +76,74 @@ export default function Navbar() {
 
   // UI state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState(
-    localStorage.getItem("language") || "en"
-  );
+  const [language, setLanguage] = useState(() => localStorage.getItem("language") || "en");
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
 
-  // Element references
-  const navLinksRef = useRef(null);
-  const hamburgerRef = useRef(null);
-  const homeRef = useRef(null);
-  const servicesRef = useRef(null);
-  const aboutRef = useRef(null);
-  const mapRef = useRef(null);
-  const adminRef = useRef(null);
+  // Element references - consolidated in one object for better organization
+  const refs = {
+    navLinks: useRef(null),
+    hamburger: useRef(null),
+    home: useRef(null),
+    services: useRef(null),
+    about: useRef(null),
+    map: useRef(null),
+    admin: useRef(null)
+  };
 
   // Handle section changes from ScrollTracker
   const handleSectionChange = useCallback((section) => {
     setCurrentSection(section);
   }, []);
 
-  // Theme toggle handler with useCallback
+  // Theme toggle handler with useCallback and improved reliability
   const handleToggleChange = useCallback((event) => {
-    const clickedToggle = event.target;
-    const isChecked = clickedToggle.checked;
-
-    document.body.classList.toggle("dark-theme", isChecked);
-    localStorage.setItem("darkMode", isChecked);
-
-    // Keep toggles in sync
-    const desktopToggle = document.getElementById("toggle");
-    const mobileToggle = document.getElementById("mobile-toggle");
-
-    if (desktopToggle && clickedToggle.id !== "toggle") {
-      desktopToggle.checked = isChecked;
-    }
-
-    if (mobileToggle && clickedToggle.id !== "mobile-toggle") {
-      mobileToggle.checked = isChecked;
+    try {
+      const clickedToggle = event.target;
+      const isChecked = clickedToggle.checked;
+      
+      // Apply theme to document
+      document.body.classList.toggle("dark-theme", isChecked);
+      localStorage.setItem("darkMode", isChecked);
+      
+      // Sync toggles (safely access DOM elements)
+      const desktopToggle = document.getElementById("toggle");
+      const mobileToggle = document.getElementById("mobile-toggle");
+      
+      if (desktopToggle && clickedToggle.id !== "toggle") {
+        desktopToggle.checked = isChecked;
+      }
+      
+      if (mobileToggle && clickedToggle.id !== "mobile-toggle") {
+        mobileToggle.checked = isChecked;
+      }
+    } catch (error) {
+      console.error("Error handling toggle change:", error);
     }
   }, []);
 
-  // Menu management functionsr
+  // Menu management with improved reliability
   const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
-    // Always ensure hamburger icon returns to default state
-    if (hamburgerRef.current) {
-      hamburgerRef.current.classList.remove('active');
+    if (refs.hamburger.current) {
+      refs.hamburger.current.classList.remove('active');
     }
   }, []);
 
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(prevState => {
       const newState = !prevState;
-      // Correctly set the active class based on the new menu state
-      // Add 'active' when menu is open, remove when closed
-      if (hamburgerRef.current) {
+      if (refs.hamburger.current) {
         if (newState) {
-          hamburgerRef.current.classList.add('active');
+          refs.hamburger.current.classList.add('active');
         } else {
-          hamburgerRef.current.classList.remove('active');
+          refs.hamburger.current.classList.remove('active');
         }
       }
       return newState;
     });
   }, []);
 
-  // Navigation handler with optimization
+  // Navigation handler - optimized to reduce complexity
   const handleNavigation = useCallback(
     (section) => {
       if (isHomePage) {
@@ -150,7 +176,7 @@ export default function Navbar() {
   // Authentication functions
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
-    setIsLoggedIn(false);
+    setAuthState(prev => ({ ...prev, isLoggedIn: false }));
     navigate("/login");
   }, [navigate]);
 
@@ -159,12 +185,13 @@ export default function Navbar() {
     return userRole === "admin" || localStorage.getItem("isAdmin") === "true";
   }, []);
 
-  // Language management
+  // Language management - optimized with better event handling
   const changeLanguage = useCallback(() => {
     const newLanguage = language === "en" ? "fr" : "en";
     setLanguage(newLanguage);
     localStorage.setItem("language", newLanguage);
     
+    // Use custom event for better cross-component communication
     document.dispatchEvent(
       new CustomEvent('languageChanged', { 
         detail: { language: newLanguage } 
@@ -172,30 +199,33 @@ export default function Navbar() {
     );
   }, [language]);
 
-  // Update login state when token changes
+  // Update login state when token changes - with optimization
   useEffect(() => {
     const hasToken = !!localStorage.getItem("token");
-    setIsLoggedIn(hasToken);
     
-    if (hasToken) {
-      setIsAdmin(checkAdminStatus());
-    } else {
-      setIsAdmin(false);
-    }
+    // Only update state when auth status actually changes
+    setAuthState(prev => {
+      const nextIsAdmin = hasToken && checkAdminStatus();
+      if (prev.isLoggedIn !== hasToken || prev.isAdmin !== nextIsAdmin) {
+        return { isLoggedIn: hasToken, isAdmin: nextIsAdmin };
+      }
+      return prev;
+    });
   }, [location.pathname, checkAdminStatus]);
 
   // Handle navigation when returning to home page with section param
   useEffect(() => {
     if (isHomePage && location.state?.scrollTo) {
       jump(location.state.scrollTo);
+      // Clear the state to prevent repeated scrolling
       navigate("/", { replace: true, state: {} });
     }
   }, [isHomePage, location.state, jump, navigate]);
 
-  // Language change listener
+  // Language change listener with better cleanup
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === "language" && e.newValue !== language) {
+      if (e.key === "language" && e.newValue !== null && e.newValue !== language) {
         setLanguage(e.newValue);
       }
     };
@@ -204,39 +234,75 @@ export default function Navbar() {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, [language]);
 
-  // Dark mode initialization
+  // Dark mode initialization with improved reliability
   useEffect(() => {
-    const toggle = document.getElementById("toggle");
-    const mobileToggle = document.getElementById("mobile-toggle");
+    // Create function for initialization to allow for retry logic
+    const initializeThemeToggles = () => {
+      const toggle = document.getElementById("toggle");
+      const mobileToggle = document.getElementById("mobile-toggle");
 
-    if (!toggle || !mobileToggle) return;
+      // If elements are not available yet, retry after a short delay
+      if (!toggle || !mobileToggle) {
+        setTimeout(initializeThemeToggles, 50);
+        return;
+      }
 
-    toggle.style.display = "block";
+      // Make desktop toggle visible
+      if (toggle.style) {
+        toggle.style.display = "block";
+        toggle.classList.add('toggle-visible');
+      }
 
-    const savedMode = localStorage.getItem("darkMode");
-    const isDarkMode = savedMode === "true";
-    
-    document.body.classList.toggle("dark-theme", isDarkMode);
-    toggle.checked = isDarkMode;
-    mobileToggle.checked = isDarkMode;
+      // Get dark mode preference
+      const savedMode = localStorage.getItem("darkMode");
+      const isDarkMode = savedMode === "true";
+      
+      // Apply theme to document
+      document.body.classList.toggle("dark-theme", isDarkMode);
+      
+      // Configure desktop toggle
+      if (toggle && !toggle.hasEventListener) {
+        toggle.checked = isDarkMode;
+        toggle.addEventListener("change", handleToggleChange);
+        toggle.hasEventListener = true;
+      }
+      
+      // Configure mobile toggle
+      if (mobileToggle && !mobileToggle.hasEventListener) {
+        mobileToggle.checked = isDarkMode;
+        mobileToggle.addEventListener("change", handleToggleChange);
+        mobileToggle.hasEventListener = true;
+      }
+    };
 
-    toggle.addEventListener("change", handleToggleChange);
-    mobileToggle.addEventListener("change", handleToggleChange);
+    // Start initialization process
+    initializeThemeToggles();
 
+    // Cleanup function
     return () => {
-      toggle.removeEventListener("change", handleToggleChange);
-      mobileToggle.removeEventListener("change", handleToggleChange);
+      const toggle = document.getElementById("toggle");
+      const mobileToggle = document.getElementById("mobile-toggle");
+      
+      if (toggle && toggle.hasEventListener) {
+        toggle.removeEventListener("change", handleToggleChange);
+        toggle.hasEventListener = false;
+      }
+      
+      if (mobileToggle && mobileToggle.hasEventListener) {
+        mobileToggle.removeEventListener("change", handleToggleChange);
+        mobileToggle.hasEventListener = false;
+      }
     };
   }, [handleToggleChange]);
 
-  // Close menu when clicking outside
+  // Close menu when clicking outside - optimized with refs
   useEffect(() => {
     if (!isMenuOpen) return;
 
     const handleClickOutside = (event) => {
-      if (navLinksRef.current && 
-          !navLinksRef.current.contains(event.target) &&
-          (!hamburgerRef.current || !hamburgerRef.current.contains(event.target))) {
+      if (refs.navLinks.current && 
+          !refs.navLinks.current.contains(event.target) &&
+          (!refs.hamburger.current || !refs.hamburger.current.contains(event.target))) {
         closeMenu();
       }
     };
@@ -245,7 +311,7 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen, closeMenu]);
 
-  // Translation helper
+  // Translation helper - memoized to prevent unnecessary recalculations
   const t = useCallback((en, fr) => language === "en" ? en : fr, [language]);
 
   return (
@@ -267,7 +333,7 @@ export default function Navbar() {
 
         {/* Hamburger menu button with ref */}
         <div
-          ref={hamburgerRef}
+          ref={refs.hamburger}
           className="hamburger"
           onClick={toggleMenu}
           role="button"
@@ -283,11 +349,11 @@ export default function Navbar() {
 
         {/* Navigation links with optimized rendering */}
         <div 
-          ref={navLinksRef}
+          ref={refs.navLinks}
           className={`nav-links ${isMenuOpen ? "active" : ""}`}
         >
           <NavLink 
-            reference={homeRef}
+            reference={refs.home}
             isActive={!isUnrelatedPage && !(isMapPage || isAdminPage) && 
                      (activeSection === "home" || (!activeSection && isHomePage))}
             onClick={() => handleNavigation("home")}
@@ -296,7 +362,7 @@ export default function Navbar() {
           </NavLink>
           
           <NavLink 
-            reference={mapRef}
+            reference={refs.map}
             isActive={!isUnrelatedPage && isMapPage}
             onClick={handleMapNavigation}
           >
@@ -304,7 +370,7 @@ export default function Navbar() {
           </NavLink>
           
           <NavLink 
-            reference={servicesRef}
+            reference={refs.services}
             isActive={!isUnrelatedPage && activeSection === "services"}
             onClick={() => handleNavigation("services")}
           >
@@ -312,7 +378,7 @@ export default function Navbar() {
           </NavLink>
           
           <NavLink 
-            reference={aboutRef}
+            reference={refs.about}
             isActive={!isUnrelatedPage && activeSection === "about"}
             onClick={() => handleNavigation("about")}
           >
@@ -321,7 +387,7 @@ export default function Navbar() {
 
           {isAdmin && (
             <NavLink 
-              reference={adminRef}
+              reference={refs.admin}
               isActive={!isUnrelatedPage && isAdminPage}
               onClick={handleAdminNavigation}
             >

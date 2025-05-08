@@ -19,7 +19,6 @@ import FlipCard from "./FlipCard.jsx";
 import InfiniteScroll from "./InfiniteScroll.jsx";
 import ScrollProgress from "./ScrollProgress.jsx";
 import FadeInSection from "./FadeInSection.jsx";
-import { detectMobileDevice } from '../utils/viewportDetection';
 
 import Percentages from "../assets/images/Percentages-removebg-preview.png";
 import "../styles/LandingPageStyle.css";
@@ -104,13 +103,6 @@ export default function LandingPage() {
       window.removeEventListener('storage', handleStorageChange);
       clearInterval(interval);
     };
-  }, []);
-
-  useEffect(() => {
-    // Initialize viewport detection
-    detectMobileDevice();
-    
-    // ...rest of your existing effects...
   }, []);
 
   return (
