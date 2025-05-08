@@ -44,7 +44,6 @@ const FlipCard = () => {
     <div className="flip-card">
       <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`}>
         <div className="flip-card-front">
-          <h2>RedHope</h2>
           <h3>{language === 'fr' ? 'Chaque don peut sauver jusqu\'à 3 vies.' : 'Every donation can save up to 3 lives.'}</h3>
           <img src="./src/assets/images/RedHope_Logo.png" alt="Blood Donation" className="card-image" />
           <button className="learn-more-btn" onClick={handleLearnMoreClick}>{language === 'fr' ? 'En savoir plus' : 'Learn More'}</button>

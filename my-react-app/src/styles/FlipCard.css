@@ -266,20 +266,16 @@
         top: -20px;
     }
 
-
-
     .dark-theme .grid-container hr {
         width: 80%;
         
     }
 
-
+    
     .flip-card-front > span > h2  {
         position: relative;
         top: -20px;
     }
-
-
 
     .donate-now-btn {
         position: relative;
@@ -314,17 +310,6 @@
     .dark-theme     .flip-card {
         width: 250px;
         height: 450px;
-    }
-
-
-    .flip-card-front h2 {
-        position: relative;
-        top: -50px;
-    }
-
-    .dark-theme     .flip-card-front h2 {
-        position: relative;
-        top: -50px;
     }
 
     .flip-card-front h3 {
@@ -380,15 +365,6 @@
     .dark-theme     .flip-card-front h3 {
         font-size: 15px;
     }
-
-    .flip-card-front h2 {
-        font-size: 16px;
-    }
-
-    .dark-theme     .flip-card-front h2 {
-        font-size: 16px;
-    }
-
 
     .dark-theme     .grid-container {
         margin-top: 10px;
@@ -455,11 +431,6 @@
     .donate-now-btn {
         position: relative;
         top: 5px;
-    }
-
-    .flip-card-front h2 {
-        position: relative;
-        top: -10px;
     }
 
     .social-media-links  span {
