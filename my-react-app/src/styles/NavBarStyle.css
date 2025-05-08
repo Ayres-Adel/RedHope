@@ -40,6 +40,7 @@ header {
 
 /* Navbar layout - mobile first */
 nav {
+  width: 100%;
   position: fixed;
   top: 0;
   left: 0;
@@ -195,7 +196,7 @@ hr {
   display: flex;
   gap: 12px; /* Smaller gap for mobile */
   position: relative;
-  left: 0;
+  left: -5px;
   flex-direction: column; /* Stack for very small screens */
   margin-top: -10px;
 }
@@ -682,7 +683,7 @@ input[type="checkbox"]:focus-visible + label.display {
 
   .hamburger {
     left: 0px !important; /* Closer to edge on very small screens */
-    top: 23px !important; /* Adjusted for smaller screens */
+    top: 20px !important; /* Adjusted for smaller screens */
     margin-left: 0 !important; /* Adjusted for smaller screens */
     padding: 15px !important; /* Adjusted for smaller screens */
   }
@@ -776,6 +777,3 @@ input[type="checkbox"]:focus-visible + label.display {
     display: none; /* Show utility section on medium screens */
   }
 }
-
-
-
