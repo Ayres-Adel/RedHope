@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../styles/FlipCard.css';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaEnvelope, FaGlobe } from 'react-icons/fa'; // React Icons
 import Search from './Search';
+import RedHopeLogo from '../assets/images/RedHope_Logo.png'; // Import your logo image
 
 const FlipCard = () => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -45,7 +46,7 @@ const FlipCard = () => {
       <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`}>
         <div className="flip-card-front">
           <h3>{language === 'fr' ? 'Chaque don peut sauver jusqu\'à 3 vies.' : 'Every donation can save up to 3 lives.'}</h3>
-          <img src="./src/assets/images/RedHope_Logo.png" alt="Blood Donation" className="card-image" />
+          <img src= {RedHopeLogo} alt="Blood Donation" className="card-image" />
           <button className="learn-more-btn" onClick={handleLearnMoreClick}>{language === 'fr' ? 'En savoir plus' : 'Learn More'}</button>
         </div>
         <div className="flip-card-back">

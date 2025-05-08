@@ -9,6 +9,7 @@ import {
 import "../styles/NavBarStyle.css";
 import { useJumpToSection } from "./JumpPages.jsx";
 import ScrollTracker from './ScrollTracker';
+import RedHopeLogo from "../assets/images/RedHope_Logo.png";
 
 // Memoized navigation link component for better performance
 const NavLink = memo(({ 
@@ -229,7 +230,7 @@ export default function Navbar() {
         {/* Logo */}
         <div className="nav-logo">
           <a href="/">
-            <img src="./assets/images/RedHope_Logo.png" alt="RedHope Logo" />
+            <img src= {RedHopeLogo} alt="RedHope Logo" />
             <h1><span>Red</span>Hope</h1>
           </a>
         </div>
