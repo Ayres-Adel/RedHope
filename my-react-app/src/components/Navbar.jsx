@@ -392,7 +392,7 @@ export default function Navbar() {
                 />
               </>
             ) : (
-              <Link 
+              <Link className="notLoggedIn-icon"
                 to="/login" 
                 aria-label={t("Login", "Connexion")}
               >

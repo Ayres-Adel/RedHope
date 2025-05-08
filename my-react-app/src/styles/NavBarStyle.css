@@ -214,44 +214,6 @@ hr {
   z-index: 1001;
 }
 
-/* Button styling - Smaller for mobile */
-.Sign-up, .Login {
-  font-weight: var(--Weights_02);
-  padding: 8px 15px; /* Smaller padding for mobile */
-  font-size: 14px; /* Smaller font for mobile */
-  border-radius: 25px;
-  display: inline-block;
-  text-decoration: none;
-  transition: all 0.4s ease;
-}
-
-.Sign-up {
-  color: var(--Primary_blue);
-  border: 2px solid #ff4747;
-  background-color: transparent;
-  box-shadow: 0 0 0 rgba(255, 71, 71, 0);
-}
-
-.Sign-up:hover {
-  background-color: rgba(255, 71, 71, 0.1);
-  box-shadow: 0 5px 15px rgba(255, 71, 71, 0.2);
-  transform: translateY(-2px);
-  color: #ff4747;
-}
-
-.Login {
-  color: white;
-  border: none;
-  background-color: #ff4747;
-  box-shadow: 0 4px 10px rgba(255, 71, 71, 0.3);
-}
-
-.Login:hover {
-  background-color: #ff3333;
-  box-shadow: 0 7px 20px rgba(255, 71, 71, 0.4);
-  transform: translateY(-2px);
-}
-
 /* Hamburger Menu - Visible by default for mobile */
 .hamburger {
   display: flex; /* Visible by default on mobile */
@@ -329,7 +291,6 @@ hr {
   font-size: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 0 !important;
 }
 
 .login-icon:hover {
@@ -675,7 +636,10 @@ input[type="checkbox"]:focus-visible + label.display {
   .auth {
     flex-direction: column; /* Stack for very small screens */
     gap: 8px; /* Smaller gap for very small screens */
-    margin-top: -5px; /* Adjusted for smaller screens */
+  }
+
+  .notLoggedIn-icon{
+    margin-top: 16px;
   }
 
   .mobile-utility-section {
@@ -701,6 +665,10 @@ input[type="checkbox"]:focus-visible + label.display {
 
   .mobile-utility-section {
     display: flex; /* Show utility section on medium screens */
+  }
+
+  .notLoggedIn-icon{
+    margin-top: 5px;
   }
 
 }
@@ -776,5 +744,9 @@ input[type="checkbox"]:focus-visible + label.display {
 
   .mobile-utility-section {
     display: none; /* Show utility section on medium screens */
+  }
+
+  .notLoggedIn-icon{
+    margin-top: 0px;
   }
 }
