@@ -262,6 +262,12 @@ h2 { font-size: 1.5rem; }
     max-width: 1100px;
 }
 
+.flip-card-container {
+    height: 550px;
+    display: flex;
+    align-items: center;
+}
+
 .img_heartbroken {
     width: 450px;
     max-width: 100%;
@@ -339,7 +345,7 @@ h2 { font-size: 1.5rem; }
     color: var(--NeutralLight_grayish_red);
     text-align: center;
     align-items: center;
-    font-size: 0.96rem;
+    font-size: 0.95rem;
     font-weight: bolder;
 }
 
@@ -410,11 +416,6 @@ h2 { font-size: 1.5rem; }
 
 .dark-theme .rights {
     color: #a0a0a0;
-}
-
-.dark-theme .flip-card-container {
-    padding-top: 140px;
-    height: 550px;
 }
 
 /* Media Queries - Optimized */

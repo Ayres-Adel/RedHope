@@ -7,7 +7,6 @@ import {
   faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import "../styles/NavBarStyle.css";
-import "../components/Map.jsx";
 import { useJumpToSection } from "./JumpPages.jsx";
 import ScrollTracker from './ScrollTracker';
 
@@ -73,29 +72,26 @@ export default function Navbar() {
 
   // Theme toggle handler with useCallback
   const handleToggleChange = useCallback((event) => {
-    const clickedToggle = event.target;
-    const isChecked = clickedToggle.checked;
-
+    const isChecked = event.target.checked;
     document.body.classList.toggle("dark-theme", isChecked);
     localStorage.setItem("darkMode", isChecked);
-
-    // Keep toggles in sync
-    const desktopToggle = document.getElementById("toggle");
-    const mobileToggle = document.getElementById("mobile-toggle");
-
-    if (desktopToggle && clickedToggle.id !== "toggle") {
-      desktopToggle.checked = isChecked;
-    }
-
-    if (mobileToggle && clickedToggle.id !== "mobile-toggle") {
-      mobileToggle.checked = isChecked;
-    }
+    
+    // Sync theme toggles
+    const allToggles = [
+      document.getElementById("toggle"), 
+      document.getElementById("mobile-toggle")
+    ];
+    
+    allToggles.forEach(toggle => {
+      if (toggle && toggle !== event.target) {
+        toggle.checked = isChecked;
+      }
+    });
   }, []);
 
-  // Menu management functionsr
+  // Menu management functions
   const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
-    // Always ensure hamburger icon returns to default state
     if (hamburgerRef.current) {
       hamburgerRef.current.classList.remove('active');
     }
@@ -104,14 +100,8 @@ export default function Navbar() {
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(prevState => {
       const newState = !prevState;
-      // Correctly set the active class based on the new menu state
-      // Add 'active' when menu is open, remove when closed
       if (hamburgerRef.current) {
-        if (newState) {
-          hamburgerRef.current.classList.add('active');
-        } else {
-          hamburgerRef.current.classList.remove('active');
-        }
+        hamburgerRef.current.classList.toggle('active', newState);
       }
       return newState;
     });
@@ -172,8 +162,9 @@ export default function Navbar() {
     );
   }, [language]);
 
-  // Update login state when token changes
+  // Effect hooks - consolidated for better performance
   useEffect(() => {
+    // Update login state
     const hasToken = !!localStorage.getItem("token");
     setIsLoggedIn(hasToken);
     
@@ -182,68 +173,46 @@ export default function Navbar() {
     } else {
       setIsAdmin(false);
     }
-  }, [location.pathname, checkAdminStatus]);
-
-  // Handle navigation when returning to home page with section param
-  useEffect(() => {
+    
+    // Handle navigation when returning to home
     if (isHomePage && location.state?.scrollTo) {
       jump(location.state.scrollTo);
       navigate("/", { replace: true, state: {} });
     }
-  }, [isHomePage, location.state, jump, navigate]);
-
-  // Language change listener
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === "language" && e.newValue !== language) {
-        setLanguage(e.newValue);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [language]);
-
-  // Dark mode initialization
-  useEffect(() => {
-    const toggle = document.getElementById("toggle");
-    const mobileToggle = document.getElementById("mobile-toggle");
-
-    if (!toggle || !mobileToggle) return;
-
-    toggle.style.display = "block";
-
-    const savedMode = localStorage.getItem("darkMode");
-    const isDarkMode = savedMode === "true";
     
-    document.body.classList.toggle("dark-theme", isDarkMode);
-    toggle.checked = isDarkMode;
-    mobileToggle.checked = isDarkMode;
-
-    toggle.addEventListener("change", handleToggleChange);
-    mobileToggle.addEventListener("change", handleToggleChange);
-
-    return () => {
-      toggle.removeEventListener("change", handleToggleChange);
-      mobileToggle.removeEventListener("change", handleToggleChange);
+    // Setup theme toggle
+    const setupThemeToggle = () => {
+      const toggle = document.getElementById("toggle");
+      const mobileToggle = document.getElementById("mobile-toggle");
+      
+      if (!toggle || !mobileToggle) return;
+      
+      const isDarkMode = localStorage.getItem("darkMode") === "true";
+      document.body.classList.toggle("dark-theme", isDarkMode);
+      toggle.checked = isDarkMode;
+      mobileToggle.checked = isDarkMode;
     };
-  }, [handleToggleChange]);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    if (!isMenuOpen) return;
-
+    
+    setupThemeToggle();
+    
+    // Click outside handler for menu closing
     const handleClickOutside = (event) => {
-      if (navLinksRef.current && 
+      if (isMenuOpen && 
+          navLinksRef.current && 
           !navLinksRef.current.contains(event.target) &&
           (!hamburgerRef.current || !hamburgerRef.current.contains(event.target))) {
         closeMenu();
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isMenuOpen, closeMenu]);
+    
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [location.pathname, checkAdminStatus, isHomePage, location.state, jump, navigate, isMenuOpen, closeMenu]);
 
   // Translation helper
   const t = useCallback((en, fr) => language === "en" ? en : fr, [language]);
@@ -260,12 +229,12 @@ export default function Navbar() {
         {/* Logo */}
         <div className="nav-logo">
           <a href="/">
-            <img src="../assets/images/RedHope_Logo.png" alt="RedHope Logo" />
+            <img src="./assets/images/RedHope_Logo.png" alt="RedHope Logo" />
             <h1><span>Red</span>Hope</h1>
           </a>
         </div>
 
-        {/* Hamburger menu button with ref */}
+        {/* Hamburger menu button */}
         <div
           ref={hamburgerRef}
           className="hamburger"
@@ -281,11 +250,12 @@ export default function Navbar() {
           <div></div>
         </div>
 
-        {/* Navigation links with optimized rendering */}
+        {/* Navigation links */}
         <div 
           ref={navLinksRef}
           className={`nav-links ${isMenuOpen ? "active" : ""}`}
         >
+          {/* Navigation links rendered with the NavLink component */}
           <NavLink 
             reference={homeRef}
             isActive={!isUnrelatedPage && !(isMapPage || isAdminPage) && 
@@ -319,6 +289,7 @@ export default function Navbar() {
             {t("About Us", "À Propos")}
           </NavLink>
 
+          {/* Admin panel link - conditionally rendered */}
           {isAdmin && (
             <NavLink 
               reference={adminRef}
@@ -343,6 +314,7 @@ export default function Navbar() {
               />
             </div>
 
+            {/* Mobile theme toggle */}
             <div className="toggle-container">
               <input 
                 type="checkbox" 
@@ -370,6 +342,7 @@ export default function Navbar() {
           <div className="auth">
             {isLoggedIn || isUserPage ? (
               <>
+                {/* User profile icon */}
                 <FontAwesomeIcon
                   icon={faUser}
                   className="login-icon"
@@ -380,6 +353,7 @@ export default function Navbar() {
                   tabIndex={0}
                   onKeyDown={(e) => e.key === "Enter" && navigate("/user")}
                 />
+                {/* Logout icon */}
                 <FontAwesomeIcon
                   icon={faSignOutAlt}
                   className="login-icon"
@@ -429,27 +403,11 @@ export default function Navbar() {
             />
             <label htmlFor="toggle" className="display">
               <div className="circle">
-                <svg
-                  className="sun"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
+                <svg className="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z" />
                 </svg>
-                <svg
-                  className="moon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z"
-                    clipRule="evenodd"
-                  />
+                <svg className="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path fillRule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clipRule="evenodd" />
                 </svg>
               </div>
             </label>

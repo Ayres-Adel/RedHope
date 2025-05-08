@@ -4,7 +4,6 @@
     width: 350px;
     height: 450px;
     perspective: 1000px;
-    margin: 50px auto;
     transform: rotate(-5deg); /* Tilt the card */
     transition: transform 0.3s ease; /* Smooth transition for hover effect */
 }

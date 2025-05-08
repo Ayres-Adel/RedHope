@@ -28,6 +28,7 @@
 
 body {
   animation: fadeIn 1s ease-in-out;
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 
 header {
@@ -40,15 +41,15 @@ header {
 
 /* Navbar layout - mobile first */
 nav {
-  width: 100vw;
+  width: 100vw; /* Changed from 100vw to prevent overflow */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   display: flex;
-  justify-content: center; /* Center for mobile by default */
+  justify-content: center;
   align-items: center;
-  padding: 0 20px; /* Smaller padding for mobile */
+  padding: 0 20px;
   background-image: linear-gradient(155deg, 
     rgba(255, 255, 255, 0.5) 0%, 
     rgba(255, 242, 242, 0.45) 30%,
@@ -59,13 +60,15 @@ nav {
   -webkit-backdrop-filter: blur(3px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   animation: none; /* Remove animation which was causing size changes */
-  transition: background-color 0.3s ease, background-image 0.3s ease, box-shadow 0.3s ease; /* Specific transitions only */
-  z-index: 1;
-  height: 80px; /* Slightly taller for mobile */
+  transition: background-color 0.3s ease, background-image 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1000; /* Increased z-index to ensure proper stacking */
+  height: 80px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  contain: layout style; /* This helps prevent layout shifts */
+  box-sizing: border-box; /* Include padding in width calculation */
+  contain: none; /* Removed potentially problematic contain property */
 }
 
+/* Dark theme navbar styles */
 .dark-theme nav {
   background-color: rgba(15, 15, 15, 0.4);
   background-image: linear-gradient(155deg, 
@@ -79,7 +82,7 @@ nav {
 
 /* Logo styling - smaller for mobile */
 .nav-logo img, .RedHope img {
-  width: 65px; /* Smaller for mobile */
+  width: 65px;
   height: 65px;
   margin-top: -8px;
   position: relative;
@@ -95,7 +98,7 @@ nav {
   display: flex;
   align-items: center;
   flex-direction: row;
-  margin: 0 auto; /* Center the logo on mobile */
+  margin: 0 auto;
   z-index: 1001;
 }
 
@@ -193,42 +196,41 @@ hr {
 /* Auth buttons for mobile - Stacked on very small screens */
 .auth {
   display: flex;
-  gap: 12px; /* Smaller gap for mobile */
+  gap: 12px;
   position: relative;
   left: 0;
-  flex-direction: column; /* Stack for very small screens */
-  margin-top: -10px;
+  flex-direction: column;
+  margin-right: 7px; /* Added space for proper alignment */
+}
+
+/* Icon alignment fix */
+.notLoggedIn-icon {
+  margin-top: 16px; /* Adjusted for proper vertical alignment */
 }
 
 /* Nav Icons Container - Mobile positioning */
 .nav-icons {
   display: flex;
   align-items: center;
-  gap: 15px; /* Smaller gap for mobile */
+  gap: 15px;
   margin-right: 0;
   position: absolute;
-  right: 10px; /* Closer to edge on mobile */
+  right: 10px;
   top: 25px;
   z-index: 1001;
 }
 
-/* Hamburger Menu - Visible by default for mobile */
-.hamburger {
-  display: flex; /* Visible by default on mobile */
-  flex-direction: column;
-  gap: 5px;
+/* Icon styling */
+.login-icon, .language-icon {
+  font-size: 25px; /* Standardized icon size */
+  color: #5f5f61;
   cursor: pointer;
-  position: absolute;
-  left: 10px !important;
-  top: 30px !important;
-  margin-left: 5px !important;
+  transition: all 0.3s ease;
 }
 
-.hamburger div {
-  width: 25px;
-  height: 3px;
-  background-color: var(--Primary_blue);
-  transition: all 0.3s ease;
+.login-icon:hover, .language-icon:hover {
+  color: #ff4747;
+  transform: scale(1.2) rotate(5deg);
 }
 
 /* HSA styling */
@@ -632,13 +634,13 @@ input[type="checkbox"]:focus-visible + label.display {
   }
 
   .auth {
-    flex-direction: column; /* Stack for very small screens */
-    gap: 8px; /* Smaller gap for very small screens */
+    flex-direction: column;
+    gap: 8px;
     margin-right: 7px;
   }
 
-  .notLoggedIn-icon{
-    margin-top: 16px;
+  .notLoggedIn-icon {
+    margin-top: 7px;
   }
 
   .mobile-utility-section {
@@ -657,19 +659,18 @@ input[type="checkbox"]:focus-visible + label.display {
 /* MEDIUM SCREENS - Mobile to Tablet (401px to 600px) */
 @media (min-width: 401px) {
   .auth {
-    flex-direction: row; /* Switch back to row */
-    gap: 20px; /* Restore larger gap */
+    flex-direction: row;
+    gap: 20px;
     margin-top: 0;
+  }
+
+  .notLoggedIn-icon {
+    margin-top: 5px;
   }
 
   .mobile-utility-section {
     display: flex; /* Show utility section on medium screens */
   }
-
-  .notLoggedIn-icon{
-    margin-top: 5px;
-  }
-
 }
 
 /* TABLET (601px to 1200px) */
@@ -745,7 +746,7 @@ input[type="checkbox"]:focus-visible + label.display {
     display: none; /* Show utility section on medium screens */
   }
 
-  .notLoggedIn-icon{
+  .notLoggedIn-icon {
     margin-top: 0px;
   }
 }
