@@ -260,7 +260,7 @@ export default function Navbar() {
         {/* Logo */}
         <div className="nav-logo">
           <a href="/">
-            <img src="./src/assets/images/RedHope_Logo.png" alt="RedHope Logo" />
+            <img src="../assets/images/RedHope_Logo.png" alt="RedHope Logo" />
             <h1><span>Red</span>Hope</h1>
           </a>
         </div>
