@@ -78,6 +78,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState(() => localStorage.getItem("language") || "en");
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
+  const [togglesLoaded, setTogglesLoaded] = useState(false);
 
   // Element references - consolidated in one object for better organization
   const refs = {
@@ -236,14 +237,24 @@ export default function Navbar() {
 
   // Dark mode initialization with improved reliability
   useEffect(() => {
+    let retryCount = 0;
+    const maxRetries = 10;
+    
     // Create function for initialization to allow for retry logic
     const initializeThemeToggles = () => {
       const toggle = document.getElementById("toggle");
       const mobileToggle = document.getElementById("mobile-toggle");
 
-      // If elements are not available yet, retry after a short delay
+      // If elements are not available yet, retry with exponential backoff
       if (!toggle || !mobileToggle) {
-        setTimeout(initializeThemeToggles, 50);
+        retryCount++;
+        if (retryCount < maxRetries) {
+          // Increase delay with each retry attempt
+          const delay = Math.min(100 * Math.pow(1.5, retryCount), 2000);
+          setTimeout(initializeThemeToggles, delay);
+        } else {
+          console.warn("Failed to initialize toggle elements after multiple attempts");
+        }
         return;
       }
 
@@ -273,13 +284,49 @@ export default function Navbar() {
         mobileToggle.addEventListener("change", handleToggleChange);
         mobileToggle.hasEventListener = true;
       }
+
+      // Add a small delay to ensure CSS transitions complete
+      setTimeout(() => {
+        // Mark toggles as loaded
+        setTogglesLoaded(true);
+        
+        // Add a class to the body to indicate toggles are ready
+        document.body.classList.add('toggles-ready');
+        
+        // Force a repaint to ensure toggles render correctly
+        toggle.style.transform = 'translateZ(0)';
+        mobileToggle.style.transform = 'translateZ(0)';
+      }, 50);
     };
 
     // Start initialization process
     initializeThemeToggles();
 
+    // Setup mutation observer as backup to detect when toggles are added to DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0) {
+          const toggle = document.getElementById("toggle");
+          const mobileToggle = document.getElementById("mobile-toggle");
+          
+          if (toggle && mobileToggle && !togglesLoaded) {
+            initializeThemeToggles();
+            observer.disconnect();
+          }
+        }
+      });
+    });
+
+    // Start observing document body for toggle elements
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
     // Cleanup function
     return () => {
+      observer.disconnect();
+      
       const toggle = document.getElementById("toggle");
       const mobileToggle = document.getElementById("mobile-toggle");
       
@@ -293,7 +340,7 @@ export default function Navbar() {
         mobileToggle.hasEventListener = false;
       }
     };
-  }, [handleToggleChange]);
+  }, [handleToggleChange, togglesLoaded]);
 
   // Close menu when clicking outside - optimized with refs
   useEffect(() => {
@@ -322,7 +369,7 @@ export default function Navbar() {
         isHomePage={isHomePage} 
       />
       
-      <nav className={isMenuOpen ? 'expanded' : ''}>
+      <nav className={`${isMenuOpen ? 'expanded' : ''} ${togglesLoaded ? 'toggles-loaded' : 'toggles-loading'}`}>
         {/* Logo */}
         <div className="nav-logo">
           <a href="/">
@@ -486,7 +533,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop dark mode toggle */}
-          <div className="toggle-container">
+          <div className={`toggle-container ${togglesLoaded ? 'visible' : 'hidden'}`}>
             <input 
               type="checkbox" 
               id="toggle" 

@@ -777,3 +777,52 @@ input[type="checkbox"]:focus-visible + label.display {
     display: none; /* Show utility section on medium screens */
   }
 }
+
+/* Add these styles to ensure toggle knobs fully load */
+
+.toggles-loading .toggle-container {
+  opacity: 0;
+}
+
+.toggles-loaded .toggle-container {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Ensure toggle input is properly styled */
+#toggle, #mobile-toggle {
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Improve toggle visibility */
+.toggle-visible {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Force hardware acceleration for smoother rendering */
+.toggle-container .circle {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Adjust timing of toggle transition */
+.toggle-container .circle svg {
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure body class properly controls toggle visibility */
+body.toggles-ready .toggle-container {
+  visibility: visible;
+}
