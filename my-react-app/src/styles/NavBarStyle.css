@@ -259,7 +259,7 @@ hr {
   position: absolute;
   left: 10px !important;
   top: 30px !important;
-  margin-left: 15px;
+  margin-left: 5px !important;
 }
 
 .hamburger div {
@@ -624,15 +624,10 @@ input[type="checkbox"]:focus-visible + label.display {
 }
 
 /* SMALL SCREENS - Mobile (0px to 400px) */
-@media (max-width: 400px) {
+@media (min-width: 0px) {
   .nav-logo img, .RedHope img {
     width: 60px; /* Smaller for very small screens */
     height: 60px;
-  }
-
-  .nav-icons {
-    right: 5px; /* Closer to edge on very small screens */
-    top: 20px; /* Adjusted for smaller screens */
   }
 
   .Sign-up, .Login {
@@ -684,7 +679,15 @@ input[type="checkbox"]:focus-visible + label.display {
   .mobile-utility-section {
     display: flex; /* Show utility section on very small screens */
   }
+
+  .hamburger {
+    left: 0px !important; /* Closer to edge on very small screens */
+    top: 23px !important; /* Adjusted for smaller screens */
+    margin-left: 0 !important; /* Adjusted for smaller screens */
+    padding: 15px !important; /* Adjusted for smaller screens */
   }
+
+} 
 
 /* MEDIUM SCREENS - Mobile to Tablet (401px to 600px) */
 @media (min-width: 401px) {
