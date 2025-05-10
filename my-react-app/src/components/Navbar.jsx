@@ -35,11 +35,12 @@ export default function Navbar() {
   // Page detection constants
   const isHomePage = location.pathname === "/";
   const isMapPage = location.pathname === "/map";
+  const isSearchPage = location.pathname === "/search"; // Add this constant
   const isSignPage = location.pathname === "/sign";
   const isLoginPage = location.pathname === "/login";
   const isUserPage = location.pathname === "/user";
   const isAdminPage = location.pathname === "/admin";
-  const isUnrelatedPage = !isHomePage && !isMapPage && !isAdminPage;
+  const isUnrelatedPage = !isHomePage && !isMapPage && !isAdminPage && !isSearchPage; // Update this line
 
   // Authentication state
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -135,6 +136,12 @@ export default function Navbar() {
 
   const handleAdminNavigation = useCallback(() => {
     navigate("/admin");
+    closeMenu();
+  }, [navigate, closeMenu]);
+
+  // Add search navigation handler
+  const handleSearchNavigation = useCallback(() => {
+    navigate("/search");
     closeMenu();
   }, [navigate, closeMenu]);
 
@@ -256,16 +263,25 @@ export default function Navbar() {
           ref={navLinksRef}
           className={`nav-links ${isMenuOpen ? "active" : ""}`}
         >
-          {/* Navigation links rendered with the NavLink component */}
+          {/* Home link */}
           <NavLink 
             reference={homeRef}
-            isActive={!isUnrelatedPage && !(isMapPage || isAdminPage) && 
+            isActive={!isUnrelatedPage && !(isMapPage || isAdminPage || isSearchPage) && 
                      (activeSection === "home" || (!activeSection && isHomePage))}
             onClick={() => handleNavigation("home")}
           >
             {t("Home", "Accueil")}
           </NavLink>
           
+          {/* Search link - Added between Home and Map */}
+          <NavLink 
+            isActive={!isUnrelatedPage && isSearchPage}
+            onClick={handleSearchNavigation}
+          >
+            {t("Search", "Recherche")}
+          </NavLink>
+          
+          {/* Map link */}
           <NavLink 
             reference={mapRef}
             isActive={!isUnrelatedPage && isMapPage}

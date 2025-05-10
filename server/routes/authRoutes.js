@@ -2,6 +2,7 @@
 const { Router } = require('express');
 const router = Router();
 const authController = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // Add debugging middleware
 router.use((req, res, next) => {
@@ -23,5 +24,11 @@ router.get('/logout', authController.logout);
 
 // Refresh token route
 router.post('/refresh-token', authController.refreshToken);
+
+// Add nearby donors route
+router.get('/nearby', authMiddleware, authController.nearby_get);
+
+// Fix public nearby donors route - remove redundant /api prefix
+router.get('/public/nearby', authController.public_nearby_get);
 
 module.exports = router;

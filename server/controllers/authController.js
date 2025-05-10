@@ -263,3 +263,188 @@ exports.refreshToken = async (req, res) => {
     });
   }
 };
+
+module.exports.dashboard_get =  async (req, res) => {
+  try {
+      const user = await User.findById(req.user.userId).select('-password');
+      res.json({
+        msg: `${user.email}`,
+      });
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+  }
+};
+
+const haversineDistance = (coords1, coords2) => {
+  const toRad = (value) => (value * Math.PI) / 180;
+  
+  const [lat1, lon1] = coords1;
+  const [lat2, lon2] = coords2;
+
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in kilometers
+};
+
+module.exports.nearby_get = async (req, res) => {
+  try {
+    console.log('nearby_get called with user ID:', req.user?.userId || 'undefined');
+    
+    let userLocation;
+    
+    // Check if location parameters are provided in the request
+    const { lat, lng } = req.query;
+    
+    if (lat && lng) {
+      // Use provided location parameters
+      userLocation = [parseFloat(lat), parseFloat(lng)];
+      
+      if (userLocation.length !== 2 || isNaN(userLocation[0]) || isNaN(userLocation[1])) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Invalid location format in query parameters.' 
+        });
+      }
+      
+      console.log('Using query location parameters:', userLocation);
+    } else {
+      // Fall back to user's stored location
+      if (!req.user || !req.user.userId) {
+        return res.status(401).json({ 
+          success: false,
+          message: 'User not authenticated or invalid token' 
+        });
+      }
+      
+      const user = await User.findById(req.user.userId);
+      if (!user) {
+        return res.status(404).json({ 
+          success: false,
+          message: 'User not found' 
+        });
+      }
+      
+      if (!user.location) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'User location not found. Please update your profile with your location or provide location parameters.' 
+        });
+      }
+
+      console.log('Using stored user location:', user.location);
+      userLocation = user.location.split(',').map(Number); // Convert to [latitude, longitude]
+      
+      if (userLocation.length !== 2 || isNaN(userLocation[0]) || isNaN(userLocation[1])) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Invalid stored location format. Please update your location in your profile.' 
+        });
+      }
+    }
+
+    // Fetch all users who are donors except the current user (if authenticated)
+    const donorQuery = { isDonor: true };
+    if (req.user && req.user.userId) {
+      donorQuery._id = { $ne: req.user.userId }; // Exclude the current user if authenticated
+    }
+    
+    const donors = await User.find(donorQuery);
+
+    // Calculate distances for each donor
+    const donorsWithDistance = donors
+      .filter(donor => donor.location) // Only include donors with location
+      .map((donor) => {
+        try {
+          const donorLocation = donor.location.split(',').map(Number); // Convert to [latitude, longitude]
+          const distance = haversineDistance(userLocation, donorLocation);
+          return { ...donor._doc, distance }; // Spread donor fields and add distance
+        } catch (error) {
+          console.error(`Error processing donor ${donor._id}:`, error);
+          return null;
+        }
+      })
+      .filter(donor => donor !== null); // Remove any donors that caused errors
+
+    // Sort donors by distance (ascending)
+    donorsWithDistance.sort((a, b) => a.distance - b.distance);
+
+    console.log(`Found ${donorsWithDistance.length} nearby donors`);
+    res.json(donorsWithDistance);
+  } catch (err) {
+    console.error('Error in nearby_get:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error when finding nearby donors',
+      error: err.message
+    });
+  }
+};
+
+module.exports.public_nearby_get = async (req, res) => {
+  try {
+    console.log('public_nearby_get called');
+    
+    // Get location from query parameters
+    const { lat, lng } = req.query;
+    
+    if (!lat || !lng) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Location parameters (lat, lng) are required' 
+      });
+    }
+    
+    const userLocation = [parseFloat(lat), parseFloat(lng)];
+    
+    if (isNaN(userLocation[0]) || isNaN(userLocation[1])) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid location format. Please provide valid latitude and longitude.' 
+      });
+    }
+
+    // Fetch all users who are donors
+    const donors = await User.find({
+      isDonor: true
+    });
+
+    // Calculate distances for each donor
+    const donorsWithDistance = donors
+      .filter(donor => donor.location) // Only include donors with location
+      .map((donor) => {
+        try {
+          const donorLocation = donor.location.split(',').map(Number);
+          const distance = haversineDistance(userLocation, donorLocation);
+          return { ...donor._doc, distance };
+        } catch (error) {
+          console.error(`Error processing donor ${donor._id}:`, error);
+          return null;
+        }
+      })
+      .filter(donor => donor !== null);
+
+    // Sort donors by distance (ascending)
+    donorsWithDistance.sort((a, b) => a.distance - b.distance);
+
+    console.log(`Found ${donorsWithDistance.length} nearby donors for public request`);
+    res.json(donorsWithDistance);
+  } catch (err) {
+    console.error('Error in public_nearby_get:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error when finding nearby donors',
+      error: err.message
+    });
+  }
+};

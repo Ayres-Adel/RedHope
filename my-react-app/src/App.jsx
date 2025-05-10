@@ -72,14 +72,28 @@ function App() {
   }, []);
 
   return (
-    <>
-      <Router>
-        {/* Include the ScrollProgress component here to make it appear on all routes */}
-        <ScrollProgress />
-        {/* Check if loading, else render routes */}
-        {loading ? <Loading /> : <AppRoutes />}
-      </Router>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/map" element={<Map />} />
+        
+        {/* Protected routes */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/user" element={<UserPage />} />
+          {/* Other protected routes */}
+        </Route>
+        
+        {/* Admin routes */}
+        <Route element={<PrivateRoute admin />}>
+          <Route path="/admin/*" element={<AdminPage />} />
+        </Route>
+        
+        {/* Auth routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/sign" element={<Sign />} />
+      </Routes>
+    </Router>
   );
 }
 

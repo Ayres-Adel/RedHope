@@ -760,7 +760,7 @@
 
 /* Column sizing - Update Action column width */
 .data-table th:last-child, .data-table td:last-child { /* Actions column */
-  width: 140px;
+  width: fit-content;
   text-align: center;
   padding: 14px; /* Consistent padding */
   vertical-align: middle; /* Vertically center content */
@@ -1567,12 +1567,16 @@
 
 .dark-theme .admin-menu li.active span,
 .dark-theme .admin-menu li.active svg {
-  color: white;
+  color: black;
 }
 
 .dark-theme .admin-menu li svg {
   color: white;
   transition: color 0.3s ease;
+}
+
+.dark-theme .admin-menu li {
+  color: #e0e0e0;
 }
 
 .dark-theme .search-container input {
