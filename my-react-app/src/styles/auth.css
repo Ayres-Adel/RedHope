@@ -1,8 +1,8 @@
 /* Auth-specific CSS - Scoped to prevent affecting other components */
 .auth-specific-container form {
   width: 600px;
-  margin: 0 auto;
-  margin-top: 150px;
+  margin: 40px auto;
+  margin-top: 110px;
   padding: 40px;
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.1);
@@ -10,10 +10,6 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
-}
-
-.auth-specific-container form:hover {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
 }
 
 .auth-specific-container form h2 {
@@ -70,12 +66,13 @@
 
 .auth-specific-container .logo {
   display: flex;
-  margin-left: 170px;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Fix span that affects all pages */
 .auth-specific-container span {
-  color: rgb(255, 71, 71);
+  color: #ff4747;
 }
 
 .auth-specific-container .logo > a {
@@ -250,7 +247,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.dark-theme .auth-specific-container form:hover {
+.auth-specific-container form:hover {
   box-shadow: 0 12px 48px rgba(190, 27, 27, 0.2);
 }
 
@@ -262,12 +259,8 @@
   mix-blend-mode: hard-light;
 }
 
-.dark-theme .auth-specific-container span {
-  color: white;
-}
-
 .dark-theme .auth-specific-container .logo > a {
-  color: rgb(252, 158, 158);
+  color: #e0e0e0;
   margin-left: -10px;
 }
 
