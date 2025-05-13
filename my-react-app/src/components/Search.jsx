@@ -388,13 +388,6 @@ export default function Search() {
 
   // Handle contact of donor - optimized with useCallback
   const handleContactDonor = useCallback((method, donor) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      if (window.confirm('You need to be logged in to contact donors. Would you like to login now?')) {
-        navigate('/login');
-      }
-      return;
-    }
     
     const formattedPhone = donor.phoneNumber.startsWith('0') 
       ? `213${donor.phoneNumber.substring(1)}` 
@@ -422,7 +415,7 @@ export default function Search() {
       default:
         window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
     }
-  }, [navigate]);
+  }, []); 
 
   // Improved page change handler - remove scrolling behavior
   const handlePageChange = useCallback((newPage) => {
