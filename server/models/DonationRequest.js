@@ -13,10 +13,6 @@ const donationRequestSchema = new mongoose.Schema({
     },
     age: {
       type: Number
-    },
-    gender: {
-      type: String,
-      enum: ['Male', 'Female', 'Anonymous']
     }
   },
   bloodType: {

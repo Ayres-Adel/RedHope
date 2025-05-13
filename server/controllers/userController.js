@@ -22,10 +22,8 @@ module.exports = {
         }
         
         return res.json({
-          username: user.username || `${user.firstName} ${user.lastName}`,
+          username: user.username,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
           role: user.role,
           permissions: user.permissions,
           lastLogin: user.lastLogin,
@@ -35,7 +33,7 @@ module.exports = {
         // Regular user
         user = await User.findById(req.user.userId)
           .select('-password -__v'); // Exclude sensitive fields
-        
+      
         if (!user) {
           return res.status(404).json({ error: 'User not found' });
         }
@@ -47,7 +45,6 @@ module.exports = {
           bloodType: user.bloodType,
           location: user.location,
           dateOfBirth: user.dateOfBirth,
-          gender: user.gender,
           isDonor: user.isDonor
         });
       }

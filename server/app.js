@@ -127,14 +127,7 @@ try {
       unique: true,
       lowercase: true
     },
-    firstName: {
-      type: String,
-      required: [true, 'Please enter your first name']
-    },
-    lastName: {
-      type: String,
-      required: [true, 'Please enter your last name']
-    },
+    // firstName and lastName fields removed
     password: {
       type: String,
       required: [true, 'Please enter a password'],

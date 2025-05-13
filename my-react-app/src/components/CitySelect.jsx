@@ -1,91 +1,109 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+import PropTypes from 'prop-types';
 import '../styles/CitySelect.css';
 import { API_BASE_URL } from '../config';
 
-const CitySelector = ({ onLocationChange, isDarkMode, includeAllCities = false }) => {
-  // Set the default value to 'all' instead of an empty string
+const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = false }) => {
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Modified useEffect to prevent auto-triggering API calls when not needed
+  const initialSelectionMade = useRef(false);
+
+  // Fetch cities data
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchCities = async () => {
       try {
         setIsLoading(true);
         const response = await fetch(`${API_BASE_URL}/api/wilaya/all`);
         
+        // Handle 404 error specifically (try to seed data)
         if (!response.ok) {
-          if (response.status === 404) {
+          if (response.status === 404 && isMounted) {
             console.log("Cities endpoint not found, trying to seed data...");
-            // Try to seed the database if no cities exist
+            
             const seedResponse = await fetch(`${API_BASE_URL}/api/wilaya/seed`, {
               method: 'POST'
             });
             
-            if (seedResponse.ok) {
+            if (seedResponse.ok && isMounted) {
               console.log("Successfully seeded cities data");
-              // Retry fetching cities after seeding
               const retryResponse = await fetch(`${API_BASE_URL}/api/wilaya/all`);
+              
               if (retryResponse.ok) {
                 const retryData = await retryResponse.json();
+                if (!isMounted) return;
+                
                 console.log('Cities loaded after seeding:', retryData.data?.length || 0);
-                setCities(retryData.data || []);
-                setIsLoading(false);
+                handleCitiesData(retryData);
                 return;
               }
             }
           }
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`Failed to load cities: ${response.status}`);
         }
         
+        // Process successful response
         const data = await response.json();
+        if (!isMounted) return;
         
-        // Get cities data and sort them by code
-        let citiesData = [];
-        
-        if (!data.data && data.success && Array.isArray(data)) {
-          citiesData = data;
-        } else if (data.data && Array.isArray(data.data)) {
-          citiesData = data.data;
-        } else {
-          console.warn('Unexpected API response format:', data);
-          throw new Error('Unexpected API response format');
-        }
-        
-        // Sort cities by their code after fetching
-        const sortedCities = citiesData.sort((a, b) => {
-          const codeA = a.code || a.wilayaCode || 0;
-          const codeB = b.code || b.wilayaCode || 0;
-          return codeA - codeB;
-        });
-        
-        console.log('Cities sorted by code, count:', sortedCities.length);
-        setCities(sortedCities);
-        setIsLoading(false);
+        handleCitiesData(data);
       } catch (error) {
-        console.error('Error fetching cities:', error);
-        setError(error.message);
-        setIsLoading(false);
+        if (isMounted) {
+          console.error('Error fetching cities:', error);
+          setError(error.message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
     
     fetchCities();
+    
+    // Cleanup function to prevent state updates if component unmounts
+    return () => {
+      isMounted = false;
+    };
   }, []);
   
-  // Remove the effect that previously triggered the All Cities selection automatically
-  // Instead, we'll manually trigger it only once on first render
-  const initialSelectionMade = useRef(false);
+  // Process cities data from API response
+  const handleCitiesData = (data) => {
+    let citiesData = [];
+    
+    if (!data.data && data.success && Array.isArray(data)) {
+      citiesData = data;
+    } else if (data.data && Array.isArray(data.data)) {
+      citiesData = data.data;
+    } else {
+      console.warn('Unexpected API response format:', data);
+      setError('Unexpected API response format');
+      return;
+    }
+    
+    // Sort cities by their numeric code
+    const sortedCities = citiesData.sort((a, b) => {
+      const codeA = parseInt(a.code || a.wilayaCode || 0);
+      const codeB = parseInt(b.code || b.wilayaCode || 0);
+      return codeA - codeB;
+    });
+    
+    console.log('Cities sorted by code, count:', sortedCities.length);
+    setCities(sortedCities);
+  };
+  
+  // Make initial selection when cities are loaded
   useEffect(() => {
-    // Only trigger once when component mounts and cities are loaded
     if (!isLoading && cities.length > 0 && !initialSelectionMade.current) {
       initialSelectionMade.current = true;
       
-      // Only if this is the first time and All Cities is selected
+      // Only trigger for "All Cities" selection
       if (selectedCity === 'all') {
-        // Delayed execution to prevent race conditions with parent components
-        setTimeout(() => {
+        // Delay to avoid race conditions
+        const timer = setTimeout(() => {
           console.log('Initial selection: All Cities');
           onLocationChange(
             {
@@ -96,16 +114,18 @@ const CitySelector = ({ onLocationChange, isDarkMode, includeAllCities = false }
             null
           );
         }, 100);
+        
+        return () => clearTimeout(timer);
       }
     }
   }, [isLoading, cities, selectedCity, onLocationChange]);
   
-  const handleCityChange = (e) => {
+  // Handle city selection change
+  const handleCityChange = useCallback((e) => {
     const cityId = e.target.value;
     setSelectedCity(cityId);
     
     if (cityId === "all") {
-      // Handle "All Cities" option without changing coordinates
       console.log('Selected: All Cities - keeping current map view');
       onLocationChange(null, "All Cities", null);
       return;
@@ -115,27 +135,34 @@ const CitySelector = ({ onLocationChange, isDarkMode, includeAllCities = false }
     
     // Find the selected city data
     const city = cities.find(c => c._id === cityId || c.id === cityId);
-    if (city && city.location && city.location.coordinates) {
-      console.log('Selected city:', city.name, city.location.coordinates);
+    if (!city) {
+      console.warn('Could not find city data for ID:', cityId);
+      return;
+    }
+    
+    // Get the city code
+    const cityCode = city.code || city.wilayaCode;
+    console.log(`Selected city: ${city.name}, code: ${cityCode}, id: ${cityId}`);
+    
+    // Handle location coordinates based on data format
+    if (city.location && city.location.coordinates) {
       onLocationChange({
-        lat: city.location.coordinates[1], // Latitude is second in GeoJSON
-        lng: city.location.coordinates[0]  // Longitude is first in GeoJSON
-      }, city.name, cityId);
-    } else if (city && city.latitude && city.longitude) {
-      // Alternative data format
-      console.log('Selected city (alt format):', city.name, city.latitude, city.longitude);
+        lat: city.location.coordinates[1],
+        lng: city.location.coordinates[0]
+      }, city.name, cityCode);
+    } else if (city.latitude && city.longitude) {
       onLocationChange({
         lat: parseFloat(city.latitude),
         lng: parseFloat(city.longitude)
-      }, city.name, cityId);
+      }, city.name, cityCode);
     } else {
       console.warn('Selected city has no valid coordinates:', city);
     }
-  };
+  }, [cities, onLocationChange]);
   
   if (error) {
     return (
-      <div className="city-selector-error">
+      <div className="city-selector-error" role="alert">
         Failed to load cities: {error}
       </div>
     );
@@ -150,7 +177,6 @@ const CitySelector = ({ onLocationChange, isDarkMode, includeAllCities = false }
         className={isDarkMode ? 'dark-mode' : 'light-mode'}
         aria-label="Select a city"
       >
-        {/* Always include All Cities and make it the first option */}
         <option value="all">All Cities</option>
         
         {cities.map(city => (
@@ -159,13 +185,22 @@ const CitySelector = ({ onLocationChange, isDarkMode, includeAllCities = false }
           </option>
         ))}
       </select>
+      
       {isLoading && (
-        <div className={`loading-indicator ${isDarkMode ? 'dark-mode' : ''}`}>
+        <div className={`loading-indicator ${isDarkMode ? 'dark-mode' : ''}`} aria-live="polite">
           Loading cities...
         </div>
       )}
     </div>
   );
+});
+
+CitySelector.propTypes = {
+  onLocationChange: PropTypes.func.isRequired,
+  isDarkMode: PropTypes.bool,
+  includeAllCities: PropTypes.bool
 };
+
+CitySelector.displayName = 'CitySelector';
 
 export default CitySelector;

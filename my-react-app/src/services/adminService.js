@@ -42,6 +42,8 @@ export const adminService = {
   },
 
   createAdmin: async (adminData) => {
+    console.log('adminService createAdmin called with:', adminData);
+    // Make sure we're using the correct endpoint
     return api.post('/api/admin/accounts', adminData);
   },
   

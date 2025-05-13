@@ -12,13 +12,13 @@ import {
   faCalendarAlt, 
   faMapMarkerAlt, 
   faTint, 
-  faMars, 
   faLock, 
   faEye, 
   faEyeSlash, 
   faPhone 
 } from '@fortawesome/free-solid-svg-icons'; // Import necessary icons
 import { API_BASE_URL } from '../config';
+import { getCurrentLocation, formatLocation } from '../utils/LocationService';
 
 // Import images
 import redHopeLogo from '../assets/images/RedHope_Logo.png';
@@ -29,22 +29,20 @@ export default function Sign() {
     email: '',
     dateOfBirth: '',
     location: '',
-    phoneNumber: '', // Added phoneNumber to the form data state
+    phoneNumber: '',
     bloodType: '',
-    gender: '',
     password: '',
-    isDonor: '' // Add isDonor to the form data state
+    isDonor: ''
   });
   const [errors, setErrors] = useState({
     username: '',
     email: '',
     dateOfBirth: '',
     location: '',
-    phoneNumber: '', // Added error state for phoneNumber
+    phoneNumber: '',
     bloodType: '',
-    gender: '',
     password: '',
-    isDonor: '', // Add error state for isDonor
+    isDonor: '',
     general: ''
   });
   const navigate = useNavigate();
@@ -87,7 +85,6 @@ export default function Sign() {
       formData.location &&
       formData.phoneNumber &&
       formData.bloodType &&
-      formData.gender &&
       formData.password.length >= 6 &&
       formData.isDonor;
     setIsButtonEnabled(isFormValid);
@@ -112,7 +109,6 @@ export default function Sign() {
       location: '',
       phoneNumber: '',
       bloodType: '',
-      gender: '',
       password: '',
       isDonor: '',
       general: ''
@@ -163,17 +159,25 @@ export default function Sign() {
       location: '', 
       phoneNumber: '', 
       bloodType: '', 
-      gender: '', 
       password: '', 
       isDonor: '', 
       general: ''
     });
-  
+    
+    const dataToSend = {
+      ...formData,
+      isDonor: formData.isDonor === 'yes',
+      // Include the cityId in data sent to the API
+      cityId: formData.cityId || null
+    };
+    
+    console.log('Sending registration data:', dataToSend);
+    
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dataToSend)
       });
   
       const data = await response.json();
@@ -185,10 +189,8 @@ export default function Sign() {
         const newErrors = { ...errors };
   
         if (data.error) {
-          // If it's a single error message
           newErrors.general = data.error;
         } else if (data.errors) {
-          // If the server returns validation errors
           data.errors.forEach(error => {
             if (error.toLowerCase().includes("email")) {
               newErrors.email = error;
@@ -207,71 +209,94 @@ export default function Sign() {
         ? 'Une erreur réseau est survenue. Veuillez réessayer.'
         : 'A network error occurred. Please try again.' 
       });
-      console.error('Error:', error);
     }
   };
 
+  // Improved location fetching using enhanced LocationService
   const getLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-  
-          try {
-            const apiKey = '4bcabb4ac4e54f1692c1e4d811bb29e5';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${latitude},${longitude}&key=${apiKey}`;
-            
-            const response = await fetch(url);
-            const data = await response.json();
-  
-            if (data.status.code === 200 && data.results.length > 0) {
-              const { country, county, hamlet } = data.results[0].components;
-  
-              // Update your formData or handle the data as needed
-              setFormData({
-                ...formData,
-                location: `${latitude}, ${longitude}`,
-                formattedLocation: language === 'fr'
-                  ? `Pays : ${country}, Département : ${county}, Localité : ${hamlet}`
-                  : `Country: ${country}, County: ${county}, Hamlet: ${hamlet}`
+    setFormData(prev => ({
+      ...prev,
+      formattedLocation: language === 'fr' ? 'Chargement...' : 'Loading...'
+    }));
+    
+    getCurrentLocation({
+      onSuccess: (position) => {
+        const { lat, lng } = position;
+        const locationString = `${lat},${lng}`;
+        
+        // First update form with just coordinates
+        setFormData(prev => ({
+          ...prev,
+          location: locationString
+        }));
+        
+        formatLocation(position, language)
+          .then(locationInfo => {
+            if (locationInfo.success) {
+              // Extract cityId from postal code if available
+              const cityId = locationInfo.details?.cityId || 
+                             locationInfo.details?.postalCode?.substring(0, 2) || null;
+              
+              // Update form with both formatted location and cityId
+              setFormData(prev => ({
+                ...prev,
+                formattedLocation: locationInfo.formatted,
+                cityId: cityId // Store the cityId in form data
+              }));
+              
+              console.log('Location details retrieved:', {
+                formatted: locationInfo.formatted,
+                cityId: cityId,
+                postal: locationInfo.details?.postalCode
               });
-  
-              console.log(`Country: ${country}, County: ${county}, Hamlet: ${hamlet}`);
+              
+              setErrors(prev => ({
+                ...prev,
+                location: ''
+              }));
             } else {
-              setErrors({
-                ...errors,
+              setFormData(prev => ({
+                ...prev,
+                formattedLocation: locationString
+              }));
+              
+              setErrors(prev => ({
+                ...prev,
                 location: language === 'fr'
-                  ? 'Échec de la récupération des informations de localisation depuis l\'API.'
-                  : 'Failed to retrieve location details from the API.'
-              });
+                  ? 'Coordonnées enregistrées, mais impossible de récupérer l\'adresse.'
+                  : 'Coordinates saved, but unable to retrieve address details.'
+              }));
             }
-          } catch (error) {
-            setErrors({
-              ...errors,
+          })
+          .catch(error => {
+            setFormData(prev => ({
+              ...prev,
+              formattedLocation: locationString
+            }));
+            
+            setErrors(prev => ({
+              ...prev,
               location: language === 'fr'
-                ? 'Erreur lors de la récupération de la localisation depuis l\'API.'
-                : 'Error fetching location from the API.'
-            });
-            console.error('Error fetching location:', error);
-          }
-        },
-        () => {
-          setErrors({
-            ...errors,
-            location: language === 'fr'
-              ? 'Impossible de récupérer votre localisation.'
-              : 'Unable to retrieve your location.'
+                ? 'Erreur lors de la récupération de l\'adresse. Coordonnées enregistrées.'
+                : 'Error fetching address. Coordinates saved.'
+            }));
           });
-        }
-      );
-    } else {
-      setErrors({
-        ...errors,
-        location: language === 'fr'
-          ? 'La géolocalisation n\'est pas supportée par ce navigateur.'
-          : 'Geolocation is not supported by this browser.'
-      });
-    }
+      },
+      onError: (errorMsg) => {
+        setFormData(prev => ({
+          ...prev,
+          formattedLocation: ''
+        }));
+        
+        setErrors(prev => ({
+          ...prev,
+          location: errorMsg
+        }));
+      },
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    });
   };
 
   useEffect(() => {
@@ -399,28 +424,31 @@ export default function Sign() {
                       <option value="A-">A-</option>
                       <option value="B+">B+</option>
                       <option value="B-">B-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
                       <option value="AB+">AB+</option>
                       <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
                     </select>
                   </div>
                   {errors.bloodType && <div className="bloodType error">{errors.bloodType}</div>}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="gender">
-                    {language === 'fr' ? 'Sexe' : 'Gender'}
+                  <label htmlFor="phoneNumber">
+                    {language === 'fr' ? 'Numéro de téléphone' : 'Phone Number'}
                   </label>
                   <div className="input-icon">
-                    <FontAwesomeIcon icon={faMars} className="icon" />
-                    <select name="gender" value={formData.gender} onChange={handleChange} required>
-                      <option value="">{language === 'fr' ? 'Sélectionnez votre sexe' : 'Select Gender'}</option>
-                      <option value="Male">{language === 'fr' ? 'Homme' : 'Male'}</option>
-                      <option value="Female">{language === 'fr' ? 'Femme' : 'Female'}</option>
-                    </select>
+                    <FontAwesomeIcon icon={faPhone} className="icon" />
+                    <input
+                      type="tel"
+                      name="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={handleChange}
+                      placeholder={language === 'fr' ? 'Entrez votre numéro de téléphone' : 'Enter your phone number'}
+                      required
+                    />
                   </div>
-                  {errors.gender && <div className="gender error">{errors.gender}</div>}
+                  {errors.phoneNumber && <div className="phoneNumber error">{errors.phoneNumber}</div>}
                 </div>
               </div>
 
@@ -445,21 +473,7 @@ export default function Sign() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="phoneNumber">
-                    {language === 'fr' ? 'Numéro de téléphone' : 'Phone Number'}
-                  </label>
-                  <div className="input-icon">
-                    <FontAwesomeIcon icon={faPhone} className="icon" />
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleChange}
-                      placeholder={language === 'fr' ? 'Entrez votre numéro de téléphone' : 'Enter your phone number'}
-                      required
-                    />
-                  </div>
-                  {errors.phoneNumber && <div className="phoneNumber error">{errors.phoneNumber}</div>}
+                  {/* This space is intentionally left empty to maintain the grid layout */}
                 </div>
               </div>
 

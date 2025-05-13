@@ -86,7 +86,7 @@ nav {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   animation: none; /* Remove animation which was causing size changes */
   transition: background-color 0.3s ease, background-image 0.3s ease, box-shadow 0.3s ease;
-  z-index: 1000; /* Increased z-index to ensure proper stacking */
+  z-index: 2000; /* Increased z-index to ensure proper stacking */
   height: 80px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   box-sizing: border-box; /* Include padding in width calculation */

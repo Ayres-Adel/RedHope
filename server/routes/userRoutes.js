@@ -174,7 +174,17 @@ router.get('/stats/dashboard', async (req, res) => {
 // Create user in actual database
 router.post('/create', async (req, res) => {
   try {
-    const { username, email, password, role, bloodType, location, isDonor } = req.body;
+    const { 
+      username, 
+      email, 
+      password, 
+      role, 
+      bloodType, 
+      location, 
+      isDonor,
+      phoneNumber,  // Extract phoneNumber
+      dateOfBirth   // Extract dateOfBirth
+    } = req.body;
     
     // Validate input
     if (!username || !email || !password) {
@@ -193,7 +203,7 @@ router.post('/create', async (req, res) => {
       });
     }
     
-    // Create new user document
+    // Create new user document with all required fields
     const newUser = new User({
       username,
       email,
@@ -202,7 +212,9 @@ router.post('/create', async (req, res) => {
       bloodType: bloodType || 'Unknown',
       location: location || 'Unknown',
       isDonor: isDonor || false,
-      isActive: true
+      isActive: true,
+      phoneNumber: phoneNumber || '0000000000', // Add phoneNumber with default
+      dateOfBirth: dateOfBirth || new Date('1990-01-01') // Add dateOfBirth with default
     });
     
     // Save to database

@@ -9,7 +9,6 @@ module.exports = {
       const {
         patientName,
         patientAge,
-        patientGender,
         bloodType,
         unitsNeeded,
         hospitalId,
@@ -26,8 +25,7 @@ module.exports = {
         requester: req.user.userId,
         patient: {
           name: patientName,
-          age: patientAge,
-          gender: patientGender
+          age: patientAge
         },
         bloodType,
         unitsNeeded,

@@ -4,8 +4,9 @@ import axios from 'axios';
 import '../styles/UserPage.css';
 import Navbar from './Navbar';
 import Toast from './Toast';
-import { FiEye, FiEyeOff, FiUser, FiMail, FiPhone, FiMapPin, FiDroplet, FiLock, FiTrash2, FiSettings, FiHome, FiShield } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiUser, FiMail, FiPhone, FiMapPin, FiDroplet, FiLock, FiTrash2, FiSettings, FiHome, FiShield, FiHeart } from 'react-icons/fi';
 import { API_BASE_URL } from '../config';
+import { getCurrentLocation, reverseGeocode, formatLocation } from '../utils/LocationService';
 
 const UserPage = () => {
   const navigate = useNavigate();
@@ -20,7 +21,17 @@ const UserPage = () => {
     email: '',
     phone: '',
     bloodType: '',
-    location: ''
+    location: '',
+    isDonor: false
+  });
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({
+    username: '',
+    email: '',
+    phoneNumber: '',
+    bloodType: '',
+    location: '',
+    isDonor: false
   });
   const [messages, setMessages] = useState([]);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -29,6 +40,7 @@ const UserPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const [activeSection, setActiveSection] = useState('profile');
+  const [updating, setUpdating] = useState(false);
 
   // Translations
   const translations = {
@@ -67,7 +79,15 @@ const UserPage = () => {
       security: 'Security',
       myProfile: 'My Profile',
       myDonations: 'My Donations',
-      overview: 'Overview'
+      overview: 'Overview',
+      saveChanges: 'Save Changes',
+      updating: 'Updating...',
+      profileUpdated: 'Profile updated successfully!',
+      donorStatus: 'Donor Status',
+      donor: 'Donor',
+      nonDonor: 'Non-Donor',
+      changeDonorStatus: 'Change Status',
+      donorStatusUpdated: 'Donor status updated successfully!'
     },
     fr: {
       accountSettings: 'Paramètres du Compte',
@@ -104,13 +124,21 @@ const UserPage = () => {
       security: 'Sécurité',
       myProfile: 'Mon profil',
       myDonations: 'Mes dons',
-      overview: 'Vue d\'ensemble'
+      overview: 'Vue d\'ensemble',
+      saveChanges: 'Enregistrer les modifications',
+      updating: 'Mise à jour...',
+      profileUpdated: 'Profil mis à jour avec succès!',
+      donorStatus: 'Statut du donneur',
+      donor: 'Donneur',
+      nonDonor: 'Non-Donneur',
+      changeDonorStatus: 'Changer le statut',
+      donorStatusUpdated: 'Statut de donneur mis à jour avec succès!'
     }
   };
 
   const t = translations[language];
 
-  // Fetch user data when component mounts - optimized with better error handling
+  // Fetch user data when component mounts - update to also set the editForm state
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -119,8 +147,6 @@ const UserPage = () => {
           navigate('/login');
           return;
         }
-
-        console.log('Fetching user profile data...');
         
         try {
           const { data } = await axios.get(`${API_BASE_URL}/api/user/profile`, {
@@ -134,48 +160,42 @@ const UserPage = () => {
             
             if (typeof formattedLocation === 'string' && formattedLocation.includes(',')) {
               try {
-                const coords = formattedLocation.split(',').map(coord => parseFloat(coord.trim()));
+                // Use formatLocation instead of direct reverseGeocode calls
+                const locationInfo = await formatLocation(formattedLocation, language);
                 
-                if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-                  const apiKey = '4bcabb4ac4e54f1692c1e4d811bb29e5';
-                  const reverseGeoUrl = `https://api.opencagedata.com/geocode/v1/json?q=${coords[0]},${coords[1]}&key=${apiKey}&language=${language}`;
-                  
-                  const geoResponse = await axios.get(reverseGeoUrl);
-                  
-                  if (geoResponse.data.results && geoResponse.data.results.length > 0) {
-                    const result = geoResponse.data.results[0];
-                    
-                    const components = result.components;
-                    
-                    const addressParts = [];
-                    if (components.road) addressParts.push(components.road);
-                    if (components.county) addressParts.push(components.county);
-                    if (components.state) addressParts.push(components.state);
-                    if (!components.state && !components.county && components.country) {
-                      addressParts.push(components.country);
-                    }
-                    
-                    formattedLocation = addressParts.join(', ');
-                  }
+                if (locationInfo.success) {
+                  formattedLocation = locationInfo.formatted;
                 }
               } catch (geoError) {
-                console.error('Error reverse geocoding:', geoError);
+                addMessage('Could not fetch location details, showing coordinates instead', 'warning');
               }
             }
             
-            setUserInfo({
+            const userInfoData = {
               id: userData._id,
               name: userData.username || userData.name || 'N/A',
               email: userData.email || 'N/A',
               phone: userData.phoneNumber || 'N/A',
               bloodType: userData.bloodType || 'N/A',
-              location: formattedLocation
+              location: formattedLocation,
+              isDonor: Boolean(userData.isDonor)
+            };
+            
+            setUserInfo(userInfoData);
+            
+            // Set edit form with the same values
+            setEditForm({
+              username: userData.username || userData.name || '',
+              email: userData.email || '',
+              phoneNumber: userData.phoneNumber || '',
+              bloodType: userData.bloodType || '',
+              location: userData.location || '',
+              isDonor: Boolean(userData.isDonor)
             });
+            
             setLoading(false);
           }
         } catch (error) {
-          console.error('API error:', error);
-          
           if (error.response?.status === 401) {
             localStorage.removeItem('token');
             addMessage(t.sessionExpired, 'error');
@@ -187,7 +207,6 @@ const UserPage = () => {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error in user data fetch:', error);
         setLoading(false);
         addMessage(t.failedLoad, 'error');
       }
@@ -351,6 +370,240 @@ const UserPage = () => {
     }
   };
 
+  // Function to handle entering edit mode
+  const handleEnterEditMode = () => {
+    setEditMode(true);
+  };
+  
+  // Function to handle canceling edit mode
+  const handleCancelEdit = () => {
+    setEditMode(false);
+    // Reset form to current user info - include isDonor status
+    setEditForm({
+      username: userInfo.name,
+      email: userInfo.email,
+      phoneNumber: userInfo.phone,
+      bloodType: userInfo.bloodType,
+      location: userInfo.location,
+      isDonor: userInfo.isDonor // Add this to preserve donor status
+    });
+  };
+  
+  // Function to handle input changes in the edit form
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Function to handle saving user information
+  const handleSaveUserInfo = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      
+      // If we have new location coordinates, try to get the cityId
+      if (editForm.location && editForm.location !== userInfo.location && editForm.location.includes(',')) {
+        try {
+          const locationInfo = await formatLocation(editForm.location, language);
+          
+          if (locationInfo.success && locationInfo.details?.cityId) {
+            // Add cityId to the data being sent to the API
+            editForm.cityId = locationInfo.details.cityId;
+            console.log('Setting cityId from postal code:', locationInfo.details.cityId);
+          }
+        } catch (geoError) {
+          console.error('Error extracting cityId from location:', geoError);
+        }
+      }
+      
+      // Send data to API including cityId if available
+      await axios.put(
+        `${API_BASE_URL}/api/user/${userInfo.id}`,
+        editForm,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      // Handle location formatting if location was updated using LocationService
+      let formattedLocation = editForm.location;
+      
+      if (formattedLocation && formattedLocation !== userInfo.location && formattedLocation.includes(',')) {
+        try {
+          // Use formatLocation function which handles parsing and reverse geocoding in one step
+          const locationInfo = await formatLocation(formattedLocation, language);
+          
+          if (locationInfo.success) {
+            formattedLocation = locationInfo.formatted;
+          }
+        } catch (geoError) {
+          addMessage('Location coordinates saved, but address could not be formatted', 'warning');
+          // If there's an error, keep the original coordinates
+        }
+      }
+      
+      // Update the user info state with the new values including properly formatted location
+      setUserInfo({
+        ...userInfo,
+        name: editForm.username,
+        email: editForm.email,
+        phone: editForm.phoneNumber,
+        bloodType: editForm.bloodType,
+        isDonor: editForm.isDonor,
+        location: formattedLocation
+      });
+      
+      addMessage(t.profileUpdated, 'success');
+      setEditMode(false);
+      
+      // The refresh of user data is kept as a backup but is now less critical
+      // since we're already formatting and updating the location above
+      const { data } = await axios.get(`${API_BASE_URL}/api/user/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (data.user || data) {
+        const userData = data.user || data;
+        // Update only what's needed, keeping the rest intact
+        setUserInfo(prev => ({
+          ...prev,
+          name: userData.username || userData.name || prev.name,
+          email: userData.email || prev.email,
+          phone: userData.phoneNumber || prev.phone,
+          bloodType: userData.bloodType || prev.bloodType,
+          isDonor: Boolean(userData.isDonor) // Make sure isDonor is updated
+          // Location will be updated with the formatted value during the next useEffect run
+        }));
+      }
+      
+    } catch (err) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        addMessage(t.sessionExpired, 'error');
+        navigate('/login');
+      } else {
+        addMessage(err.response?.data?.error || t.networkError, 'error');
+      }
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  // Function to toggle donor status
+  const handleToggleDonorStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      
+      const newDonorStatus = !userInfo.isDonor;
+      
+      await axios.put(
+        `${API_BASE_URL}/api/user/${userInfo.id}`,
+        { isDonor: newDonorStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      // Update the user info state with the new donor status
+      setUserInfo(prev => ({
+        ...prev,
+        isDonor: newDonorStatus
+      }));
+      
+      // Update the edit form state as well
+      setEditForm(prev => ({
+        ...prev,
+        isDonor: newDonorStatus
+      }));
+      
+      addMessage(t.donorStatusUpdated, 'success');
+      
+    } catch (err) {
+      console.error('Error updating donor status:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        addMessage(t.sessionExpired, 'error');
+        navigate('/login');
+      } else {
+        addMessage(err.response?.data?.error || t.networkError, 'error');
+      }
+    }
+  };
+
+  // Replace the local fetchUserLocation function with imported getCurrentLocation
+  const handleGetLocation = () => {
+    setUpdating(true);
+    
+    getCurrentLocation({
+      onSuccess: (position) => {
+        const { lat, lng } = position;
+        const locationString = `${lat},${lng}`;
+        
+        // Update form with just coordinates first
+        setEditForm(prev => ({
+          ...prev,
+          location: locationString
+        }));
+        
+        // Use the improved formatLocation function instead of separate reverse geocoding
+        formatLocation(position, language)
+          .then(locationInfo => {
+            if (locationInfo.success) {
+              // Extract cityId from location details
+              const cityId = locationInfo.details?.cityId || null;
+              
+              // Update form with cityId if available
+              if (cityId) {
+                setEditForm(prev => ({
+                  ...prev,
+                  cityId: cityId // Add cityId to form data
+                }));
+              }
+              
+              // Show the formatted address in a success message
+              addMessage(`Location updated: ${locationInfo.formatted}`, 'success');
+            } else {
+              console.warn('Could not get formatted location:', locationInfo.message);
+              addMessage('Location coordinates saved, but address details could not be retrieved', 'warning');
+            }
+            setUpdating(false);
+          })
+          .catch(error => {
+            console.error('Error formatting location:', error);
+            addMessage('Location coordinates saved without address details', 'warning');
+            setUpdating(false);
+          });
+      },
+      onError: (errorMsg) => {
+        console.error('Error getting location:', errorMsg);
+        addMessage(errorMsg, 'error');
+        setUpdating(false);
+      },
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    });
+  };
+
   return (
     <>
       <Navbar />
@@ -410,48 +663,184 @@ const UserPage = () => {
                         </div>
                         <h3>{t.overview}</h3>
                       </div>
-                      <div className="info-grid">
-                        <div className="info-item">
-                          <span className="info-label">
-                            <FiUser className="info-icon" />
-                            {t.name}
-                          </span>
-                          <span className="info-value">{userInfo.name}</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">
-                            <FiMail className="info-icon" />
-                            {t.email}
-                          </span>
-                          <span className="info-value">{userInfo.email}</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">
-                            <FiPhone className="info-icon" />
-                            {t.phone}
-                          </span>
-                          <span className="info-value">{userInfo.phone}</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">
-                            <FiDroplet className="info-icon" />
-                            {t.bloodType}
-                          </span>
-                          <span className="info-value">{userInfo.bloodType}</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">
-                            <FiMapPin className="info-icon" />
-                            {t.location}
-                          </span>
-                          <span className="info-value">{userInfo.location}</span>
-                        </div>
-                      </div>
-                      <div className="security-footer">
-                        <button className="edit-info-btn">
-                          <FiSettings /> {t.editInformation}
-                        </button>
-                      </div>
+                      
+                      {!editMode ? (
+                        <>
+                          <div className="info-grid">
+                            <div className="info-item">
+                              <span className="info-label">
+                                <FiUser className="info-icon" />
+                                {t.name}
+                              </span>
+                              <span className="info-value">{userInfo.name}</span>
+                            </div>
+                            <div className="info-item">
+                              <span className="info-label">
+                                <FiMail className="info-icon" />
+                                {t.email}
+                              </span>
+                              <span className="info-value">{userInfo.email}</span>
+                            </div>
+                            <div className="info-item">
+                              <span className="info-label">
+                                <FiPhone className="info-icon" />
+                                {t.phone}
+                              </span>
+                              <span className="info-value">{userInfo.phone}</span>
+                            </div>
+                            <div className="info-item">
+                              <span className="info-label">
+                                <FiDroplet className="info-icon" />
+                                {t.bloodType}
+                              </span>
+                              <span className="info-value">{userInfo.bloodType}</span>
+                            </div>
+                            <div className="info-item">
+                              <span className="info-label">
+                                <FiMapPin className="info-icon" />
+                                {t.location}
+                              </span>
+                              <span className="info-value">{userInfo.location}</span>
+                            </div>
+                            {/* Add donor status info item with toggle button */}
+                            <div className="info-item donor-status-item">
+                              <span className="info-label">
+                                <FiHeart className="info-icon" />
+                                {t.donorStatus}
+                              </span>
+                              <div className="donor-status-container">
+                                <span className={`donor-badge ${userInfo.isDonor ? 'is-donor' : 'not-donor'}`}>
+                                  {userInfo.isDonor ? t.donor : t.nonDonor}
+                                </span>
+                                <button 
+                                  className="donor-toggle-btn" 
+                                  onClick={handleToggleDonorStatus}
+                                  aria-label={userInfo.isDonor ? t.nonDonor : t.donor}
+                                >
+                                  {userInfo.isDonor ? t.nonDonor : t.donor}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="security-footer">
+                            <button className="edit-info-btn" onClick={handleEnterEditMode}>
+                              <FiSettings /> {t.editInformation}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <form onSubmit={handleSaveUserInfo} className="edit-profile-form">
+                          <div className="edit-form">
+                            <div className="form-field">
+                              <label><FiUser className="info-icon" /> {t.name}</label>
+                              <input
+                                type="text"
+                                name="username"
+                                value={editForm.username}
+                                onChange={handleEditFormChange}
+                                className="profile-input"
+                              />
+                            </div>
+                            <div className="form-field">
+                              <label><FiMail className="info-icon" /> {t.email}</label>
+                              <input
+                                type="email"
+                                name="email"
+                                value={editForm.email}
+                                onChange={handleEditFormChange}
+                                className="profile-input"
+                              />
+                            </div>
+                            <div className="form-field">
+                              <label><FiPhone className="info-icon" /> {t.phone}</label>
+                              <input
+                                type="text"
+                                name="phoneNumber"
+                                value={editForm.phoneNumber}
+                                onChange={handleEditFormChange}
+                                className="profile-input"
+                              />
+                            </div>
+                            <div className="form-field">
+                              <label><FiDroplet className="info-icon" /> {t.bloodType}</label>
+                              <select 
+                                name="bloodType" 
+                                value={editForm.bloodType}
+                                onChange={handleEditFormChange}
+                                className="profile-select"
+                              >
+                                <option value="">Select Blood Type</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                              </select>
+                            </div>
+                            <div className="form-field location-field">
+                              <label><FiMapPin className="info-icon" /> {t.location}</label>
+                              <div className="location-input-container">
+                                <input
+                                  type="hidden"
+                                  name="location"
+                                  value={editForm.location}
+                                  onChange={handleEditFormChange}
+                                  placeholder="Latitude, Longitude"
+                                />
+                                <button 
+                                  type="button" 
+                                  className="get-location-btn"
+                                  onClick={handleGetLocation}
+                                  disabled={updating}
+                                >
+                                  <FiMapPin />
+                                  {updating ? 'Getting...' : 'Get Current Location'}
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <div className="form-field">
+                              <label><FiDroplet className="info-icon" /> {t.donorStatus}</label>
+                              <div className="donor-toggle-container">
+                                <label className="toggle-switch">
+                                  <input
+                                    type="checkbox"
+                                    name="isDonor"
+                                    checked={editForm.isDonor}
+                                    onChange={(e) => setEditForm(prev => ({
+                                      ...prev,
+                                      isDonor: e.target.checked
+                                    }))}
+                                  />
+                                  <span className="toggle-slider"></span>
+                                </label>
+                                <span className={`donor-badge ${editForm.isDonor ? 'is-donor' : 'not-donor'}`}>
+                                  {editForm.isDonor ? t.donor : t.nonDonor}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="security-footer edit-buttons">
+                            <button 
+                              type="button" 
+                              className="cancel-btn" 
+                              onClick={handleCancelEdit}
+                            >
+                              {t.cancel}
+                            </button>
+                            <button 
+                              type="submit" 
+                              className="edit-info-btn"
+                              disabled={updating}
+                            >
+                              {updating ? t.updating : t.saveChanges}
+                            </button>
+                          </div>
+                        </form>
+                      )}
                     </div>
                   </section>
                 )}

@@ -31,6 +31,8 @@ const userService = {
   },
 
   createUser: async (userData) => {
+    console.log('userService createUser called with:', userData);
+    // Make sure we're using the correct endpoint
     return api.post('/api/user/create', userData);
   },
 

@@ -30,13 +30,11 @@ router.get('/profile', requireAuth || fallbackAuth, (req, res) => {
           return res.status(404).json({ error: 'Admin not found' });
         }
         
-        // Return admin data
+        // Return admin data - removed firstName, lastName
         res.json({
           id: admin._id,
           username: admin.username,
           email: admin.email,
-          firstName: admin.firstName,
-          lastName: admin.lastName,
           role: admin.role,
           permissions: admin.permissions
         });
@@ -260,15 +258,13 @@ router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
       });
     }
     
-    // Format and return the admin data
+    // Format and return the admin data - removed firstName, lastName
     res.status(200).json({
       success: true,
       admin: {
         id: admin._id,
         username: admin.username,
         email: admin.email,
-        firstName: admin.firstName,
-        lastName: admin.lastName,
         role: admin.role,
         permissions: admin.permissions,
         lastLogin: admin.lastLogin,
@@ -290,8 +286,8 @@ router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
 // Create a new admin account
 router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
   try {
-    // Extract admin data from request body
-    const { username, email, firstName, lastName, password, role, permissions } = req.body;
+    // Extract admin data from request body - removed firstName, lastName
+    const { username, email, password, role, permissions } = req.body;
     
     // Validate required fields
     if (!username || !email || !password) {
@@ -314,12 +310,10 @@ router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       });
     }
     
-    // Create new admin
+    // Create new admin - removed firstName, lastName
     const newAdmin = new Admin({
       username,
       email,
-      firstName: firstName || '',
-      lastName: lastName || '',
       password, // Will be hashed by pre-save hook in model
       role: role || 'admin',
       permissions: permissions || {
@@ -359,7 +353,8 @@ router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
 router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, firstName, lastName, role, isActive, permissions } = req.body;
+    // Removed firstName, lastName from destructuring
+    const { username, email, role, isActive, permissions } = req.body;
     
     // Get Admin model
     const Admin = mongoose.model('Admin');
@@ -386,11 +381,9 @@ router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
       }
     }
     
-    // Update fields if provided
+    // Update fields if provided - removed firstName, lastName
     if (username) admin.username = username;
     if (email) admin.email = email;
-    if (firstName !== undefined) admin.firstName = firstName;
-    if (lastName !== undefined) admin.lastName = lastName;
     if (role) admin.role = role;
     if (isActive !== undefined) admin.isActive = isActive;
     if (permissions) admin.permissions = { ...admin.permissions, ...permissions };

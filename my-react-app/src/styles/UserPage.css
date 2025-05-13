@@ -366,17 +366,6 @@ section h2 {
   box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2);
 }
 
-.password-submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  background: #f8f8f8;
-  color: #999;
-  border-color: #ddd;
-  box-shadow: none;
-  transform: none;
-}
-
-/* Danger Zone */
 .danger-box {
   background: #fff5f5;
   border: 1px solid #ffe3e3;
@@ -567,6 +556,128 @@ section h2 {
 /* But allow interaction with the toast itself */
 .toast-container>* {
   pointer-events: auto;
+}
+
+/* Donor Status Styles */
+.donor-status-item {
+  position: relative;
+}
+
+.donor-status-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.donor-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.donor-badge.is-donor {
+  background-color: #e6f7e6;
+  color: #156b23;
+  border: 1px solid #c3e6c3;
+}
+
+.donor-badge.not-donor {
+  background-color: #ffebeb;
+  color: #c62828;
+  border: 1px solid #ffbaba;
+}
+
+.donor-toggle-btn {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 0;
+  margin-left: 0;
+}
+
+.donor-toggle-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Toggle Switch Styles for Edit Mode */
+.donor-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 28px;
+  margin: 0 !important;
+  margin-right: 10px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: var(--primary);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(32px);
+}
+
+.toggle-label {
+  font-weight: 500;
+}
+
+.dark-theme .donor-badge.is-donor {
+  background-color: rgba(21, 107, 35, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(21, 107, 35, 0.3);
+}
+
+.dark-theme .donor-badge.not-donor {
+  background-color: rgba(198, 40, 40, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+.dark-theme .toggle-slider {
+  background-color: #555;
 }
 
 /* Dark Theme Support */
@@ -779,7 +890,74 @@ section h2 {
   color: white;
 }
 
-/* Responsive styles - Mobile-first approach */
+/* Location input with button */
+.location-field {
+  position: relative;
+}
+
+.location-input-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.location-input-container input {
+  flex: 1;
+  width: auto;
+}
+
+.get-location-btn {
+  background: #fff;
+  color: #ff4747;
+  border: 1px solid #ff4747;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.get-location-btn:hover {
+  background: #ff4747;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2);
+}
+
+.get-location-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #f8f8f8;
+  color: #999;
+  border-color: #ddd;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Dark theme styles for the location button */
+.dark-theme .get-location-btn {
+  background-color: transparent;
+  color: #ff4747;
+  border-color: #ff4747;
+}
+
+.dark-theme .get-location-btn:hover {
+  background: #ff4747;
+  color: white;
+}
+
+.dark-theme .get-location-btn:disabled {
+  background: #333;
+  color: #777;
+  border-color: #555;
+}
+
+/* Media queries for responsive design */
 @media (max-width: 1024px) {
   .settings-wrapper {
     flex-direction: column;
@@ -812,6 +990,15 @@ section h2 {
   .security-content,
   .security-footer {
     padding: 15px;
+  }
+
+  .location-input-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .get-location-btn {
+    width: 100%;
   }
 }
 
@@ -865,4 +1052,204 @@ section h2 {
   .modal-buttons {
     flex-direction: column;
   }
+}
+
+/* Edit Form Styling Enhancements */
+.edit-profile-form {
+  padding: 20px;
+}
+
+.edit-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.edit-form .form-field {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 14px;
+  border: 1px solid #eee;
+  transition: all 0.2s ease;
+}
+
+.edit-form .form-field:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+.edit-form label {
+  display: flex;
+  align-items: center;
+  color: #666;
+  font-size: 12px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.profile-input,
+.profile-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.profile-input:focus,
+.profile-select:focus {
+  border-color: #ff4747;
+  box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.1);
+  outline: none;
+}
+
+/* Improved Toggle Switch Styling */
+.toggle-switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 26px;
+  margin: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 26px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #ff4747;
+}
+
+input:focus + .toggle-slider {
+  box-shadow: 0 0 1px #ff4747;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+.toggle-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Edit buttons styling */
+.edit-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+.cancel-btn {
+  background: #f8f9fa;
+  color: #666;
+  border: 1px solid #ddd;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.edit-info-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Dark theme support for edit form */
+.dark-theme .edit-form .form-field {
+  background-color: #252525;
+  border-color: #333;
+}
+
+.dark-theme .edit-form .form-field:hover {
+  background-color: #2a2a2a;
+}
+
+.dark-theme .edit-form label {
+  color: #aaa;
+}
+
+.dark-theme .profile-input,
+.dark-theme .profile-select {
+  background-color: #2a2a2a;
+  border-color: #333;
+  color: #e0e0e0;
+}
+
+.dark-theme .profile-input:focus,
+.dark-theme .profile-select:focus {
+  border-color: #ff4747;
+  box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.2);
+}
+
+.dark-theme .toggle-slider {
+  background-color: #555;
+}
+
+.dark-theme .toggle-label {
+  color: #e0e0e0;
+}
+
+.dark-theme .cancel-btn {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-theme .cancel-btn:hover {
+  background-color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }

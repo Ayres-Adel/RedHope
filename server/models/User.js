@@ -31,11 +31,6 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'Please select your blood type'],
     enum: ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']
   },
-  gender: {
-    type: String,
-    required: [true, 'Please select your gender'],
-    enum: ['Male', 'Female', 'Anonymous']
-  },
   password: {
     type: String,
     required: [true, 'Please enter a password'],

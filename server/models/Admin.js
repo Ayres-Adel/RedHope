@@ -15,16 +15,6 @@ const adminSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
-  firstName: {
-    type: String,
-    required: [true, 'Please enter first name'],
-    trim: true
-  },
-  lastName: {
-    type: String,
-    required: [true, 'Please enter last name'],
-    trim: true
-  },
   password: {
     type: String,
     required: [true, 'Please enter a password'],

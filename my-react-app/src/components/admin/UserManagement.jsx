@@ -54,35 +54,82 @@ const UserManagement = ({
         ) : users.length === 0 ? (
           <EmptyStateMessage type="user" message={searchTerm ? 'No users match search.' : 'No users found.'} />
         ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>{translations.id}</th>
-                <th>{translations.name}</th>
-                <th>{translations.email}</th>
-                <th>{translations.bloodType}</th>
-                <th>{translations.location}</th>
-                <th>{translations.status}</th>
-                <th>{translations.actions}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(user => (
-                <tr key={user._id}>
-                  <td>{user._id.slice(-6)}</td>
-                  <td>{user.username}</td>
-                  <td>{user.email}</td>
-                  <td>{user.bloodType}</td>
-                  <td>{user.location}</td>
-                  <td><StatusBadge isDonor={user.isDonor} /></td>
-                  <td className="actions">
-                    <ActionButton type="edit" onClick={() => onOpenModal(modalType, user)} />
-                    <ActionButton type="delete" onClick={() => onDeleteUser(user._id, user.username)} />
-                  </td>
+          <div className="table-wrapper">
+            {/* Regular table for desktop view */}
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>{translations.id}</th>
+                  <th>{translations.name}</th>
+                  <th>{translations.email}</th>
+                  <th>{translations.bloodType}</th>
+                  <th>{translations.location}</th>
+                  <th>{translations.status}</th>
+                  <th>{translations.actions}</th>
                 </tr>
+              </thead>
+              <tbody>
+                {users.map(user => (
+                  <tr key={user._id}>
+                    <td>{user._id.slice(-6)}</td>
+                    <td data-label={translations.name}>{user.username}</td>
+                    <td data-label={translations.email}>{user.email}</td>
+                    <td data-label={translations.bloodType} className="blood-type-cell">{user.bloodType}</td>
+                    <td data-label={translations.location}>{user.location}</td>
+                    <td data-label={translations.status}><StatusBadge isDonor={user.isDonor} /></td>
+                    <td className="actions">
+                      <ActionButton type="edit" onClick={() => onOpenModal(modalType, user)} />
+                      <ActionButton type="delete" onClick={() => onDeleteUser(user._id, user.username)} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Card view for mobile */}
+            <div className="data-cards">
+              {users.map(user => (
+                <div className="data-card" key={user._id}>
+                  <div className="data-card-blood-type">{user.bloodType}</div>
+                  
+                  <div className="data-card-header">
+                    <h3 className="data-card-title">{user.username}</h3>
+                  </div>
+                  
+                  <div className="data-card-content">
+                    <div className="data-card-field">
+                      <span className="data-card-label">{translations.id}</span>
+                      <span className="data-card-value">{user._id.slice(-6)}</span>
+                    </div>
+                    
+                    <div className="data-card-field">
+                      <span className="data-card-label">{translations.email}</span>
+                      <span className="data-card-value">{user.email}</span>
+                    </div>
+                    
+                    <div className="data-card-field">
+                      <span className="data-card-label">{translations.location}</span>
+                      <span className="data-card-value">{user.location}</span>
+                    </div>
+                    
+                    <div className="data-card-field">
+                      <span className="data-card-label">{translations.status}</span>
+                      <span className="data-card-value status">
+                        <StatusBadge isDonor={user.isDonor} />
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="data-card-footer">
+                    <div className="actions">
+                      <ActionButton type="edit" onClick={() => onOpenModal(modalType, user)} />
+                      <ActionButton type="delete" onClick={() => onDeleteUser(user._id, user.username)} />
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         )}
       </div>
       <Pagination

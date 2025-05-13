@@ -124,7 +124,7 @@ exports.login = async (req, res) => {
       refreshToken,
       user: {
         id: user._id,
-        username: user.username || user.firstName + ' ' + user.lastName,
+        username: user.username,
         email: user.email,
         role,
         isAdmin
@@ -149,14 +149,12 @@ exports.register = async (req, res) => {
       username, 
       email, 
       password, 
-      firstName, 
-      lastName, 
       bloodType, 
       isDonor,
       dateOfBirth,
       location,
-      gender,
-      phoneNumber 
+      phoneNumber,
+      cityId  // Add support for cityId field from client
     } = req.body;
     
     // Validation
@@ -181,16 +179,14 @@ exports.register = async (req, res) => {
       username,
       email,
       password,
-      firstName: firstName || username,
-      lastName: lastName || '',
       bloodType: bloodType || 'Unknown',
       role: 'user',
       isDonor: isDonor || false,
-      // Include the required fields
       dateOfBirth,
       location,
-      gender,
-      phoneNumber
+      phoneNumber,
+      cityId: cityId || null, // Store the cityId in the user document
+      lastCityUpdate: cityId ? new Date() : null // Track when cityId was set
     });
     
     // Generate token
@@ -301,6 +297,11 @@ module.exports.nearby_get = async (req, res) => {
   try {
     console.log('nearby_get called with user ID:', req.user?.userId || 'undefined');
     
+    // Extract pagination and filter parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const bloodType = req.query.bloodType || null; // Add bloodType filter parameter
+    
     let userLocation;
     
     // Check if location parameters are provided in the request
@@ -353,20 +354,27 @@ module.exports.nearby_get = async (req, res) => {
       }
     }
 
-    // Fetch all users who are donors except the current user (if authenticated)
+    // Fetch ALL donors matching the query (without pagination yet)
     const donorQuery = { isDonor: true };
+    
+    // Add blood type filter if provided
+    if (bloodType) {
+      donorQuery.bloodType = bloodType;
+    }
+    
     if (req.user && req.user.userId) {
       donorQuery._id = { $ne: req.user.userId }; // Exclude the current user if authenticated
     }
     
-    const donors = await User.find(donorQuery);
-
+    // Get all donors matching filters - we'll paginate after sorting by distance
+    const allDonors = await User.find(donorQuery);
+    
     // Calculate distances for each donor
-    const donorsWithDistance = donors
+    const donorsWithDistance = allDonors
       .filter(donor => donor.location) // Only include donors with location
       .map((donor) => {
         try {
-          const donorLocation = donor.location.split(',').map(Number); // Convert to [latitude, longitude]
+          const donorLocation = donor.location.split(',').map(Number);
           const distance = haversineDistance(userLocation, donorLocation);
           return { ...donor._doc, distance }; // Spread donor fields and add distance
         } catch (error) {
@@ -374,13 +382,30 @@ module.exports.nearby_get = async (req, res) => {
           return null;
         }
       })
-      .filter(donor => donor !== null); // Remove any donors that caused errors
+      .filter(donor => donor !== null);
 
-    // Sort donors by distance (ascending)
+    // Sort by distance (closest first)
     donorsWithDistance.sort((a, b) => a.distance - b.distance);
 
-    console.log(`Found ${donorsWithDistance.length} nearby donors`);
-    res.json(donorsWithDistance);
+    // Get total count for pagination metadata
+    const totalDonors = donorsWithDistance.length;
+    
+    // Apply pagination AFTER sorting by distance
+    const skip = (page - 1) * limit;
+    const paginatedDonors = donorsWithDistance.slice(skip, skip + limit);
+
+    console.log(`Found ${donorsWithDistance.length} nearby donors, returning page ${page} (${paginatedDonors.length} items)`);
+    
+    // Return with pagination metadata
+    res.json({
+      data: paginatedDonors,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalDonors / limit) || 1,
+        totalItems: totalDonors,
+        itemsPerPage: limit
+      }
+    });
   } catch (err) {
     console.error('Error in nearby_get:', err);
     res.status(500).json({
@@ -394,6 +419,11 @@ module.exports.nearby_get = async (req, res) => {
 module.exports.public_nearby_get = async (req, res) => {
   try {
     console.log('public_nearby_get called');
+    
+    // Extract pagination and filter parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const bloodType = req.query.bloodType || null; // Add bloodType filter parameter
     
     // Get location from query parameters
     const { lat, lng } = req.query;
@@ -414,14 +444,20 @@ module.exports.public_nearby_get = async (req, res) => {
       });
     }
 
-    // Fetch all users who are donors
-    const donors = await User.find({
-      isDonor: true
-    });
-
+    // Create query object with filters
+    const donorQuery = { isDonor: true };
+    
+    // Add blood type filter if provided
+    if (bloodType) {
+      donorQuery.bloodType = bloodType;
+    }
+    
+    // Get all donors matching filters - we'll paginate after sorting by distance
+    const allDonors = await User.find(donorQuery);
+    
     // Calculate distances for each donor
-    const donorsWithDistance = donors
-      .filter(donor => donor.location) // Only include donors with location
+    const donorsWithDistance = allDonors
+      .filter(donor => donor.location)
       .map((donor) => {
         try {
           const donorLocation = donor.location.split(',').map(Number);
@@ -434,17 +470,81 @@ module.exports.public_nearby_get = async (req, res) => {
       })
       .filter(donor => donor !== null);
 
-    // Sort donors by distance (ascending)
+    // Sort by distance (closest first)
     donorsWithDistance.sort((a, b) => a.distance - b.distance);
 
-    console.log(`Found ${donorsWithDistance.length} nearby donors for public request`);
-    res.json(donorsWithDistance);
+    // Get total count for pagination metadata
+    const totalDonors = donorsWithDistance.length;
+    
+    // Apply pagination AFTER sorting by distance
+    const skip = (page - 1) * limit;
+    const paginatedDonors = donorsWithDistance.slice(skip, skip + limit);
+
+    console.log(`Found ${donorsWithDistance.length} nearby donors for public request, returning page ${page} (${paginatedDonors.length} items)`);
+    
+    // Return with pagination metadata
+    res.json({
+      data: paginatedDonors,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalDonors / limit) || 1,
+        totalItems: totalDonors,
+        itemsPerPage: limit
+      }
+    });
   } catch (err) {
     console.error('Error in public_nearby_get:', err);
     res.status(500).json({
       success: false,
       message: 'Server error when finding nearby donors',
       error: err.message
+    });
+  }
+};
+
+// This is a conceptual example - modify your actual endpoint
+exports.findNearbyDonors = async (req, res) => {
+  try {
+    const { lat, lng, page = 1, limit = 10 } = req.query;
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Validate coordinates
+    if (!lat || !lng) {
+      return res.status(400).json({
+        success: false, 
+        message: 'Latitude and longitude are required'
+      });
+    }
+
+    // Find donors with pagination
+    const donors = await User.find({ isDonor: true })
+      .skip(skip)
+      .limit(limitNum);
+    
+    // Calculate total for pagination
+    const totalDonors = await User.countDocuments({ isDonor: true });
+    
+    // Calculate distances and add to response
+    // ...your existing distance calculation code...
+
+    return res.status(200).json({
+      success: true,
+      data: donors,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalDonors / limitNum),
+        totalItems: totalDonors,
+        itemsPerPage: limitNum
+      }
+    });
+  } catch (error) {
+    console.error('Error in findNearbyDonors:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

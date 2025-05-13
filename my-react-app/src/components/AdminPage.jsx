@@ -28,7 +28,6 @@ const DEBOUNCE_DELAY = 500;
 
 const ROLES = {
   USER: 'user',
-  DONOR: 'donor',
   ADMIN: 'admin',
   SUPERADMIN: 'superadmin',
 };
@@ -59,9 +58,12 @@ const INITIAL_USER_FORM_DATA = {
   email: '',
   role: ROLES.USER,
   bloodType: '',
-  isDonor: false,
+  isDonor: true, // Changed from false to true - users are donors by default
   isActive: true,
   password: '',
+  phoneNumber: '0500000000', // Default phone number to satisfy API requirements
+  dateOfBirth: new Date('1990-01-01').toISOString().split('T')[0], // Default date of birth (YYYY-MM-DD)
+  location: '0.000000, 0.000000', // Coordinated location format (latitude, longitude)
 };
 
 const INITIAL_ADMIN_FORM_DATA = {
@@ -342,8 +344,8 @@ const AdminPage = () => {
         
         Object.entries(bloodData).forEach(([type, count]) => {
           // Determine status based on count
-          if (count >= 10) supply[type] = BLOOD_SUPPLY_STATUS.STABLE;
-          else if (count >= 5) supply[type] = BLOOD_SUPPLY_STATUS.LOW;
+          if (count >= 20) supply[type] = BLOOD_SUPPLY_STATUS.STABLE;
+          else if (count >= 10) supply[type] = BLOOD_SUPPLY_STATUS.LOW;
           else supply[type] = BLOOD_SUPPLY_STATUS.CRITICAL;
           
           // Store the count
@@ -598,7 +600,29 @@ const AdminPage = () => {
     setLoading('action', true);
     setError(null);
     try {
-      const response = await userService.createUser(userData);
+      // Log what we're sending to the API
+      console.log('Sending user data to API:', userData);
+      
+      // Ensure required fields are present
+      if (!userData.username || !userData.email || !userData.password) {
+        setError('Username, email, and password are required fields.');
+        return false;
+      }
+      
+      // Send the request
+      const response = await userService.createUser({
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        role: userData.role || ROLES.USER,
+        bloodType: userData.bloodType || '',
+        isDonor: userData.isDonor || true, // Default to true
+        isActive: userData.isActive !== false,
+        phoneNumber: userData.phoneNumber || '0500000000', // Default phone number to satisfy API requirements
+        dateOfBirth: userData.dateOfBirth || new Date('1990-01-01').toISOString().split('T')[0], // Default date of birth (YYYY-MM-DD)
+        location: userData.location || 'N/A',
+      });
+      
       if (response.data?.success) {
         alert('User created successfully!');
         await fetchAllUsers(pageInfo.users.page, ITEMS_PER_PAGE, searchTerm);
@@ -612,7 +636,7 @@ const AdminPage = () => {
     } finally {
       setLoading('action', false);
     }
-  }, [handleApiError, fetchAllUsers, pageInfo.users.page, searchTerm, setLoading]);
+  }, [handleApiError, fetchAllUsers, pageInfo.users.page, searchTerm, setLoading, setError]);
 
   const updateUser = useCallback(async (userId, userData) => {
     setLoading('action', true);
@@ -671,7 +695,24 @@ const AdminPage = () => {
     setLoading('action', true);
     setError(null);
     try {
-      const response = await adminService.createAdmin(data);
+      // Log what we're sending to the API
+      console.log('Sending admin data to API:', data);
+      
+      // Ensure required fields are present
+      if (!data.username || !data.email || !data.password) {
+        setError('Username, email, and password are required fields.');
+        return false;
+      }
+      
+      // Send the request with explicitly defined fields
+      const response = await adminService.createAdmin({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        role: data.role || ROLES.ADMIN,
+        permissions: data.permissions || INITIAL_ADMIN_FORM_DATA.permissions
+      });
+      
       if (response.data?.success) {
         alert('Admin created successfully!');
         await fetchAdminAccounts();
@@ -685,7 +726,7 @@ const AdminPage = () => {
     } finally {
       setLoading('action', false);
     }
-  }, [handleApiError, fetchAdminAccounts, setLoading]);
+  }, [handleApiError, fetchAdminAccounts, setLoading, setError]);
 
   const updateAdmin = useCallback(async (adminId, data) => {
     setLoading('action', true);
@@ -829,8 +870,8 @@ const AdminPage = () => {
         email: data.email,
         role: data.role,
         bloodType: data.bloodType || '',
-        isDonor: data.isDonor || false,
-        isActive: data.isActive !== false,
+        isDonor: true, // Always set to true, regardless of existing value
+        isActive: true, // Always set to true, regardless of existing value
         password: data.password || '',
       } : INITIAL_USER_FORM_DATA);
     } else if (type === MODAL_TYPE.ADMIN) {
@@ -874,31 +915,55 @@ const AdminPage = () => {
     }
   }, []);
 
-  const handleUserSubmit = useCallback(async (e) => {
+  const handleUserSubmit = useCallback(async (e, formData) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.username || !formData.email || (!modalState.data && !formData.password)) {
+      setError('Username, email, and password are required fields.');
+      return;
+    }
+    
     let success = false;
     if (modalState.data) {
-      success = await updateUser(modalState.data._id, userFormData);
+      // When updating, only include password if it's provided
+      const dataToUpdate = {...formData};
+      if (!dataToUpdate.password) delete dataToUpdate.password;
+      success = await updateUser(modalState.data._id, dataToUpdate);
     } else {
-      success = await createUser(userFormData);
+      // Log the data being sent to createUser
+      console.log('Form data submitted to createUser:', formData);
+      success = await createUser(formData);
     }
     if (success) {
       closeModal();
     }
-  }, [modalState.data, userFormData, updateUser, createUser, closeModal]);
+  }, [modalState.data, updateUser, createUser, closeModal, setError]);
 
-  const handleAdminSubmit = useCallback(async (e) => {
+  const handleAdminSubmit = useCallback(async (e, formData) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.username || !formData.email || (!modalState.data && !formData.password)) {
+      setError('Username, email, and password are required fields.');
+      return;
+    }
+    
     let success = false;
     if (modalState.data && modalState.data.id) {
-      success = await updateAdmin(modalState.data.id, adminFormData);
+      // When updating, only include password if it's provided
+      const dataToUpdate = {...formData};
+      if (!dataToUpdate.password) delete dataToUpdate.password;
+      success = await updateAdmin(modalState.data.id, dataToUpdate);
     } else {
-      success = await createAdmin(adminFormData);
+      // Log the data being sent to createAdmin
+      console.log('Form data submitted to createAdmin:', formData);
+      success = await createAdmin(formData);
     }
     if (success) {
       closeModal();
     }
-  }, [modalState.data, adminFormData, updateAdmin, createAdmin, closeModal]);
+  }, [modalState.data, updateAdmin, createAdmin, closeModal, setError]);
 
   const exportToCSV = useCallback(async (type) => {
     setLoading('action', true);

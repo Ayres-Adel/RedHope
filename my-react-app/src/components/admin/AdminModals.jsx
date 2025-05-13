@@ -102,7 +102,7 @@ const ModalWrapper = memo(({ title, isOpen, onClose, onSubmit, children, isSubmi
       });
     }
     
-    // Pass the data directly to onSubmit instead of wrapping it
+    // Pass the actual form data object directly
     onSubmit(e, data);
   };
   
@@ -148,40 +148,15 @@ const AdminModals = ({
   const isEditingUser = Boolean(modalState.data && modalState.type === modalTypes.USER);
   const isEditingAdmin = Boolean(modalState.data && modalState.type === modalTypes.ADMIN);
   
-  // Handle form submissions - call parent handlers with proper event structure
+  // Handle form submissions - call parent handlers with direct form data
   const onUserSubmit = useCallback((e, formData) => {
-    // Create a synthetic event that matches what the parent expects
-    const syntheticEvent = {
-      preventDefault: () => {},
-      target: {
-        username: { value: formData.username || '' },
-        email: { value: formData.email || '' },
-        password: { value: formData.password || '' },
-        role: { value: formData.role || '' },
-        bloodType: { value: formData.bloodType || '' },
-        isDonor: { checked: formData.isDonor || false },
-        isActive: { checked: formData.isActive !== false }
-      }
-    };
-    handleUserSubmit(syntheticEvent);
+    // Pass the actual form data directly
+    handleUserSubmit(e, formData);
   }, [handleUserSubmit]);
 
   const onAdminSubmit = useCallback((e, formData) => {
-    // Create a synthetic event that matches what the parent expects
-    const syntheticEvent = {
-      preventDefault: () => {},
-      target: {
-        username: { value: formData.username || '' },
-        email: { value: formData.email || '' },
-        password: { value: formData.password || '' },
-        role: { value: formData.role || '' },
-        permission_manageUsers: { checked: formData.permissions?.manageUsers !== false },
-        permission_manageDonations: { checked: formData.permissions?.manageDonations !== false },
-        permission_manageContent: { checked: formData.permissions?.manageContent !== false },
-        permission_manageSettings: { checked: formData.permissions?.manageSettings || false }
-      }
-    };
-    handleAdminSubmit(syntheticEvent);
+    // Pass the actual form data directly
+    handleAdminSubmit(e, formData);
   }, [handleAdminSubmit]);
 
   const UserModal = () => (
@@ -216,14 +191,11 @@ const AdminModals = ({
         defaultValue={userFormData.password}  
         required={!isEditingUser} 
       />
-      <UncontrolledSelect 
-        label="Role" 
-        id="role" 
-        name="role" 
-        defaultValue={userFormData.role}
-      >
-        {Object.values(roles).map(role => <option key={role} value={role}>{role}</option>)}
-      </UncontrolledSelect>
+      {/* Role field is removed - users will always have the role "user" */}
+      <input type="hidden" name="role" value={roles.USER} />
+      {/* Add hidden inputs for isDonor and isActive which will be true by default */}
+      <input type="hidden" name="isDonor" value="true" />
+      <input type="hidden" name="isActive" value="true" />
       <UncontrolledSelect 
         label="Blood Type" 
         id="bloodType" 
@@ -233,16 +205,6 @@ const AdminModals = ({
         <option value="">Select Blood Type</option>
         {bloodTypes.map(type => <option key={type} value={type}>{type}</option>)}
       </UncontrolledSelect>
-      <UncontrolledCheckbox 
-        label="Registered as Donor" 
-        name="isDonor" 
-        defaultChecked={userFormData.isDonor} 
-      />
-      <UncontrolledCheckbox 
-        label="Active Account" 
-        name="isActive" 
-        defaultChecked={userFormData.isActive} 
-      />
     </ModalWrapper>
   );
 
