@@ -104,8 +104,6 @@ export default function Login() {
     setErrors({ email: '', password: '', general: '' }); // Reset errors before submitting
 
     try {
-      console.log('Sending login request to server...');
-      
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -115,11 +113,8 @@ export default function Login() {
       });
 
       const data = await response.json();
-      console.log('Server response:', response.status, data);
 
       if (response.ok) {
-        console.log('Login successful!', data);
-        
         // Store token in localStorage
         if (data.token) {
           localStorage.setItem('token', data.token);
@@ -141,11 +136,8 @@ export default function Login() {
             localStorage.setItem('userId', data.user.id);
           }
           
-          console.log('Admin status:', isAdmin);
-          
           // Redirect based on admin status
           if (isAdmin) {
-            console.log('Admin login detected, redirecting to admin page');
             navigate('/admin');
             return;
           } else {

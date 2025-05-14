@@ -36,14 +36,16 @@ const BloodSupplySection = ({ stats, translations }) => {
                   <div className="blood-count-bar">
                     <div 
                       className={`blood-count-progress ${status}`} 
-                      style={{ width: `${progressWidth}%` }}
+                      style={{ 
+                        width: `${progressWidth}%` 
+                      }}
                     ></div>
                   </div>
                   <span>
                     <span className="donor-icon">
                       <FontAwesomeIcon icon={faUsers} />
                     </span>
-                    {count} donors
+                    {count} {translations.donors}
                   </span>
                 </div>
               </div>

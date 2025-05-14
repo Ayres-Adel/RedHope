@@ -179,11 +179,6 @@
     color: white;
 }
 
-
-
-
-
-
 .dark-theme .learn-more-btn, .dark-theme .donate-now-btn {
     margin-top: 20px;
     padding: 10px 20px;
@@ -191,7 +186,6 @@
     border-radius: 25px;
     background-color: #ffffff;
     color: #ff1a1a;
-    font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
 }
@@ -205,8 +199,6 @@
     background-color: #ff1a1a;
     color: white;
 }
-
-
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
@@ -235,11 +227,7 @@
     .dark-theme .grid-container h2 {
         font-size: 20px;
     }
-
-
-
     
-
     .learn-more-btn, .donate-now-btn {
         font-size: 14px;
         width: 100%;
@@ -269,7 +257,6 @@
         width: 80%;
         
     }
-
     
     .flip-card-front > span > h2  {
         position: relative;
@@ -280,8 +267,6 @@
         position: relative;
         top: -15px;
     }
-
-
 
     .social-media-links  span {
         position: relative;

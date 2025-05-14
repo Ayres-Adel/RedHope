@@ -29,7 +29,6 @@ export const useBloodStatistics = () => {
         ? `${API_BASE_URL}/api/stats/blood-types?cityId=${cityId}` 
         : `${API_BASE_URL}/api/stats/blood-types`;
       
-      console.log(`Fetching blood stats from: ${endpoint}`);
       const response = await fetch(endpoint);
       
       if (!response.ok) {

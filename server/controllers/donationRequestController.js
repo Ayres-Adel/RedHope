@@ -1,6 +1,5 @@
 const DonationRequest = require('../models/DonationRequest');
 const User = require('../models/User');
-const Notification = require('../models/Notification');
 
 module.exports = {
   // Create a new donation request

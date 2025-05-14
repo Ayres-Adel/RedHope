@@ -6,7 +6,6 @@ const adminMiddleware = require('../middleware/adminMiddleware');
 
 // Add error handling middleware
 router.use((req, res, next) => {
-  console.log(`Stats API request: ${req.method} ${req.originalUrl}`);
   next();
 });
 

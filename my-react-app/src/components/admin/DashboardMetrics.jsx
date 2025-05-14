@@ -1,11 +1,11 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faUsers, faTint, faBell, faUserShield
+  faUsers, faUserShield, faHospital
 } from '@fortawesome/free-solid-svg-icons';
 
 /**
- * Displays the four main dashboard metric cards
+ * Displays the main dashboard metric cards
  */
 const DashboardMetrics = ({ stats, translations }) => {
   return (
@@ -25,17 +25,10 @@ const DashboardMetrics = ({ stats, translations }) => {
         </div>
       </div>
       <div className="metric-card">
-        <div className="metric-icon"><FontAwesomeIcon icon={faTint} /></div>
+        <div className="metric-icon"><FontAwesomeIcon icon={faHospital} /></div>
         <div className="metric-data">
-          <h3>{translations.totalDonations}</h3>
-          <p>{stats.totalDonations || 0}</p>
-        </div>
-      </div>
-      <div className="metric-card">
-        <div className="metric-icon"><FontAwesomeIcon icon={faBell} /></div>
-        <div className="metric-data">
-          <h3>{translations.pendingRequests}</h3>
-          <p>{stats.pendingRequests || 0}</p>
+          <h3>{translations.hospitals}</h3>
+          <p>{stats.totalHospitals || 0}</p>
         </div>
       </div>
     </div>

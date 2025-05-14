@@ -4,12 +4,6 @@ const router = Router();
 const authController = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Add debugging middleware
-router.use((req, res, next) => {
-  console.log(`Auth API request: ${req.method} ${req.originalUrl}`);
-  next();
-});
-
 // Login route
 router.post('/login', authController.login);
 

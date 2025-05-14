@@ -1,8 +1,10 @@
 .toast-container {
   position: fixed;
+  top: auto; /* Ensure top is not overriding bottom positioning */
   bottom: 24px;
   left: 24px;
-  z-index: 1000;
+  right: auto; /* Ensure right is not overriding left positioning */
+  z-index: 2000;
   display: flex;
   flex-direction: column;
   gap: 8px;

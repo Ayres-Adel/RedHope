@@ -14,7 +14,6 @@ const hospitalRoutes = require('./routes/hospitalRoutes');
 const wilayaRoutes = require('./routes/wilayaRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const donationRequestRoutes = require('./routes/donationRequestRoutes');
-const notificationRoutes = require('./routes/notificationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 // Add map routes
 const mapRoutes = require('./routes/mapRoutes');
@@ -26,8 +25,6 @@ dotenv.config();
 
 // Debug database connection string (masked for security)
 const dbUriParts = (process.env.MONGO_URI || '').split(':');
-console.log(`Database connection string format check: ${dbUriParts.length > 2 ? 'Valid format' : 'Invalid format'}`);
-console.log(`Database host: ${dbUriParts.length > 2 ? dbUriParts[2].split('@')[1].split('/')[0] : 'Missing'}`);
 
 // Apply middleware
 app.use(cors());
@@ -48,7 +45,6 @@ app.use('/api/hospital', hospitalRoutes);
 app.use('/api/wilaya', wilayaRoutes);
 app.use('/api/donation', donationRoutes);
 app.use('/api/donation-request', donationRequestRoutes);
-app.use('/api/notification', notificationRoutes);
 // Use the admin routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/stats', statsRoutes);
@@ -141,7 +137,6 @@ try {
     permissions: {
       manageUsers: { type: Boolean, default: true },
       manageHospitals: { type: Boolean, default: true },
-      manageDonations: { type: Boolean, default: true },
       manageContent: { type: Boolean, default: false },
       viewReports: { type: Boolean, default: true },
       manageAdmins: { type: Boolean, default: false }

@@ -23,7 +23,6 @@ export const useHospitals = () => {
         }
         
         const hospitalsData = data.data?.locations || [];
-        console.log(`Loaded ${hospitalsData.length} hospitals`);
         
         if (hospitalsData.length === 0) {
           console.warn('No hospitals found in the data');
@@ -41,5 +40,29 @@ export const useHospitals = () => {
     fetchHospitals();
   }, []);
 
-  return { hospitals, isLoading, error };
+  const fetchAllHospitals = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/map/hospitals`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to fetch all hospitals');
+      }
+      
+      return data.data?.locations || [];
+    } catch (err) {
+      console.error("Error fetching all hospitals:", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { hospitals, isLoading, error, fetchAllHospitals };
 };

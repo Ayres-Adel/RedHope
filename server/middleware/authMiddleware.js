@@ -9,7 +9,6 @@ module.exports = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('No token provided or invalid format');
       return res.status(401).json({
         success: false,
         message: 'No authentication token provided'
@@ -20,7 +19,6 @@ module.exports = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     
     if (!token) {
-      console.log('Token is empty');
       return res.status(401).json({
         success: false,
         message: 'Authentication token is missing'
@@ -45,24 +43,20 @@ module.exports = async (req, res, next) => {
           entity = await Admin.findById(entityId);
         }
         if (!entity) {
-          console.log(`Admin not found in database with ID: ${entityId}`);
           return res.status(401).json({
             success: false,
             message: 'Admin account not found or invalid token' 
           });
         }
-        console.log(`Auth successful for admin ID: ${entityId}`);
       } else {
         // Assume 'user' role if not admin/superadmin
         entity = await User.findById(entityId);
         if (!entity) {
-          console.log(`User not found in database with ID: ${entityId}`);
           return res.status(401).json({
             success: false,
             message: 'User no longer exists' 
           });
         }
-        console.log(`Auth successful for user ID: ${entityId}`);
       }
       
       // Attach essential user info (like ID and role) to req.user for downstream use
@@ -76,8 +70,6 @@ module.exports = async (req, res, next) => {
       
       next();
     } catch (tokenError) {
-      console.log('Token verification failed:', tokenError.message);
-      
       // Handle expired tokens differently
       if (tokenError.name === 'TokenExpiredError') {
         return res.status(401).json({

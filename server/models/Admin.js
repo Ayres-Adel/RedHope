@@ -28,10 +28,9 @@ const adminSchema = new mongoose.Schema({
   permissions: {
     manageUsers: { type: Boolean, default: true },
     manageHospitals: { type: Boolean, default: true },
-    manageDonations: { type: Boolean, default: true },
     viewReports: { type: Boolean, default: true },
     manageContent: { type: Boolean, default: false },
-    manageAdmins: { type: Boolean, default: false } // Only for superadmin
+    manageAdmins: { type: Boolean, default: false }
   },
   isActive: {
     type: Boolean,

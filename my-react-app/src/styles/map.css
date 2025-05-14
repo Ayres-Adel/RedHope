@@ -465,12 +465,6 @@ body.dark-theme .map-location-indicator {
   font-weight: 500;
 }
 
-/* Info window styling */
-.hospital-info-window {
-  padding: 12px;
-  min-width: 250px;
-}
-
 .hospital-info-window h3 {
   margin-top: 0;
   margin-bottom: 12px;
@@ -478,6 +472,12 @@ body.dark-theme .map-location-indicator {
   font-size: 16px;
   border-bottom: 1px solid #eee;
   padding-bottom: 8px;
+}
+
+/* Add dark mode styles for info window heading */
+body.dark-theme .hospital-info-window h3 {
+  color: #f0f0f0;
+  border-bottom-color: #444;
 }
 
 .hospital-info-window p {
@@ -489,29 +489,34 @@ body.dark-theme .map-location-indicator {
   font-size: 14px;
 }
 
+/* Add dark mode styles for info window paragraph text */
+body.dark-theme .hospital-info-window p {
+  color: #ddd;
+}
+
 .hospital-info-buttons {
   display: flex;
   gap: 8px;
   margin-top: 15px;
 }
 
-.donation-button {
-  padding: 6px 10px;
-  border-radius: 15px;
-  border: none;
+/* Accepting donations label - positioned to appear next to the close button */
+.accepting-donations-label {
+  position: absolute;
+  top: 25px;
+  left: 12px; /* Position next to the close button */
   font-size: 11px;
   font-weight: 500;
-  cursor: pointer;
-}
-
-.donation-button.accepting {
-  background-color: rgba(46, 204, 113, 0.15);
   color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.15);
+  padding: 3px 8px;
+  border-radius: 10px;
+  z-index: 1;
 }
 
-.donation-button.emergency {
-  background-color: rgba(255, 71, 71, 0.15);
-  color: #ff4747;
+body.dark-theme .accepting-donations-label {
+  color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.2);
 }
 
 /* Animation for loading spinner */

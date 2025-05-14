@@ -43,11 +43,7 @@ try {
 
 // Get all wilayas
 router.get('/all', asyncHandler(async (req, res) => {
-  console.log('Fetching all wilayas/cities');
-  
   const wilayas = await Wilaya.find().sort({ name: 1 }).lean();
-  
-  console.log(`Found ${wilayas.length} wilayas/cities`);
   
   return res.status(200).json({
     success: true,

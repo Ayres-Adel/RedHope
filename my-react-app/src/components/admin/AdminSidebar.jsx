@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faUsers, faTint, faNewspaper, faCog,
+  faUsers, faHospital, faNewspaper, faCog,
   faUserShield, faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -15,7 +15,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, translations }) => {
     { id: 'dashboard', icon: faChartLine, label: translations.dashboard },
     { id: 'users', icon: faUsers, label: translations.userManagement },
     { id: 'adminManagement', icon: faUserShield, label: translations.adminManagement },
-    { id: 'donations', icon: faTint, label: translations.donations },
+    { id: 'hospitals', icon: faHospital, label: translations.hospitalManagement },
     { id: 'content', icon: faNewspaper, label: translations.content },
     { id: 'settings', icon: faCog, label: translations.settings },
   ], [translations]);

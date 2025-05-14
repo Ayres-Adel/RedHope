@@ -26,7 +26,7 @@ const STATUS_COLORS = {
 };
 
 // Blood type card component
-const BloodTypeCard = ({ type, count, percentage, statusColor, statusBgColor }) => (
+const BloodTypeCard = ({ type, count, percentage, statusColor, statusBgColor, donorsLabel }) => (
   <div className="blood-type-card">
     <div className="blood-type-symbol" style={{ 
       backgroundColor: statusBgColor, 
@@ -53,7 +53,7 @@ const BloodTypeCard = ({ type, count, percentage, statusColor, statusBgColor }) 
     </div>
     <div className="blood-type-info">
       <div className="blood-count">{count.toLocaleString()}</div>
-      <div className="blood-label">donors</div>
+      <div className="blood-label">{donorsLabel}</div>
     </div>
   </div>
 );
@@ -86,8 +86,40 @@ export const BloodTypeStats = ({
   loadingStats = false, 
   totalDonors = 0, 
   statsError = false, 
-  fetchBloodTypeStats = () => {}
+  fetchBloodTypeStats = () => {},
+  language = 'en'
 }) => {
+  // Translations
+  const translations = useMemo(() => ({
+    en: {
+      bloodTypeStatistics: "Blood Type Statistics",
+      region: "Region",
+      registeredDonors: "Registered Donors",
+      loadingDonorData: "Loading donor data...",
+      couldNotLoad: "Could not load blood type statistics",
+      tryAgain: "Try Again",
+      donors: "donors",
+      stable: "STABLE",
+      low: "LOW",
+      critical: "CRITICAL"
+    },
+    fr: {
+      bloodTypeStatistics: "Statistiques des Groupes Sanguins",
+      region: "Région",
+      registeredDonors: "Donneurs Enregistrés",
+      loadingDonorData: "Chargement des données des donneurs...",
+      couldNotLoad: "Impossible de charger les statistiques des groupes sanguins",
+      tryAgain: "Réessayer",
+      donors: "donneurs",
+      stable: "STABLE",
+      low: "FAIBLE",
+      critical: "CRITIQUE"
+    }
+  }), []);
+  
+  // Use the selected language translations
+  const t = translations[language] || translations.en;
+
   // Process blood type data with memoization to avoid recalculation on re-renders
   const processedBloodTypes = useMemo(() => {
     return Object.entries(bloodTypeStats || {}).map(([type, data]) => {
@@ -117,10 +149,11 @@ export const BloodTypeStats = ({
         percentage,
         status,
         statusColor,
-        statusBgColor
+        statusBgColor,
+        statusText: t[status.toLowerCase()] || status
       };
     });
-  }, [bloodTypeStats, totalDonors]);
+  }, [bloodTypeStats, totalDonors, t]);
   
   // Render skeleton loading cards
   const renderSkeletonCards = () => (
@@ -136,13 +169,13 @@ export const BloodTypeStats = ({
   // Render error state
   const renderError = () => (
     <div className="stats-error" role="alert">
-      <p>Could not load blood type statistics</p>
+      <p>{t.couldNotLoad}</p>
       <button 
         onClick={fetchBloodTypeStats} 
         className="retry-button"
-        aria-label="Try loading blood type statistics again"
+        aria-label={t.tryAgain}
       >
-        Try Again
+        {t.tryAgain}
       </button>
     </div>
   );
@@ -158,6 +191,7 @@ export const BloodTypeStats = ({
           percentage={percentage}
           statusColor={statusColor}
           statusBgColor={statusBgColor}
+          donorsLabel={t.donors}
         />
       ))}
     </div>
@@ -182,20 +216,20 @@ export const BloodTypeStats = ({
   return (
     <div className="blood-type-stats">
       <div className="stats-header">
-        <h3><FontAwesomeIcon icon={faTint} aria-hidden="true" /> Blood Type Statistics</h3>
+        <h3><FontAwesomeIcon icon={faTint} aria-hidden="true" /> {t.bloodTypeStatistics}</h3>
         <div className="stats-location">
           <FontAwesomeIcon icon={faMapMarkerAlt} aria-hidden="true" /> 
-          <span>{selectedCityName} Region</span>
+          <span>{selectedCityName} {t.region}</span>
         </div>
         <p className="donor-count">
           <FontAwesomeIcon icon={faUsers} aria-hidden="true" /> 
           {loadingStats ? (
             <span className="loading-text">
               <FontAwesomeIcon icon={faSpinner} className="fa-spin" aria-hidden="true" /> 
-              Loading donor data...
+              {t.loadingDonorData}
             </span>
           ) : (
-            <span>{totalDonors.toLocaleString()} Registered Donors</span>
+            <span>{totalDonors.toLocaleString()} {t.registeredDonors}</span>
           )}
         </p>
       </div>
@@ -211,14 +245,15 @@ export const BloodTypeStats = ({
   );
 };
 
-// PropTypes for type checking
+// Update PropTypes for new language prop
 BloodTypeStats.propTypes = {
   bloodTypeStats: PropTypes.object,
   selectedCityName: PropTypes.string,
   loadingStats: PropTypes.bool,
   totalDonors: PropTypes.number,
   statsError: PropTypes.bool,
-  fetchBloodTypeStats: PropTypes.func
+  fetchBloodTypeStats: PropTypes.func,
+  language: PropTypes.string
 };
 
 // PropTypes for sub-components
@@ -227,7 +262,8 @@ BloodTypeCard.propTypes = {
   count: PropTypes.number.isRequired,
   percentage: PropTypes.number.isRequired,
   statusColor: PropTypes.string.isRequired,
-  statusBgColor: PropTypes.string.isRequired
+  statusBgColor: PropTypes.string.isRequired,
+  donorsLabel: PropTypes.string.isRequired
 };
 
 ChartBar.propTypes = {

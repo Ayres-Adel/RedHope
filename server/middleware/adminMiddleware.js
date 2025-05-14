@@ -39,8 +39,7 @@ module.exports = (req, res, next) => {
   try {
     // Check if user exists in request (set by authMiddleware)
     if (!req.user) {
-      // Log but don't block
-      console.log('Admin check: No user found in request');
+      // Don't block
       return next();
     }
 
@@ -49,11 +48,6 @@ module.exports = (req, res, next) => {
     
     // Add admin status to request object
     req.isAdmin = isAdmin;
-    
-    // Don't block non-admins, just mark them
-    if (!isAdmin) {
-      console.log(`User ${req.user.userId || req.user.id} is not an admin`);
-    }
     
     next();
   } catch (err) {

@@ -97,7 +97,7 @@
   width: 260px;
   padding: 24px;
   margin-right: 24px;
-  height: calc(100vh - 130px);
+  height: calc(100vh - 110px);
   position: sticky;
   top: 80px;
 }
@@ -149,7 +149,6 @@
 .admin-menu li {
   padding: 12px 16px;
   border-radius: var(--radius-md);
-  margin-bottom: 8px;
   cursor: pointer;
   transition: var(--transition-normal);
   display: flex;
@@ -179,7 +178,7 @@
   flex: 1;
   padding: 32px;
   overflow: auto;
-  height: calc(100vh - 130px);
+  height: calc(100vh - 110px);
 }
 
 .admin-content-area h2 {
@@ -833,6 +832,37 @@
   font-size: 12px;
 }
 
+/* Add these styles for permission icons */
+.permission-icons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.permission-icon {
+  font-size: 1.2rem;
+  color: #4CAF50;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(76, 175, 80, 0.1);
+  margin: 0 2px;
+}
+
+.no-permissions {
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.permissions-cell {
+  min-width: 120px;
+}
+
 /* Pagination */
 .pagination {
   display: flex;
@@ -1237,98 +1267,197 @@
   transition: var(--transition-normal);
 }
 
-/* Modals */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+/* Coordinate input styling */
+.coordinates-group {
+  margin-bottom: 20px;
+}
+
+.coordinates-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.coordinates-inputs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 5px;
+}
+
+.coordinate-input-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.coordinate-input-wrapper label {
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  color: var(--text-color-light);
+}
+
+.coordinate-input-wrapper input {
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-color-light);
+  transition: border-color 0.3s;
+}
+
+.coordinate-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(255, 71, 71, 0.2);
+}
+
+.coordinate-input-wrapper input.error {
+  border-color: var(--danger-color);
+}
+
+.coordinate-input-wrapper small {
+  font-size: 0.7rem;
+  color: var(--text-color-light);
+  margin-top: 4px;
+}
+
+.coordinate-error {
+  color: var(--danger-color);
+  font-size: 0.7rem;
+  margin-top: 2px;
+}
+
+.coordinate-info {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px;
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-radius: 4px;
+  font-size: 0.8rem;
 }
 
-.user-modal {
-  background-color: white;
-  border-radius: var(--radius-lg);
-  width: 90%;
-  max-width: 550px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  animation: slideUp 0.3s ease;
+.coordinate-info svg {
+  color: var(--primary-color);
 }
 
+/* Hospital table enhancements */
+.hospitals-table .actions {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.hospitals-cards .hospital-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  background-color: var(--bg-color-light);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.hospitals-cards .data-card-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.hospitals-cards .data-card-field:last-child {
+  border-bottom: none;
+}
+
+.hospitals-cards .data-card-label {
+  font-size: 0.9rem;
+  color: var(--text-color-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hospitals-cards .data-card-label svg {
+  color: var(--primary-color);
+}
+
+.hospitals-cards .data-card-value {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* Modal improvements */
 .modal-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border-light);
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f7f7f7;
-  border-top-left-radius: var(--radius-lg);
-  border-top-right-radius: var(--radius-lg);
 }
 
 .modal-header h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-dark);
+  color: var(--text-color);
 }
 
 .close-btn {
-  background: none;
+  background: transparent;
   border: none;
   font-size: 24px;
-  font-weight: 700;
-  color: #666;
   cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: var(--transition-normal);
+  color: var(--text-color-light);
+  transition: color 0.2s;
 }
 
 .close-btn:hover {
-  color: var(--primary);
-  background-color: #f0f0f0;
+  color: var(--danger-color);
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 20px;
   max-height: 60vh;
   overflow-y: auto;
 }
 
 .modal-footer {
-  padding: 18px 24px;
-  border-top: 1px solid var(--border-light);
+  padding: 15px 20px;
+  border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  border-bottom-left-radius: var(--radius-lg);
-  border-bottom-right-radius: var(--radius-lg);
-}
-
-.btn-save {
-  padding: 10px 18px;
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  gap: 10px;
 }
 
 .btn-cancel {
-  padding: 10px 18px;
-  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: var(--bg-color-dark);
+}
+
+.btn-save {
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-save:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.btn-save:disabled, .btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Mobile Card View - Changed from 576px to 768px */
@@ -1353,10 +1482,6 @@
     padding: 12px;
     border: 1px solid var(--border-light);
     animation: cardFadeIn 0.3s ease-in-out;
-  }
-
-  .admin-management .data-card {
-    padding-top: 40px;
   }
   
   .data-card-header {
@@ -1576,7 +1701,7 @@
   .table-container {
     width: 100% !important; /* Force full width */
     margin: 0 !important; /* Remove all margins */
-    padding: 0 !important; /* Remove all padding */
+    padding: 0 16px;
     position: static;
     display: block;
     box-sizing: border-box;
@@ -1584,7 +1709,7 @@
 
   /* Remove negative margins that cause width issues */
   .admin-users .table-container,
-  .admin-donations .table-container,
+  .admin-hospitals .table-container,
   .admin-management .table-container {
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -2082,7 +2207,7 @@
 
   /* Remove negative margins that cause width issues */
   .admin-users .table-container,
-  .admin-donations .table-container,
+  .admin-hospitals .table-container,
   .admin-management .table-container {
     margin-left: 0 !important;
     margin-right: 0 !important;

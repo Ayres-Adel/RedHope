@@ -3,8 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faSignOutAlt, 
-  faGlobe, 
   faLocationArrow, 
   faExclamationTriangle,
   faMapMarkerAlt,
@@ -26,18 +24,47 @@ export default function Search() {
   const navigate = useNavigate();
   const location = useLocation();
   const isMapPage = location.pathname === '/map';
-  const isSignPage = location.pathname === '/sign';
-  const isLoginPage = location.pathname === '/login';
-
-  // UI state management
-  const [message, setMessage] = useState('');
+  
+  // UI state management - removed unused variables
   const [buttonClicked, setButtonClicked] = useState(false);
   const [showTable, setShowTable] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [locationStatus, setLocationStatus] = useState('loading'); // 'loading', 'success', 'error'
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+
+  // Updated language effect to listen for custom events - optimized for performance
+  useEffect(() => {
+    // Handle direct language change events from navbar
+    const handleLanguageChange = (e) => {
+      setLanguage(e.detail.language);
+    };
+    
+    document.addEventListener('languageChanged', handleLanguageChange);
+    
+    // Use storage event instead of polling with setInterval for better performance
+    const handleStorageChange = (e) => {
+      if (e.key === 'language') {
+        const newLang = e.newValue || 'en';
+        if (newLang !== language) {
+          setLanguage(newLang);
+        }
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Check once on mount
+    const currentLang = localStorage.getItem('language') || 'en';
+    if (currentLang !== language) {
+      setLanguage(currentLang);
+    }
+    
+    return () => {
+      document.removeEventListener('languageChanged', handleLanguageChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [language]);
 
   // Map state
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
@@ -89,6 +116,35 @@ export default function Search() {
       location: 'Location',
       distance: 'Distance',
       contact: 'Contact',
+      // New translations
+      loading: 'Loading donors...',
+      nearbyDonors: 'Nearby Blood Donors',
+      allBloodTypes: 'All Blood Types',
+      yourLocation: 'Your location',
+      bloodDonors: 'Blood donors',
+      page: 'Page',
+      of: 'of',
+      detectingLocation: 'Detecting your location',
+      locationSuccess: 'Location detected successfully!',
+      locationProblem: 'Location Problem',
+      reloadAndTry: 'Reload & Try Again',
+      sendSms: 'Send SMS message',
+      callPhone: 'Call phone number',
+      contactWhatsApp: 'Contact via WhatsApp',
+      contactTelegram: 'Contact via Telegram',
+      previousPage: 'Previous page',
+      nextPage: 'Next page',
+      // Additional translations for missing text
+      aPlus: 'A+',
+      aMinus: 'A-',
+      bPlus: 'B+',
+      bMinus: 'B-',
+      abPlus: 'AB+',
+      abMinus: 'AB-',
+      oPlus: 'O+',
+      oMinus: 'O-',
+      bloodTypeLabel: 'Blood Type',
+      locationLabel: 'Location',
     },
     fr: {
       findNearby: 'Trouver des donneurs à proximité',
@@ -107,31 +163,39 @@ export default function Search() {
       location: 'Emplacement',
       distance: 'Distance',
       contact: 'Contacter',
+      // New translations
+      loading: 'Chargement des donneurs...',
+      nearbyDonors: 'Donneurs de sang à proximité',
+      allBloodTypes: 'Tous les groupes sanguins',
+      yourLocation: 'Votre position',
+      bloodDonors: 'Donneurs de sang',
+      page: 'Page',
+      of: 'sur',
+      detectingLocation: 'Détection de votre position',
+      locationSuccess: 'Position détectée avec succès !',
+      locationProblem: 'Problème de localisation',
+      reloadAndTry: 'Recharger et réessayer',
+      sendSms: 'Envoyer un SMS',
+      callPhone: 'Appeler',
+      contactWhatsApp: 'Contacter via WhatsApp',
+      contactTelegram: 'Contacter via Telegram',
+      previousPage: 'Page précédente',
+      nextPage: 'Page suivante',
+      // Additional translations for missing text
+      aPlus: 'A+',
+      aMinus: 'A-',
+      bPlus: 'B+',
+      bMinus: 'B-',
+      abPlus: 'AB+',
+      abMinus: 'AB-',
+      oPlus: 'O+',
+      oMinus: 'O-',
+      bloodTypeLabel: 'Groupe sanguin',
+      locationLabel: 'Localisation',
     },
   }), []);
 
-  // Function to handle smooth scrolling - implemented with useCallback
-  const handleScroll = useCallback((id) => {
-    if (location.pathname !== '/') {
-      navigate('/');
-      
-      setTimeout(() => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    } else {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-    
-    setActiveSection(id);
-  }, [location.pathname, navigate]);
-
-  // Fetch location details - move this BEFORE handleFindDonorsClick
+  // Fetch location details - optimized with proper caching
   const fetchLocationDetails = useCallback(async (latitude, longitude) => {
     try {
       const geoData = await reverseGeocode(latitude, longitude, language);
@@ -152,6 +216,7 @@ export default function Search() {
         formatted: 'N/A' 
       };
     } catch (error) {
+      console.error("Error fetching location details:", error);
       return { 
         country: 'Error fetching location', 
         county: '', 
@@ -161,7 +226,7 @@ export default function Search() {
     }
   }, [language]);
 
-  // Handle finding donors - modify to preserve server-side sorting
+  // Handle finding donors - improved error handling and promise structure
   const handleFindDonorsClick = useCallback(async (page = 1, filterOverrides = null) => {
     setButtonClicked(true);
     setIsLoading(true);
@@ -173,116 +238,136 @@ export default function Search() {
     if (currentCoords.lat === 0 || currentCoords.lng === 0) {
       setIsLoading(false);
       setError('Unable to determine your location. Please enable location services and try again.');
-      return;
+      return Promise.resolve(); // Return a resolved promise
     }
     
     // Use provided filters or current state
     const currentFilters = filterOverrides || filters;
     
-    try {
-      const token = localStorage.getItem('token');
-      // Build query string with all parameters
-      let queryParams = `lat=${currentCoords.lat}&lng=${currentCoords.lng}&page=${page}&limit=${pagination.itemsPerPage}`;
-      
-      // Add blood type filter if selected
-      if (currentFilters.bloodType) {
-        queryParams += `&bloodType=${encodeURIComponent(currentFilters.bloodType)}`;
-      }
-      
-      // Add pagination parameters to the endpoint
-      let endpoint = token 
-        ? `${API_BASE_URL}/api/auth/nearby?${queryParams}`
-        : `${API_BASE_URL}/api/auth/public/nearby?${queryParams}`;
-      
-      const response = await axios.get(endpoint, token ? {
-        headers: { Authorization: `Bearer ${token}` }
-      } : {});
-      
-      // Extract donor data from response, handling both array format and {data: [...]} format
-      const donorData = Array.isArray(response.data) ? response.data : (response.data.data || []);
-      
-      if (!donorData || donorData.length === 0) {
-        setDonors([]);
-        setShowTable(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // Extract pagination info from response if available
-      if (response.data.pagination) {
-        setPagination({
-          currentPage: response.data.pagination.currentPage || page,
-          totalPages: response.data.pagination.totalPages || 1,
-          totalItems: response.data.pagination.totalItems || donorData.length,
-          itemsPerPage: pagination.itemsPerPage
-        });
-      }
-
-      // Process donors with basic info first for faster UI updates
-      // Use donorData directly as it's already sorted by distance on the server
-      const basicDonors = donorData.map(donor => {
-        let latitude = 0, longitude = 0;
+    // Return the promise so we can use it for coordinating actions
+    return new Promise(async (resolve) => {
+      try {
+        const token = localStorage.getItem('token');
+        // Build query string with all parameters
+        let queryParams = `lat=${currentCoords.lat}&lng=${currentCoords.lng}&page=${page}&limit=${pagination.itemsPerPage}`;
         
-        if (donor.location && typeof donor.location === 'string') {
-          const coords = donor.location.split(',').map(coord => parseFloat(coord.trim()));
-          if (coords.length === 2) {
-            latitude = coords[0];
-            longitude = coords[1];
-          }
-        } else if (donor.latitude !== undefined && donor.longitude !== undefined) {
-          latitude = parseFloat(donor.latitude);
-          longitude = parseFloat(donor.longitude);
+        // Add blood type filter if selected
+        if (currentFilters.bloodType) {
+          queryParams += `&bloodType=${encodeURIComponent(currentFilters.bloodType)}`;
         }
         
-        return {
-          ...donor,
-          latitude,
-          longitude,
-          locationDetails: { country: 'Loading...', county: 'Loading...', hamlet: 'Loading...' }
-        };
-      });
-      
-      // Update UI immediately with basic data - already sorted by distance
-      setDonors(basicDonors);
-      setShowTable(true);
-      
-      // Then enhance with location details in background
-      Promise.all(
-        basicDonors.map(async (donor) => {
-          if (!donor.latitude || !donor.longitude) return donor;
+        // Add pagination parameters to the endpoint
+        let endpoint = token 
+          ? `${API_BASE_URL}/api/auth/nearby?${queryParams}`
+          : `${API_BASE_URL}/api/auth/public/nearby?${queryParams}`;
+        
+        const response = await axios.get(endpoint, token ? {
+          headers: { Authorization: `Bearer ${token}` }
+        } : {});
+        
+        // Extract donor data from response, handling both array format and {data: [...]} format
+        const donorData = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        
+        if (!donorData || donorData.length === 0) {
+          setDonors([]);
+          setShowTable(true);
+          setIsLoading(false);
+          resolve(); // Resolve the promise
+          return;
+        }
+
+        // Extract pagination info from response if available
+        if (response.data.pagination) {
+          setPagination({
+            currentPage: response.data.pagination.currentPage || page,
+            totalPages: response.data.pagination.totalPages || 1,
+            totalItems: response.data.pagination.totalItems || donorData.length,
+            itemsPerPage: pagination.itemsPerPage
+          });
+        }
+
+        // Process donors with basic info first for faster UI updates
+        const basicDonors = donorData.map(donor => {
+          let latitude = 0, longitude = 0;
           
-          try {
-            const locationDetails = await fetchLocationDetails(donor.latitude, donor.longitude);
-            return { ...donor, locationDetails };
-          } catch (err) {
-            return donor;
+          if (donor.location && typeof donor.location === 'string') {
+            const coords = donor.location.split(',').map(coord => parseFloat(coord.trim()));
+            if (coords.length === 2) {
+              latitude = coords[0];
+              longitude = coords[1];
+            }
+          } else if (donor.latitude !== undefined && donor.longitude !== undefined) {
+            latitude = parseFloat(donor.latitude);
+            longitude = parseFloat(donor.longitude);
           }
-        })
-      ).then(enhancedDonors => {
-        // Maintain the same order as basicDonors (sorted by distance)
-        setDonors(enhancedDonors);
-      }).catch(err => {
-        // Keep console.error for debugging but don't show to user since it's not critical
-        console.error("Error enhancing donor data:", err);
-        // This error isn't critical enough for a user-facing message
-      });
-      
-    } catch (err) {
-      if (err.response) {
-        setError(`Server error (${err.response.status}): ${err.response.data?.message || 'Unknown error'}`);
-      } else if (err.request) {
-        setError('No response received from server. Please check your connection.');
-      } else {
-        setError(err.message || 'Failed to fetch nearby donors. Please try again.');
+          
+          return {
+            ...donor,
+            latitude,
+            longitude,
+            locationDetails: { country: 'Loading...', county: 'Loading...', hamlet: 'Loading...' }
+          };
+        });
+        
+        // Update UI immediately with basic data - already sorted by distance
+        setDonors(basicDonors);
+        setShowTable(true);
+        
+        // Initial data is loaded, let's resolve so we can scroll
+        resolve();
+        
+        // Then enhance with location details in background (don't wait for this)
+        // Use AbortController to manage requests that might be canceled
+        const controller = new AbortController();
+        const signal = controller.signal;
+        
+        Promise.all(
+          basicDonors.map(async (donor) => {
+            if (!donor.latitude || !donor.longitude) return donor;
+            
+            try {
+              // Check if the request has been aborted
+              if (signal.aborted) return donor;
+              
+              const locationDetails = await fetchLocationDetails(donor.latitude, donor.longitude);
+              return { ...donor, locationDetails };
+            } catch (err) {
+              console.error(`Error fetching location details for donor ${donor.username}:`, err);
+              return donor;
+            }
+          })
+        ).then(enhancedDonors => {
+          if (!signal.aborted) {
+            setDonors(enhancedDonors);
+          }
+        }).catch(err => {
+          if (!signal.aborted) {
+            console.error("Error enhancing donor data:", err);
+          }
+        });
+        
+        // Return a cleanup function to abort pending requests if component unmounts
+        return () => {
+          controller.abort();
+        };
+        
+      } catch (err) {
+        if (err.response) {
+          setError(`Server error (${err.response.status}): ${err.response.data?.message || 'Unknown error'}`);
+        } else if (err.request) {
+          setError('No response received from server. Please check your connection.');
+        } else {
+          setError(err.message || 'Failed to fetch nearby donors. Please try again.');
+        }
+        setDonors([]);
+        resolve(); // Resolve even on error
+      } finally {
+        setIsLoading(false);
       }
-      setDonors([]);
-    } finally {
-      setIsLoading(false);
-    }
+    });
   }, [userLocation, mapCenter, filters, pagination.itemsPerPage, fetchLocationDetails]);
 
-  // Function to handle filter changes - modified to send filters to server
-  // Now correct since handleFindDonorsClick is defined above
+  // Function to handle filter changes - optimized with debounce logic
   const handleFilterChange = useCallback((e) => {
     const { name, value } = e.target;
     setFilters(prevFilters => {
@@ -293,18 +378,24 @@ export default function Search() {
       
       // Reset to page 1 when filters change and refetch data
       if (buttonClicked) {
-        // Small delay to ensure state is updated
-        setTimeout(() => {
+        // Use debounce to prevent excessive API calls
+        if (window.filterTimeout) {
+          clearTimeout(window.filterTimeout);
+        }
+        
+        window.filterTimeout = setTimeout(() => {
           handleFindDonorsClick(1, newFilters);
-        }, 0);
+        }, 300); // 300ms debounce
       }
       
       return newFilters;
     });
   }, [buttonClicked, handleFindDonorsClick]);
 
-  // Handle row click in the table - useCallback to prevent recreating function
+  // Handle row click in the table - optimized for better performance
   const handleRowClick = useCallback((donor) => {
+    if (!donor || !donor.latitude || !donor.longitude) return;
+    
     setSelectedDonor(donor);
     setMapCenter({ lat: donor.latitude, lng: donor.longitude });
     setMapZoom(15);
@@ -327,16 +418,15 @@ export default function Search() {
       // Only scroll if the map isn't fully visible
       if (!isVisible) {
         // Scroll just enough to make the map visible in the viewport
-        const scrollOptions = { 
+        mapElement.scrollIntoView({
           behavior: 'smooth',
           block: 'nearest' // This prevents scrolling all the way to top
-        };
-        mapElement.scrollIntoView(scrollOptions);
+        });
       }
     }
   }, []);
 
-  // Location request function - optimized with useCallback
+  // Location request function - improved error handling
   const requestUserLocation = useCallback((fallbackToStored = true) => {
     setLocationStatus('loading');
     const token = localStorage.getItem('token');
@@ -344,6 +434,13 @@ export default function Search() {
     
     // Get saved coordinates if available
     const savedCoords = getSavedCoordinates(isLoggedIn);
+    
+    // Use saved coordinates while waiting for fresh location
+    if (savedCoords && isLoggedIn) {
+      setMapCenter(savedCoords);
+      setUserLocation(savedCoords);
+      setMapZoom(14);
+    }
     
     getCurrentLocation({
       onSuccess: (position) => {
@@ -377,98 +474,100 @@ export default function Search() {
       timeout: 10000,
       maximumAge: 0
     });
-    
-    // Use saved coordinates while waiting for fresh location
-    if (savedCoords && isLoggedIn) {
-      setMapCenter(savedCoords);
-      setUserLocation(savedCoords);
-      setMapZoom(14);
-    }
   }, []);
 
-  // Handle contact of donor - optimized with useCallback
+  // Contact message text - use the current language for message
   const handleContactDonor = useCallback((method, donor) => {
-    
-    const formattedPhone = donor.phoneNumber.startsWith('0') 
-      ? `213${donor.phoneNumber.substring(1)}` 
-      : `213${donor.phoneNumber}`;
-    
-    const messageText = encodeURIComponent('Hello, I found you on RedHope. I need your help with blood donation.');
-    
-    switch (method) {
-      case 'whatsapp':
-        window.open(`https://wa.me/${formattedPhone}?text=${messageText}`, '_blank');
-        break;
-        
-      case 'telegram':
-        window.open(`https://t.me/+${formattedPhone}`, '_blank');
-        break;
-        
-      case 'sms':
-        window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
-        break;
-        
-      case 'call':
-        window.open(`tel:${donor.phoneNumber}`, '_blank');
-        break;
-        
-      default:
-        window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
+    if (!donor || !donor.phoneNumber) {
+      console.error("Missing phone number for donor");
+      return;
     }
-  }, []); 
+    
+    // Improved phone number formatting for international numbers
+    let formattedPhone = donor.phoneNumber;
+    
+    // Format for Algeria (213)
+    if (formattedPhone.startsWith('0')) {
+      formattedPhone = `213${formattedPhone.substring(1)}`;
+    } else if (!formattedPhone.startsWith('213') && !formattedPhone.startsWith('+213')) {
+      formattedPhone = `213${formattedPhone}`;
+    }
+    
+    // Remove any plus sign for services that don't need it
+    formattedPhone = formattedPhone.replace(/^\+/, '');
+    
+    // Use localized message if available
+    const messageText = encodeURIComponent(
+      language === 'fr' 
+        ? 'Bonjour, je vous ai trouvé sur RedHope. J\'ai besoin de votre aide pour un don de sang.'
+        : 'Hello, I found you on RedHope. I need your help with a blood donation.'
+    );
+    
+    try {
+      switch (method) {
+        case 'whatsapp':
+          window.open(`https://wa.me/${formattedPhone}?text=${messageText}`, '_blank');
+          break;
+          
+        case 'telegram':
+          window.open(`https://t.me/+${formattedPhone}`, '_blank');
+          break;
+          
+        case 'sms':
+          window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
+          break;
+          
+        case 'call':
+          window.open(`tel:${donor.phoneNumber}`, '_blank');
+          break;
+          
+        default:
+          window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
+      }
+    } catch (error) {
+      console.error("Error opening contact method:", error);
+    }
+  }, [language]); // Add language dependency
 
-  // Improved page change handler - remove scrolling behavior
+  // Improved page change handler with better scrolling coordination
   const handlePageChange = useCallback((newPage) => {
     if (newPage < 1 || newPage > pagination.totalPages) return;
     
     // Show loading state
     setIsLoading(true);
     
-    // Fetch donors for the new page with current filters
-    handleFindDonorsClick(newPage, filters);
-    
-    // Remove the scrollIntoView behavior to prevent scrolling to top on pagination
-    // This keeps the user at their current scroll position
+    // Fetch donors for the new page with current filters, then scroll when basic data is ready
+    handleFindDonorsClick(newPage, filters).then(() => {
+      // Use requestAnimationFrame to wait for the next paint cycle
+      requestAnimationFrame(() => {
+        const tableContainer = document.querySelector('.table-container');
+        if (tableContainer) {
+          // Scroll to slightly above the table container
+          window.scrollTo({
+            top: tableContainer.offsetTop - 90,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
   }, [pagination.totalPages, handleFindDonorsClick, filters]);
 
-  // Helper functions
-  const toggleMenu = useCallback(() => {
-    setIsMenuOpen(prev => !prev);
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem('token');
-  }, []);
-
+  // Simplified helper functions
   const changeLanguage = useCallback((lang) => {
     setLanguage(lang);
     localStorage.setItem('language', lang);
   }, []);
   
-  // Request donor contact through API - optimized
-  const requestDonorContact = useCallback(async (method, donorId) => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(`${API_BASE_URL}/api/contact-requests`, {
-        donorId,
-        contactMethod: method
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      alert('Contact request sent! The donor will be notified of your request.');
-    } catch (err) {
-      // Keep the console.error for debugging purposes
-      console.error('Error sending contact request:', err);
-      alert('Failed to send contact request. Please try again later.');
-    }
-  }, []);
-
-  // Effects section - properly organized with dependencies
-  
   // Initial location request
   useEffect(() => {
     requestUserLocation(true);
+    
+    // Cleanup function to abort any pending requests when component unmounts
+    return () => {
+      if (window.filterTimeout) {
+        clearTimeout(window.filterTimeout);
+      }
+    };
   }, [requestUserLocation]);
 
   // Update line position based on active section
@@ -490,6 +589,8 @@ export default function Search() {
     };
 
     updateLinePosition();
+    
+    // Add event listener with proper cleanup
     window.addEventListener('resize', updateLinePosition);
     return () => window.removeEventListener('resize', updateLinePosition);
   }, [activeSection]);
@@ -525,6 +626,26 @@ export default function Search() {
     return () => observer.disconnect();
   }, []);
 
+  // Optimize marker rendering by using memo for stable marker styles
+  const userLocationMarkerStyle = useMemo(() => ({
+    width: "16px",
+    height: "16px",
+    background: "#4285F4",
+    borderRadius: "50%",
+    border: "2px solid white",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+    zIndex: 200,
+  }), []);
+  
+  const donorMarkerStyle = useMemo(() => ({
+    width: "14px",
+    height: "14px",
+    background: "#ff4747",
+    borderRadius: "50%",
+    border: "2px solid white",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+  }), []);
+
   // Main render
   return (
     <>
@@ -548,7 +669,7 @@ export default function Search() {
                   <div className="location-spinner-inner"></div>
                 </div>
                 <p className="location-status-text">
-                  Detecting your location<span className="dot-animation">...</span>
+                  {translations[language].detectingLocation}<span className="dot-animation">...</span>
                 </p>
               </div>
             </div>
@@ -560,7 +681,7 @@ export default function Search() {
                 <div className="location-success-icon-container">
                   <FontAwesomeIcon icon={faLocationArrow} className="location-success-icon" />
                 </div>
-                <p className="location-status-text success">Location detected successfully!</p>
+                <p className="location-status-text success">{translations[language].locationSuccess}</p>
               </div>
             </div>
           )}
@@ -573,17 +694,17 @@ export default function Search() {
                   <FontAwesomeIcon icon={faExclamationTriangle} className="error-icon" />
                 </div>
                 <div className="error-text-container">
-                  <p className="error-title">Location Problem</p>
+                  <p className="error-title">{translations[language].locationProblem}</p>
                   <p className="error-description">{error}</p>
                 </div>
               </div>
               <button 
                 className="retry-location-button" 
                 onClick={() => window.location.reload()}
-                aria-label="Reload and try again"
+                aria-label={translations[language].reloadAndTry}
               >
                 <FontAwesomeIcon icon={faLocationArrow} className="retry-icon" spin />
-                Reload & Try Again
+                {translations[language].reloadAndTry}
               </button>
             </div>
           )}
@@ -610,24 +731,24 @@ export default function Search() {
               {/* Filters */}
               <div className="filters">
                 <div className="filter-group">
-                  <label htmlFor="bloodType">Blood Type</label>
+                  <label htmlFor="bloodType">{translations[language].bloodType}</label>
                   <select
                     id="bloodType"
                     name="bloodType"
                     value={filters.bloodType}
                     onChange={handleFilterChange}
                     className="filter-select"
-                    aria-label="Filter donors by blood type"
+                    aria-label={`Filter donors by ${translations[language].bloodType}`}
                   >
-                    <option value="">All Blood Types</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
+                    <option value="">{translations[language].allBloodTypes}</option>
+                    <option value="A+">{translations[language].aPlus}</option>
+                    <option value="A-">{translations[language].aMinus}</option>
+                    <option value="B+">{translations[language].bPlus}</option>
+                    <option value="B-">{translations[language].bMinus}</option>
+                    <option value="AB+">{translations[language].abPlus}</option>
+                    <option value="AB-">{translations[language].abMinus}</option>
+                    <option value="O+">{translations[language].oPlus}</option>
+                    <option value="O-">{translations[language].oMinus}</option>
                   </select>
                 </div>
               </div>
@@ -638,7 +759,7 @@ export default function Search() {
                   <div className="loading-spinner-animation">
                     <div className="spinner-circle"></div>
                   </div>
-                  <p className="loading-text">Loading donors...</p>
+                  <p className="loading-text">{translations[language].loading}</p>
                 </div>
               )}
 
@@ -665,7 +786,8 @@ export default function Search() {
                       options={{
                         gestureHandling: "cooperative",
                         disableDefaultUI: true,
-                        fullscreenControl: true
+                        fullscreenControl: true,
+                        zoomControl: true, // Add zoom control to the map
                       }}
                       onDragStart={() => setIsControlled(false)}
                       onDrag={() => setIsControlled(false)}
@@ -684,15 +806,8 @@ export default function Search() {
                     >
                       {/* User location marker */}
                       {userLocation.lat !== 0 && userLocation.lng !== 0 && (
-                        <AdvancedMarker position={userLocation} title="Your Location">
-                          <div style={{
-                            width: "16px",
-                            height: "16px",
-                            background: "#4285F4",
-                            borderRadius: "50%",
-                            border: "2px solid white",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-                          }}></div>
+                        <AdvancedMarker position={userLocation} title={translations[language].yourLocation}>
+                          <div style={userLocationMarkerStyle}></div>
                         </AdvancedMarker>
                       )}
                       
@@ -725,14 +840,7 @@ export default function Search() {
                               setIsControlled(true);
                             }}
                           >
-                            <div style={{
-                              width: "14px",
-                              height: "14px",
-                              background: "#ff4747",
-                              borderRadius: "50%",
-                              border: "2px solid white",
-                              boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-                            }}></div>
+                            <div style={donorMarkerStyle}></div>
                           </AdvancedMarker>
                         );
                       })}
@@ -762,27 +870,27 @@ export default function Search() {
                   <div className="map-legend" aria-label="Map legend">
                     <div className="legend-item">
                       <div className="legend-marker your-location"></div>
-                      <span>Your location</span>
+                      <span>{translations[language].yourLocation}</span>
                     </div>
                     <div className="legend-item">
                       <div className="legend-marker donor-location"></div>
-                      <span>Blood donors</span>
+                      <span>{translations[language].bloodDonors}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Donors table */}
                 <div className="table-container">
-                  <h3>Nearby Blood Donors</h3>
+                  <h3 className="nearby-donors-heading">{translations[language].nearbyDonors}</h3>
                   <div className={`donor-table-wrapper ${showTable ? 'show' : ''}`}>
                     <table className="donor-table" aria-label="Blood donor information">
                       <thead>
                         <tr>
-                          <th scope="col">{translations[language].username}</th>
-                          <th scope="col">{translations[language].bloodType}</th>
-                          <th scope="col">{translations[language].location}</th>
-                          <th scope="col">{translations[language].distance}</th>
-                          <th scope="col">{translations[language].contact}</th>
+                          <th scope="col" className="responsive-header">{translations[language].username}</th>
+                          <th scope="col" className="responsive-header">{translations[language].bloodType}</th>
+                          <th scope="col" className="responsive-header">{translations[language].location}</th>
+                          <th scope="col" className="responsive-header">{translations[language].distance}</th>
+                          <th scope="col" className="responsive-header">{translations[language].contact}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -800,8 +908,8 @@ export default function Search() {
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleContactDonor('sms', donor); }} 
                                   className="contact-btn sms-btn" 
-                                  title="Send SMS message"
-                                  aria-label={`Send SMS to ${donor.username}`}
+                                  title={translations[language].sendSms}
+                                  aria-label={`${translations[language].sendSms} ${donor.username}`}
                                 >
                                   <FontAwesomeIcon icon={faSms} style={{color: '#e74c3c', fontSize: '1.4rem'}} />
                                 </button>
@@ -809,8 +917,8 @@ export default function Search() {
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleContactDonor('call', donor); }} 
                                   className="contact-btn call-btn" 
-                                  title="Call phone number"
-                                  aria-label={`Call ${donor.username}`}
+                                  title={translations[language].callPhone}
+                                  aria-label={`${translations[language].callPhone} ${donor.username}`}
                                 >
                                   <FontAwesomeIcon icon={faPhone} style={{color: '#e74c3c', fontSize: '1.4rem'}} />
                                 </button>
@@ -818,8 +926,8 @@ export default function Search() {
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleContactDonor('whatsapp', donor); }} 
                                   className="contact-btn whatsapp-btn" 
-                                  title="Contact via WhatsApp"
-                                  aria-label={`WhatsApp ${donor.username}`}
+                                  title={translations[language].contactWhatsApp}
+                                  aria-label={`${translations[language].contactWhatsApp} ${donor.username}`}
                                 >
                                   <FontAwesomeIcon icon={faWhatsapp} style={{color: '#25D366', fontSize: '1.4rem'}} />
                                 </button>
@@ -827,8 +935,8 @@ export default function Search() {
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleContactDonor('telegram', donor); }} 
                                   className="contact-btn telegram-btn" 
-                                  title="Contact via Telegram"
-                                  aria-label={`Telegram ${donor.username}`}
+                                  title={translations[language].contactTelegram}
+                                  aria-label={`${translations[language].contactTelegram} ${donor.username}`}
                                 >
                                   <FontAwesomeIcon icon={faTelegram} style={{color: '#0088cc', fontSize: '1.4rem'}} />
                                 </button>
@@ -853,20 +961,20 @@ export default function Search() {
                         onClick={() => handlePageChange(pagination.currentPage - 1)} 
                         disabled={pagination.currentPage === 1}
                         className="pagination-button"
-                        aria-label="Previous page"
+                        aria-label={translations[language].previousPage}
                       >
                         <span aria-hidden="true">«</span>
                       </button>
                       
                       <span className="pagination-info">
-                        Page {pagination.currentPage} of {pagination.totalPages}
+                        {translations[language].page} {pagination.currentPage} {translations[language].of} {pagination.totalPages}
                       </span>
                       
                       <button 
                         onClick={() => handlePageChange(pagination.currentPage + 1)} 
                         disabled={pagination.currentPage === pagination.totalPages}
                         className="pagination-button"
-                        aria-label="Next page"
+                        aria-label={translations[language].nextPage}
                       >
                         <span aria-hidden="true">»</span>
                       </button>
@@ -887,11 +995,11 @@ export default function Search() {
                           
                           <div className="donor-card-info">
                             <div>
-                              <label>Blood Type</label>
+                              <label>{translations[language].bloodTypeLabel}</label>
                               <span className="blood-type">{donor.bloodType}</span>
                             </div>
                             <div>
-                              <label>Location</label>
+                              <label>{translations[language].locationLabel}</label>
                               <span>{donor.locationDetails?.county || donor.locationDetails?.hamlet || 'N/A'}</span>
                             </div>
                           </div>
@@ -902,16 +1010,16 @@ export default function Search() {
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleContactDonor('sms', donor); }} 
                                 className="contact-btn sms-btn" 
-                                title="Send SMS message"
+                                title={translations[language].sendSms}
                                 aria-label={`Send SMS to ${donor.username}`}
                               >
                                 <FontAwesomeIcon icon={faSms} style={{color: '#e74c3c', fontSize: '1.4rem'}} />
                               </button>
                               
-                              <button 
+                              <button
                                 onClick={(e) => { e.stopPropagation(); handleContactDonor('call', donor); }} 
                                 className="contact-btn call-btn" 
-                                title="Call phone number"
+                                title={translations[language].callPhone}
                                 aria-label={`Call ${donor.username}`}
                               >
                                 <FontAwesomeIcon icon={faPhone} style={{color: '#e74c3c', fontSize: '1.4rem'}} />
@@ -920,7 +1028,7 @@ export default function Search() {
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleContactDonor('whatsapp', donor); }} 
                                 className="contact-btn whatsapp-btn" 
-                                title="Contact via WhatsApp"
+                                title={translations[language].contactWhatsApp}
                                 aria-label={`WhatsApp ${donor.username}`}
                               >
                                 <FontAwesomeIcon icon={faWhatsapp} style={{color: '#25D366', fontSize: '1.4rem'}} />
@@ -929,7 +1037,7 @@ export default function Search() {
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleContactDonor('telegram', donor); }} 
                                 className="contact-btn telegram-btn" 
-                                title="Contact via Telegram"
+                                title={translations[language].contactTelegram}
                                 aria-label={`Telegram ${donor.username}`}
                               >
                                 <FontAwesomeIcon icon={faTelegram} style={{color: '#0088cc', fontSize: '1.4rem'}} />
@@ -957,20 +1065,20 @@ export default function Search() {
                         onClick={() => handlePageChange(pagination.currentPage - 1)} 
                         disabled={pagination.currentPage === 1}
                         className="pagination-button"
-                        aria-label="Previous page"
+                        aria-label={translations[language].previousPage}
                       >
                         <span aria-hidden="true">«</span>
                       </button>
                       
                       <span className="pagination-info">
-                        Page {pagination.currentPage} of {pagination.totalPages}
+                        {translations[language].page} {pagination.currentPage} {translations[language].of} {pagination.totalPages}
                       </span>
                       
                       <button 
                         onClick={() => handlePageChange(pagination.currentPage + 1)} 
                         disabled={pagination.currentPage === pagination.totalPages}
                         className="pagination-button"
-                        aria-label="Next page"
+                        aria-label={translations[language].nextPage}
                       >
                         <span aria-hidden="true">»</span>
                       </button>
@@ -985,4 +1093,3 @@ export default function Search() {
     </>
   );
 }
-

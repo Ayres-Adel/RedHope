@@ -123,8 +123,6 @@ exports.getBloodTypeStats = async (req, res) => {
     const cityCode = code || cityId;
     
     if (cityCode) {
-      console.log(`Finding donors by city code: ${cityCode}`);
-      
       // Use $or for multiple possible field matches
       query.$or = [
         { cityCode: cityCode.toString() },
@@ -141,7 +139,6 @@ exports.getBloodTypeStats = async (req, res) => {
         
         if (city) {
           locationName = city.name;
-          console.log(`Found city: ${city.name} with code: ${cityCode}`);
         }
       } catch (err) {
         console.warn('Could not get city name:', err);
@@ -164,11 +161,8 @@ exports.getBloodTypeStats = async (req, res) => {
       locationName = `Within ${parseInt(distance)/1000}km radius`;
     }
     
-    console.log('Query for blood stats:', JSON.stringify(query));
-    
     // Get only necessary fields for performance
     const donors = await User.find(query, 'bloodType');
-    console.log(`Found ${donors.length} donors matching the filter: ${cityCode || 'National'}`);
     
     // Initialize all blood type counts
     const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];

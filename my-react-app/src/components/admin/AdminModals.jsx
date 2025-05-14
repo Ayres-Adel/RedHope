@@ -1,5 +1,7 @@
-import React, { memo, useCallback, useRef, useState } from 'react';
+import React, { memo, useCallback, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 // Create completely uncontrolled input components that don't re-render when typing
 const UncontrolledInput = memo(({ label, id, name, defaultValue, type = "text", required = false }) => {
@@ -57,8 +59,20 @@ const UncontrolledCheckbox = memo(({ label, name, defaultChecked }) => {
 });
 
 // The modal wrapper component
-const ModalWrapper = memo(({ title, isOpen, onClose, onSubmit, children, isSubmitting, isUpdate }) => {
+const ModalWrapper = memo(({ title, isOpen, onClose, onSubmit, children, isSubmitting, isUpdate, translations }) => {
   if (!isOpen) return null;
+  
+  // Add escape key listener
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && !isSubmitting) {
+        onClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose, isSubmitting]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -118,12 +132,84 @@ const ModalWrapper = memo(({ title, isOpen, onClose, onSubmit, children, isSubmi
         <form onSubmit={handleSubmit}>
           <div className="modal-body">{children}</div>
           <div className="modal-footer">
-            <button type="button" className="btn-cancel" onClick={onClose} disabled={isSubmitting}>Cancel</button>
+            <button type="button" className="btn-cancel" onClick={onClose} disabled={isSubmitting}>
+              {translations.cancel}
+            </button>
             <button type="submit" className="btn-save" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : (isUpdate ? 'Update' : 'Create')}
+              {isSubmitting ? translations.saving : (isUpdate ? translations.update : translations.create)}
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+});
+
+// New component for coordinates input with validation and better UI
+const CoordinatesInput = memo(({ defaultLatitude, defaultLongitude, translations }) => {
+  const [errors, setErrors] = useState({ latitude: '', longitude: '' });
+  
+  // Validate coordinate on blur
+  const validateCoordinate = (value, type) => {
+    if (!value) return '';
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) return 'Must be a number';
+    
+    if (type === 'latitude') {
+      if (numValue < -90 || numValue > 90) return 'Must be between -90 and 90';
+    } else {
+      if (numValue < -180 || numValue > 180) return 'Must be between -180 and 180';
+    }
+    return '';
+  };
+  
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const errorMsg = validateCoordinate(value, name);
+    setErrors(prev => ({ ...prev, [name]: errorMsg }));
+  };
+  
+  return (
+    <div className="form-group coordinates-group">
+      <label className="coordinates-label">
+        <FontAwesomeIcon icon={faMapMarkerAlt} /> {translations.locationCoordinates}
+      </label>
+      
+      <div className="coordinates-inputs">
+        <div className="coordinate-input-wrapper">
+          <label htmlFor="latitude">{translations.latitude}</label>
+          <input 
+            type="text" 
+            id="latitude" 
+            name="latitude" 
+            className={errors.latitude ? 'error' : ''}
+            placeholder={translations.latitudeExample} 
+            defaultValue={defaultLatitude || ''}
+            onBlur={handleBlur}
+          />
+          {errors.latitude && <div className="coordinate-error">{errors.latitude}</div>}
+          <small>{translations.latitudeBetween}</small>
+        </div>
+        
+        <div className="coordinate-input-wrapper">
+          <label htmlFor="longitude">{translations.longitude}</label>
+          <input 
+            type="text" 
+            id="longitude" 
+            name="longitude"
+            className={errors.longitude ? 'error' : ''} 
+            placeholder={translations.longitudeExample}
+            defaultValue={defaultLongitude || ''}
+            onBlur={handleBlur}
+          />
+          {errors.longitude && <div className="coordinate-error">{errors.longitude}</div>}
+          <small>{translations.longitudeBetween}</small>
+        </div>
+      </div>
+      
+      <div className="coordinate-info">
+        <FontAwesomeIcon icon={faInfoCircle} />
+        <span>{translations.algeriaCoordinates}</span>
       </div>
     </div>
   );
@@ -136,8 +222,10 @@ const AdminModals = ({
   modalState,
   userFormData,
   adminFormData,
+  hospitalFormData,
   handleUserSubmit,
   handleAdminSubmit,
+  handleHospitalSubmit,
   closeModal,
   loadingAction,
   translations,
@@ -147,6 +235,7 @@ const AdminModals = ({
 }) => {
   const isEditingUser = Boolean(modalState.data && modalState.type === modalTypes.USER);
   const isEditingAdmin = Boolean(modalState.data && modalState.type === modalTypes.ADMIN);
+  const isEditingHospital = Boolean(modalState.data && modalState.type === modalTypes.HOSPITAL);
   
   // Handle form submissions - call parent handlers with direct form data
   const onUserSubmit = useCallback((e, formData) => {
@@ -158,15 +247,21 @@ const AdminModals = ({
     // Pass the actual form data directly
     handleAdminSubmit(e, formData);
   }, [handleAdminSubmit]);
+  
+  const onHospitalSubmit = useCallback((e, formData) => {
+    // Pass the actual form data directly
+    handleHospitalSubmit(e, formData);
+  }, [handleHospitalSubmit]);
 
   const UserModal = () => (
     <ModalWrapper
-      title={isEditingUser ? `Edit User: ${modalState.data?.username}` : translations.addNewUser}
+      title={isEditingUser ? `${translations.editUser}: ${modalState.data?.username}` : translations.addNewUser}
       isOpen={modalState.isOpen && modalState.type === modalTypes.USER}
       onClose={closeModal}
       onSubmit={onUserSubmit}
       isSubmitting={loadingAction}
       isUpdate={isEditingUser}
+      translations={translations}
     >
       <UncontrolledInput 
         label="Username" 
@@ -184,7 +279,7 @@ const AdminModals = ({
         required 
       />
       <UncontrolledInput 
-        label={isEditingUser ? "Password (leave blank to keep current)" : "Password"} 
+        label={isEditingUser ? translations.passwordLeaveBlank : "Password"} 
         id="password" 
         name="password" 
         type="password" 
@@ -197,12 +292,12 @@ const AdminModals = ({
       <input type="hidden" name="isDonor" value="true" />
       <input type="hidden" name="isActive" value="true" />
       <UncontrolledSelect 
-        label="Blood Type" 
+        label={translations.bloodTypeLabel} 
         id="bloodType" 
         name="bloodType" 
         defaultValue={userFormData.bloodType} 
       >
-        <option value="">Select Blood Type</option>
+        <option value="">{translations.selectBloodType}</option>
         {bloodTypes.map(type => <option key={type} value={type}>{type}</option>)}
       </UncontrolledSelect>
     </ModalWrapper>
@@ -210,12 +305,13 @@ const AdminModals = ({
 
   const AdminModal = () => (
     <ModalWrapper
-      title={isEditingAdmin ? `Edit Admin: ${modalState.data?.username}` : translations.addNewAdmin}
+      title={isEditingAdmin ? `${translations.editAdmin}: ${modalState.data?.username}` : translations.addNewAdmin}
       isOpen={modalState.isOpen && modalState.type === modalTypes.ADMIN}
       onClose={closeModal}
       onSubmit={onAdminSubmit}
       isSubmitting={loadingAction}
       isUpdate={isEditingAdmin}
+      translations={translations}
     >
       <UncontrolledInput 
         label="Username" 
@@ -233,7 +329,7 @@ const AdminModals = ({
         required 
       />
       <UncontrolledInput 
-        label={isEditingAdmin ? "Password (leave blank to keep current)" : "Password"} 
+        label={isEditingAdmin ? translations.passwordLeaveBlank : "Password"} 
         id="password" 
         name="password" 
         type="password" 
@@ -250,35 +346,100 @@ const AdminModals = ({
         <option value={roles.SUPERADMIN}>Super Admin</option>
       </UncontrolledSelect>
       <div className="form-group">
-        <label>Permissions</label>
+        <label>{translations.permissions}</label>
         <UncontrolledCheckbox 
-          label="Manage Users" 
+          label={translations.manageUsers} 
           name="permission_manageUsers" 
           defaultChecked={adminFormData.permissions?.manageUsers} 
         />
         <UncontrolledCheckbox 
-          label="Manage Donations" 
+          label={translations.manageHospitals} 
           name="permission_manageDonations" 
           defaultChecked={adminFormData.permissions?.manageDonations} 
         />
         <UncontrolledCheckbox 
-          label="Manage Content" 
+          label={translations.manageContent} 
           name="permission_manageContent" 
           defaultChecked={adminFormData.permissions?.manageContent} 
         />
         <UncontrolledCheckbox 
-          label="Manage Settings" 
+          label={translations.manageSettings} 
           name="permission_manageSettings" 
           defaultChecked={adminFormData.permissions?.manageSettings} 
         />
       </div>
     </ModalWrapper>
   );
+  
+  // Improved Hospital Modal component with better coordinate input
+  const HospitalModal = () => {
+    // Extract coordinates for default values
+    const defaultLatitude = modalState.data?.location?.coordinates 
+      ? modalState.data.location.coordinates[1] 
+      : '';
+    const defaultLongitude = modalState.data?.location?.coordinates 
+      ? modalState.data.location.coordinates[0] 
+      : '';
+      
+    return (
+      <ModalWrapper
+        title={isEditingHospital ? `${translations.editHospital}: ${modalState.data?.name}` : translations.addNewHospital}
+        isOpen={modalState.isOpen && modalState.type === modalTypes.HOSPITAL}
+        onClose={closeModal}
+        onSubmit={onHospitalSubmit}
+        isSubmitting={loadingAction}
+        isUpdate={isEditingHospital}
+        translations={translations}
+      >
+        <UncontrolledInput 
+          label={translations.hospitalName} 
+          id="hospital_name" 
+          name="name" 
+          defaultValue={hospitalFormData.name} 
+          required 
+        />
+        <UncontrolledInput 
+          label="Structure" 
+          id="structure" 
+          name="structure" 
+          defaultValue={hospitalFormData.structure} 
+          required 
+        />
+        <UncontrolledInput 
+          label="Wilaya" 
+          id="wilaya" 
+          name="wilaya" 
+          defaultValue={hospitalFormData.wilaya} 
+          required 
+        />
+        <UncontrolledInput 
+          label="Telephone" 
+          id="telephone" 
+          name="telephone" 
+          defaultValue={hospitalFormData.telephone} 
+        />
+        <UncontrolledInput 
+          label="Fax" 
+          id="fax" 
+          name="fax" 
+          defaultValue={hospitalFormData.fax} 
+        />
+        
+        {/* Improved coordinates input */}
+        <CoordinatesInput 
+          defaultLatitude={defaultLatitude} 
+          defaultLongitude={defaultLongitude} 
+          translations={translations}
+        />
+      </ModalWrapper>
+    );
+  };
 
   return (
     <>
       <UserModal />
       <AdminModal />
+      <HospitalModal />
     </>
   );
 };
@@ -307,7 +468,7 @@ UncontrolledCheckbox.propTypes = {
   defaultChecked: PropTypes.bool
 };
 
-// Existing PropTypes for ModalWrapper and AdminModals
+// Update PropTypes for ModalWrapper
 ModalWrapper.propTypes = {
   title: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
@@ -315,16 +476,26 @@ ModalWrapper.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
-  isUpdate: PropTypes.bool.isRequired
+  isUpdate: PropTypes.bool.isRequired,
+  translations: PropTypes.object.isRequired
 };
 
-// Existing PropTypes for AdminModals
+// Update PropTypes for CoordinatesInput
+CoordinatesInput.propTypes = {
+  defaultLatitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  defaultLongitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  translations: PropTypes.object.isRequired
+};
+
+// Update PropTypes for AdminModals
 AdminModals.propTypes = {
   modalState: PropTypes.object.isRequired,
   userFormData: PropTypes.object.isRequired,
   adminFormData: PropTypes.object.isRequired,
+  hospitalFormData: PropTypes.object.isRequired,
   handleUserSubmit: PropTypes.func.isRequired,
   handleAdminSubmit: PropTypes.func.isRequired,
+  handleHospitalSubmit: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
   loadingAction: PropTypes.bool.isRequired,
   translations: PropTypes.object.isRequired,

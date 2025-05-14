@@ -39,7 +39,8 @@ const INITIAL_CONTENT_DATA = {
   },
   [CONTENT_TYPES.ABOUT_US]: {
     title: 'About Us',
-    description: 'At RedHope we are dedicated to bridging the gap between blood donors and those in need. Our mission is to save lives by making blood donation easier and more accessible for everyone. We believe that every drop counts, and together, we can make a difference.',
+    descriptionEn: 'At RedHope we are dedicated to bridging the gap between blood donors and those in need. Our mission is to save lives by making blood donation easier and more accessible for everyone. We believe that every drop counts, and together, we can make a difference.',
+    descriptionFr: 'À RedHope, nous nous consacrons à combler le fossé entre les donneurs de sang et ceux qui en ont besoin. Notre mission est de sauver des vies en rendant le don de sang plus facile et plus accessible pour tous. Nous croyons que chaque goutte compte, et ensemble, nous pouvons faire la différence.',
     lastModified: new Date().toISOString(),
     status: 'published',
   },
@@ -126,6 +127,16 @@ export default function LandingPage() {
                 ? "Notre plateforme vous aide à trouver des donneurs de sang à proximité à tout moment. Que vous ayez un besoin urgent ou que vous planifiez un don futur, nous vous mettons en relation avec des donneurs disponibles près de chez vous pour un soutien rapide."
                 : "Our platform helps you locate blood donors nearby anytime. Whether you're in urgent need or planning for a future donation, we connect you with available donors near your location for timely support."}
             </p>
+            <div className="hero-buttons">
+              <Link to="/search" className="primary-button">
+                <FontAwesomeIcon icon={faMagnifyingGlass} className="button-icon" />
+                {language === "fr" ? "Trouver des donneurs" : "Find Donors"}
+              </Link>
+              <Link to="/sign" className="secondary-button">
+                <FontAwesomeIcon icon={faHeart} className="button-icon" />
+                {language === "fr" ? "Devenir donneur" : "Become a Donor"}
+              </Link>
+            </div>
           </div>
         </FadeInSection>
 
@@ -246,8 +257,8 @@ export default function LandingPage() {
             <div className="about-content">
               <p>
                 {language === "fr"
-                  ? contentData[CONTENT_TYPES.ABOUT_US].description
-                  : contentData[CONTENT_TYPES.ABOUT_US].description}
+                  ? contentData[CONTENT_TYPES.ABOUT_US].descriptionFr || contentData[CONTENT_TYPES.ABOUT_US].description
+                  : contentData[CONTENT_TYPES.ABOUT_US].descriptionEn || contentData[CONTENT_TYPES.ABOUT_US].description}
               </p>
             </div>
             <div className="flip-card-container">

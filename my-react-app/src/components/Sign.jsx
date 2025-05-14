@@ -171,8 +171,6 @@ export default function Sign() {
       cityId: formData.cityId || null
     };
     
-    console.log('Sending registration data:', dataToSend);
-    
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
@@ -243,12 +241,6 @@ export default function Sign() {
                 formattedLocation: locationInfo.formatted,
                 cityId: cityId // Store the cityId in form data
               }));
-              
-              console.log('Location details retrieved:', {
-                formatted: locationInfo.formatted,
-                cityId: cityId,
-                postal: locationInfo.details?.postalCode
-              });
               
               setErrors(prev => ({
                 ...prev,

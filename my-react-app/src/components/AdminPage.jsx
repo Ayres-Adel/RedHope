@@ -8,6 +8,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import adminService from '../services/adminService';
 import userService from '../services/userService';
+import hospitalService from '../services/hospitalService'; // Add this import
 import ActionButton from './ui/ActionButton';
 import StatusBadge from './ui/StatusBadge';
 // Import the components
@@ -18,13 +19,14 @@ import AdminSidebar from './admin/AdminSidebar';
 import ContentManagement from './admin/ContentManagement';
 import SystemSettings from './admin/SystemSettings';
 import UserManagement from './admin/UserManagement';
-import DonationManagement from './admin/DonationManagement';
 import AdminManagement from './admin/AdminManagement';
 import AdminModals from './admin/AdminModals';
+import HospitalManagement from './admin/HospitalManagement'; // Add this import to fix the error
 
 // --- Constants ---
 const ITEMS_PER_PAGE = 10;
 const DEBOUNCE_DELAY = 500;
+const EXPORT_LOADING_KEY = 'export'; // Add new loading key for exports
 
 const ROLES = {
   USER: 'user',
@@ -51,6 +53,7 @@ const BLOOD_SUPPLY_STATUS = {
 const MODAL_TYPE = {
   USER: 'user',
   ADMIN: 'admin',
+  HOSPITAL: 'hospital', // Add this type
 };
 
 const INITIAL_USER_FORM_DATA = {
@@ -77,6 +80,18 @@ const INITIAL_ADMIN_FORM_DATA = {
     manageContent: true,
     manageSettings: false,
   },
+};
+
+const INITIAL_HOSPITAL_FORM_DATA = {
+  name: '',
+  structure: '',
+  location: {
+    type: 'Point',
+    coordinates: [0, 0] // [longitude, latitude]
+  },
+  telephone: '',
+  fax: '',
+  wilaya: '',
 };
 
 // --- Helper Components (Internal) ---
@@ -121,45 +136,58 @@ const AdminPage = () => {
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
   const [isDarkMode, setIsDarkMode] = useState(() => document.body.classList.contains('dark-theme'));
 
+  // Add polling for language changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentLang = localStorage.getItem('language') || 'en';
+      if (currentLang !== language) {
+        setLanguage(currentLang);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [language]);
+
   // Data States
   const [users, setUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
-  const [donations, setDonations] = useState([]);
+  const [hospitals, setHospitals] = useState([]);
   const [adminAccounts, setAdminAccounts] = useState([]);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalDonors: 0,
-    totalDonations: 0,
+    totalHospitals: 0,
     pendingRequests: 0,
     bloodSupply: {},
-    bloodCounts: {}, // Add bloodCounts to state
+    bloodCounts: {},
     bloodSupplyUnavailable: false,
   });
 
   // UI States
   const [loadingStates, setLoadingStates] = useState({
-    global: true, // For initial admin check
+    global: true,
     dashboard: false,
     users: false,
-    donations: false,
+    hospitals: false,
     admins: false,
-    action: false, // For specific actions like delete/update/create
+    action: false,
+    export: false, // New export-specific loading state
   });
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [pageInfo, setPageInfo] = useState({
     users: { page: 1, totalPages: 1, totalItems: 0 },
-    donations: { page: 1, totalPages: 1, totalItems: 0 },
+    hospitals: { page: 1, totalPages: 1, totalItems: 0 },
   });
 
   // Modal State
   const [modalState, setModalState] = useState({
     isOpen: false,
-    type: null, // 'user' or 'admin'
-    data: null, // user or admin object for editing
+    type: null, // 'user', 'admin', or 'hospital'
+    data: null, // user, admin, or hospital object for editing
   });
   const [userFormData, setUserFormData] = useState(INITIAL_USER_FORM_DATA);
   const [adminFormData, setAdminFormData] = useState(INITIAL_ADMIN_FORM_DATA);
+  const [hospitalFormData, setHospitalFormData] = useState(INITIAL_HOSPITAL_FORM_DATA); // Add this state
 
   // --- Translations ---
   const translations = useMemo(() => ({
@@ -188,6 +216,7 @@ const AdminPage = () => {
       searchDonations: 'Search donations...',
       addNewUser: 'Add New User',
       addNewAdmin: 'Add New Admin',
+      addNewHospital: 'Add New Hospital',
       id: 'ID',
       name: 'Name',
       email: 'Email',
@@ -236,6 +265,45 @@ const AdminPage = () => {
       exportData: 'Export Data',
       filterData: 'Filter Data',
       noBloodSupplyData: 'No blood supply data available',
+      hospitals: 'Hospitals',
+      hospitalManagement: 'Hospital Management',
+      searchHospitals: 'Search hospitals...',
+      noHospitalsFound: 'No hospitals found',
+      structure: 'Structure',
+      wilaya: 'Wilaya',
+      telephone: 'Telephone',
+      fax: 'Fax',
+      coordinates: 'Coordinates',
+      edit: 'Edit',
+      delete: 'Delete',
+
+      // Modal translations
+      editUser: 'Edit User',
+      editAdmin: 'Edit Admin',
+      editHospital: 'Edit Hospital',
+      passwordLeaveBlank: 'Password (leave blank to keep current)',
+      save: 'Save',
+      update: 'Update',
+      create: 'Create',
+      cancel: 'Cancel',
+      saving: 'Saving...',
+      permissions: 'Permissions',
+      manageUsers: 'Manage Users',
+      manageHospitals: 'Manage Hospitals',
+      manageContent: 'Manage Content',
+      manageSettings: 'Manage Settings',
+      bloodTypeLabel: 'Blood Type',
+      selectBloodType: 'Select Blood Type',
+      hospitalName: 'Hospital Name',
+      locationCoordinates: 'Location Coordinates',
+      latitude: 'Latitude',
+      longitude: 'Longitude',
+      latitudeExample: 'Ex: 36.7538',
+      longitudeExample: 'Ex: 3.0588',
+      latitudeBetween: 'Values between -90 and 90',
+      longitudeBetween: 'Values between -180 and 180',
+      algeriaCoordinates: 'For Algeria, coordinates are typically latitude ~36 and longitude ~3',
+      donors: 'donors',
     },
     fr: {
       dashboard: 'Tableau de bord',
@@ -262,6 +330,7 @@ const AdminPage = () => {
       searchDonations: 'Rechercher des dons...',
       addNewUser: 'Ajouter un nouvel utilisateur',
       addNewAdmin: 'Ajouter un Admin',
+      addNewHospital: 'Ajouter un Nouvel Hôpital',
       id: 'ID',
       name: 'Nom',
       email: 'Email',
@@ -310,6 +379,45 @@ const AdminPage = () => {
       exportData: 'Exporter les données',
       filterData: 'Filtrer les données',
       noBloodSupplyData: 'Aucune donnée sur l\'approvisionnement en sang disponible',
+      hospitals: 'Hôpitaux',
+      hospitalManagement: 'Gestion des Hôpitaux',
+      searchHospitals: 'Rechercher des hôpitaux...',
+      noHospitalsFound: 'Aucun hôpital trouvé',
+      structure: 'Structure',
+      wilaya: 'Wilaya',
+      telephone: 'Téléphone',
+      fax: 'Fax',
+      coordinates: 'Coordonnées',
+      edit: 'Modifier',
+      delete: 'Supprimer',
+
+      // Modal translations
+      editUser: 'Modifier l\'utilisateur',
+      editAdmin: 'Modifier l\'administrateur',
+      editHospital: 'Modifier l\'hôpital',
+      passwordLeaveBlank: 'Mot de passe (laisser vide pour conserver l\'actuel)',
+      save: 'Enregistrer',
+      update: 'Mettre à jour',
+      create: 'Créer',
+      cancel: 'Annuler',
+      saving: 'Enregistrement...',
+      permissions: 'Permissions',
+      manageUsers: 'Gérer les utilisateurs',
+      manageHospitals: 'Gérer les hôpitaux',
+      manageContent: 'Gérer le contenu',
+      manageSettings: 'Gérer les paramètres',
+      bloodTypeLabel: 'Groupe sanguin',
+      selectBloodType: 'Sélectionner un groupe sanguin',
+      hospitalName: 'Nom de l\'hôpital',
+      locationCoordinates: 'Coordonnées de localisation',
+      latitude: 'Latitude',
+      longitude: 'Longitude',
+      latitudeExample: 'Ex: 36.7538',
+      longitudeExample: 'Ex: 3.0588',
+      latitudeBetween: 'Valeurs entre -90 et 90',
+      longitudeBetween: 'Valeurs entre -180 et 180',
+      algeriaCoordinates: 'Pour l\'Algérie, les coordonnées sont généralement latitude ~36 et longitude ~3',
+      donors: 'donneurs',
     }
   }), [language]); // Only depends on language
 
@@ -409,36 +517,37 @@ const AdminPage = () => {
       }
 
       try {
-        const donationsResponse = await axios.get(`${API_BASE_URL}/api/donations`, getAuthHeaders());
-        if (donationsResponse.data?.donations) {
-          const donationsData = donationsResponse.data.donations;
+        // Make a paginated request to get all hospitals with count information
+        const hospitalsResponse = await hospitalService.getAllHospitals(1, 1, '');
+        
+        if (hospitalsResponse.data?.success || hospitalsResponse.data?.hospitals) {
+          // Extract the total count from pagination metadata instead of array length
+          const totalHospitalsCount = hospitalsResponse.data.pagination?.totalItems || 0;
+          
           setStats(prev => ({
             ...prev,
-            totalDonations: donationsData.length,
-            pendingRequests: donationsData.filter(d => d.status === STATUS.PENDING).length
+            totalHospitals: totalHospitalsCount
           }));
-          setDonations(donationsData);
         } else {
-          setStats(prev => ({ ...prev, totalDonations: 0, pendingRequests: 0 }));
-          setDonations([]);
+          console.warn("Invalid hospital response format:", hospitalsResponse.data);
+          setStats(prev => ({ ...prev, totalHospitals: 0 }));
         }
-      } catch (donationError) {
-        handleApiError('retrieve donation stats', donationError);
-        setStats(prev => ({ ...prev, totalDonations: 0, pendingRequests: 0 }));
-        setDonations([]);
+      } catch (hospitalError) {
+        console.error("Hospital stats fetch error:", hospitalError);
+        handleApiError('retrieve hospital stats', hospitalError);
+        setStats(prev => ({ ...prev, totalHospitals: 0 }));
       }
     } catch (err) {
       handleApiError('retrieve stats data', err);
       setStats({
         totalUsers: 0,
         totalDonors: 0,
-        totalDonations: 0,
+        totalHospitals: 0,
         pendingRequests: 0,
         bloodSupply: {},
         bloodSupplyUnavailable: true,
       });
       setUsers([]);
-      setDonations([]);
     } finally {
       setLoading('dashboard', false);
     }
@@ -448,25 +557,11 @@ const AdminPage = () => {
     setLoading('dashboard', true);
     setError(null);
     
+    // Skip the API call to /api/stats/dashboard and use fetchStatsFromDatabase directly
     try {
-      console.log('Fetching dashboard stats...');
-      const response = await axios.get(`${API_BASE_URL}/api/stats/dashboard`, getAuthHeaders());
-      console.log('Dashboard API response:', response.data);
-      
-      if (response.data && response.data.success) {
-        console.log('Successfully loaded dashboard stats');
-        setStats(prev => ({ 
-          ...prev, 
-          ...(response.data.stats || {}),
-          bloodSupplyUnavailable: prev.bloodSupplyUnavailable
-        }));
-      } else {
-        console.warn('Dashboard API returned success:false or invalid format');
-        await fetchStatsFromDatabase();
-      }
+      await fetchStatsFromDatabase();
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
-      await fetchStatsFromDatabase();
     }
     
     // Fetch blood supply separately to isolate potential failures
@@ -481,7 +576,7 @@ const AdminPage = () => {
     } finally {
       setLoading('dashboard', false);
     }
-  }, [getAuthHeaders, handleApiError, fetchBloodSupply, fetchStatsFromDatabase, setLoading]);
+  }, [fetchBloodSupply, fetchStatsFromDatabase, setLoading]);
 
   const fetchAllUsers = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
     setLoading('users', true);
@@ -531,31 +626,53 @@ const AdminPage = () => {
     }
   }, [handleApiError, setLoading]);
 
-  const fetchDonations = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
-    setLoading('donations', true);
+  const fetchHospitals = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
+    setLoading('hospitals', true);
     setError(null);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/donations`, {
-        ...getAuthHeaders(),
-        params: { page, limit, search: searchQuery }
-      });
-      setDonations(response.data?.donations || []);
-      setPageInfo(prev => ({
-        ...prev,
-        donations: {
-          page: response.data?.page || page,
-          totalPages: response.data?.totalPages || 1,
-          totalItems: response.data?.totalItems || 0
+      // Log the request
+      console.log('Fetching hospitals with params:', { page, limit, searchQuery });
+      
+      const response = await hospitalService.getAllHospitals(page, limit, searchQuery);
+      console.log('Hospital API response:', response);
+      
+      if (response.data && (response.data.success || response.data.hospitals)) {
+        const hospitalData = response.data.hospitals || [];
+        
+        // Ensure hospitalData is an array before setting state
+        if (Array.isArray(hospitalData)) {
+          setHospitals(hospitalData);
+          
+          setPageInfo(prev => ({
+            ...prev,
+            hospitals: {
+              page: response.data.pagination?.currentPage || page,
+              totalPages: response.data.pagination?.totalPages || 1,
+              totalItems: response.data.pagination?.totalItems || hospitalData.length
+            }
+          }));
+        } else {
+          console.error('Hospital data is not an array:', hospitalData);
+          // If hospitalData is not an array, initialize with empty array
+          setHospitals([]);
+          setPageInfo(prev => ({ 
+            ...prev, 
+            hospitals: { page: 1, totalPages: 1, totalItems: 0 } 
+          }));
         }
-      }));
+      } else {
+        console.error('Invalid hospital API response format:', response.data);
+        throw new Error(response.data?.message || 'Invalid response format');
+      }
     } catch (err) {
-      handleApiError('retrieve donations', err);
-      setDonations([]);
-      setPageInfo(prev => ({ ...prev, donations: { page: 1, totalPages: 1, totalItems: 0 } }));
+      console.error('Hospital fetch error details:', err);
+      handleApiError('retrieve hospitals', err);
+      setHospitals([]);
+      setPageInfo(prev => ({ ...prev, hospitals: { page: 1, totalPages: 1, totalItems: 0 } }));
     } finally {
-      setLoading('donations', false);
+      setLoading('hospitals', false);
     }
-  }, [getAuthHeaders, handleApiError, setLoading]);
+  }, [handleApiError, setLoading]);
 
   const fetchAdminAccounts = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
     setLoading('admins', true);
@@ -678,19 +795,6 @@ const AdminPage = () => {
     }
   }, [handleApiError, fetchAllUsers, pageInfo.users.page, searchTerm, setLoading]);
 
-  const updateDonationStatus = useCallback(async (donationId, status) => {
-    setLoading('action', true);
-    setError(null);
-    try {
-      await axios.put(`${API_BASE_URL}/api/donations/${donationId}/status`, { status }, getAuthHeaders());
-      fetchDonations(pageInfo.donations.page, ITEMS_PER_PAGE, searchTerm);
-    } catch (err) {
-      handleApiError(`update donation status to ${status}`, err);
-    } finally {
-      setLoading('action', false);
-    }
-  }, [getAuthHeaders, handleApiError, fetchDonations, setLoading, pageInfo.donations.page, searchTerm]);
-
   const createAdmin = useCallback(async (data) => {
     setLoading('action', true);
     setError(null);
@@ -768,6 +872,133 @@ const AdminPage = () => {
     }
   }, [handleApiError, fetchAdminAccounts, setLoading]);
 
+  const createHospital = useCallback(async (hospitalData) => {
+    setLoading('action', true);
+    setError(null);
+    try {
+      // Log what we're sending to the API
+      console.log('Sending hospital data to API:', hospitalData);
+      
+      // Ensure required fields are present
+      if (!hospitalData.name || !hospitalData.structure || !hospitalData.wilaya) {
+        setError('Name, structure, and wilaya are required fields.');
+        return false;
+      }
+      
+      // Extract and validate coordinates
+      const latitude = parseFloat(hospitalData.latitude);
+      const longitude = parseFloat(hospitalData.longitude);
+      
+      // Create the hospital data object with proper GeoJSON format
+      const formattedData = {
+        name: hospitalData.name,
+        structure: hospitalData.structure,
+        wilaya: hospitalData.wilaya,
+        telephone: hospitalData.telephone || '',
+        fax: hospitalData.fax || '',
+        // Only include location if both coordinates are valid numbers
+        ...((!isNaN(latitude) && !isNaN(longitude)) ? {
+          location: {
+            type: 'Point',
+            coordinates: [longitude, latitude] // GeoJSON format is [longitude, latitude]
+          }
+        } : {})
+      };
+      
+      console.log('Formatted hospital data for API:', formattedData);
+      
+      const response = await hospitalService.createHospital(formattedData);
+      
+      if (response.data?.success || response.status === 201) {
+        alert('Hospital created successfully!');
+        await fetchHospitals(pageInfo.hospitals.page, ITEMS_PER_PAGE, searchTerm);
+        return true;
+      } else {
+        throw new Error(response.data?.message || 'Failed to create hospital');
+      }
+    } catch (err) {
+      handleApiError('create hospital', err);
+      return false;
+    } finally {
+      setLoading('action', false);
+    }
+  }, [fetchHospitals, handleApiError, pageInfo.hospitals.page, searchTerm, setError, setLoading]);
+
+  const updateHospital = useCallback(async (hospitalId, hospitalData) => {
+    setLoading('action', true);
+    setError(null);
+    try {
+      // Ensure required fields are present
+      if (!hospitalData.name || !hospitalData.structure || !hospitalData.wilaya) {
+        setError('Name, structure, and wilaya are required fields.');
+        return false;
+      }
+      
+      // Extract and validate coordinates
+      const latitude = parseFloat(hospitalData.latitude);
+      const longitude = parseFloat(hospitalData.longitude);
+      
+      // Create the hospital data object with proper GeoJSON format
+      const formattedData = {
+        name: hospitalData.name,
+        structure: hospitalData.structure,
+        wilaya: hospitalData.wilaya,
+        telephone: hospitalData.telephone || '',
+        fax: hospitalData.fax || '',
+        // Only include location if both coordinates are valid numbers
+        ...((!isNaN(latitude) && !isNaN(longitude)) ? {
+          location: {
+            type: 'Point',
+            coordinates: [longitude, latitude] // GeoJSON format is [longitude, latitude]
+          }
+        } : {})
+      };
+      
+      console.log('Formatted hospital data for update API:', formattedData);
+      
+      const response = await hospitalService.updateHospital(hospitalId, formattedData);
+      
+      if (response.data?.success) {
+        alert('Hospital updated successfully!');
+        await fetchHospitals(pageInfo.hospitals.page, ITEMS_PER_PAGE, searchTerm);
+        return true;
+      } else {
+        throw new Error(response.data?.message || 'Failed to update hospital');
+      }
+    } catch (err) {
+      handleApiError('update hospital', err);
+      return false;
+    } finally {
+      setLoading('action', false);
+    }
+  }, [fetchHospitals, handleApiError, pageInfo.hospitals.page, searchTerm, setError, setLoading]);
+
+  const deleteHospital = useCallback(async (hospitalId, hospitalName) => {
+    if (window.confirm(`Are you sure you want to delete hospital: ${hospitalName}? This action cannot be undone.`)) {
+      setLoading('action', true);
+      setError(null);
+      try {
+        console.log(`Deleting hospital ID: ${hospitalId}`);
+        const response = await hospitalService.deleteHospital(hospitalId);
+        
+        if (response.data?.success) {
+          alert('Hospital deleted successfully!');
+          // Re-fetch the list to update UI
+          await fetchHospitals(pageInfo.hospitals.page, ITEMS_PER_PAGE, searchTerm);
+          return true;
+        } else {
+          throw new Error(response.data?.message || 'Failed to delete hospital');
+        }
+      } catch (err) {
+        handleApiError('delete hospital', err);
+        return false;
+      } finally {
+        setLoading('action', false);
+      }
+    }
+    return false;
+  }, [fetchHospitals, handleApiError, pageInfo.hospitals.page, searchTerm, setLoading]);
+
   // --- Effects ---
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -816,7 +1047,7 @@ const AdminPage = () => {
 
   useEffect(() => {
     if (isAdmin) {
-      if (['users', 'donations', 'adminManagement'].includes(activeTab)) {
+      if (['users', 'hospitals', 'adminManagement'].includes(activeTab)) {
         setSearchTerm('');
       }
 
@@ -827,8 +1058,8 @@ const AdminPage = () => {
         case 'users':
           fetchAllUsers(1, ITEMS_PER_PAGE, '');
           break;
-        case 'donations':
-          fetchDonations(1, ITEMS_PER_PAGE, '');
+        case 'hospitals': // Changed from 'donations'
+          fetchHospitals(1, ITEMS_PER_PAGE, '');
           break;
         case 'adminManagement':
           fetchAdminAccounts();
@@ -837,7 +1068,7 @@ const AdminPage = () => {
           break;
       }
     }
-  }, [activeTab, isAdmin, fetchStats, fetchAllUsers, fetchDonations, fetchAdminAccounts]);
+  }, [activeTab, isAdmin, fetchStats, fetchAllUsers, fetchHospitals, fetchAdminAccounts]);
 
   const handleSearchChange = useCallback((e) => {
     const value = e.target.value;
@@ -849,16 +1080,22 @@ const AdminPage = () => {
         fetchAllUsers(1, ITEMS_PER_PAGE, value);
       }, DEBOUNCE_DELAY);
       return () => clearTimeout(handler);
+    } else if (activeTab === 'hospitals') { // Changed from 'donations'
+      // Add debounce for search
+      const handler = setTimeout(() => {
+        fetchHospitals(1, ITEMS_PER_PAGE, value);
+      }, DEBOUNCE_DELAY);
+      return () => clearTimeout(handler);
     }
-  }, [activeTab, fetchAllUsers]);
+  }, [activeTab, fetchAllUsers, fetchHospitals]);
 
   const handlePageChange = useCallback((type, newPage) => {
     if (type === 'users') {
       fetchAllUsers(newPage, ITEMS_PER_PAGE, searchTerm);
-    } else if (type === 'donations') {
-      fetchDonations(newPage, ITEMS_PER_PAGE, searchTerm);
+    } else if (type === 'hospitals') { // Changed from 'donations'
+      fetchHospitals(newPage, ITEMS_PER_PAGE, searchTerm);
     }
-  }, [fetchAllUsers, fetchDonations, searchTerm]);
+  }, [fetchAllUsers, fetchHospitals, searchTerm]);
 
   // --- Event Handlers ---
   const openModal = useCallback((type, data = null) => {
@@ -882,6 +1119,26 @@ const AdminPage = () => {
         password: data.password || '',
         permissions: { ...INITIAL_ADMIN_FORM_DATA.permissions, ...data.permissions },
       } : INITIAL_ADMIN_FORM_DATA);
+    } else if (type === MODAL_TYPE.HOSPITAL) {
+      // Format hospital data for edit or create new
+      if (data) {
+        console.log('Opening edit modal with hospital data:', data);
+        const locationCoords = data.location?.coordinates || [0, 0];
+        setHospitalFormData({
+          name: data.name || '',
+          structure: data.structure || '',
+          location: {
+            type: 'Point',
+            coordinates: locationCoords
+          },
+          telephone: data.telephone || '',
+          fax: data.fax || '',
+          wilaya: data.wilaya || ''
+        });
+      } else {
+        console.log('Opening new hospital modal');
+        setHospitalFormData(INITIAL_HOSPITAL_FORM_DATA);
+      }
     }
   }, []);
 
@@ -889,6 +1146,7 @@ const AdminPage = () => {
     setModalState({ isOpen: false, type: null, data: null });
     setUserFormData(INITIAL_USER_FORM_DATA);
     setAdminFormData(INITIAL_ADMIN_FORM_DATA);
+    setHospitalFormData(INITIAL_HOSPITAL_FORM_DATA); // Reset hospital form
   }, []);
 
   const handleUserFormChange = useCallback((e) => {
@@ -911,6 +1169,29 @@ const AdminPage = () => {
       setAdminFormData(prev => ({
         ...prev,
         [name]: type === 'checkbox' ? checked : value
+      }));
+    }
+  }, []);
+
+  const handleHospitalFormChange = useCallback((e) => {
+    const { name, value } = e.target;
+    
+    if (name === 'latitude' || name === 'longitude') {
+      // Handle coordinate changes separately
+      setHospitalFormData(prev => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          coordinates: name === 'longitude' 
+            ? [parseFloat(value) || 0, prev.location.coordinates[1]] 
+            : [prev.location.coordinates[0], parseFloat(value) || 0]
+        }
+      }));
+    } else {
+      // Handle all other fields
+      setHospitalFormData(prev => ({
+        ...prev,
+        [name]: value
       }));
     }
   }, []);
@@ -965,41 +1246,204 @@ const AdminPage = () => {
     }
   }, [modalState.data, updateAdmin, createAdmin, closeModal, setError]);
 
+  const handleHospitalSubmit = useCallback(async (e, formData) => {
+    e.preventDefault();
+    console.log('Hospital form submitted with data:', formData);
+    
+    // Validate required fields
+    if (!formData.name || !formData.structure || !formData.wilaya) {
+      setError('Name, structure, and wilaya are required fields.');
+      return;
+    }
+    
+    let success = false;
+    if (modalState.data && modalState.data._id) {
+      console.log(`Updating hospital ID: ${modalState.data._id}`);
+      success = await updateHospital(modalState.data._id, formData);
+    } else {
+      console.log('Creating new hospital');
+      success = await createHospital(formData);
+    }
+    if (success) {
+      closeModal();
+    }
+  }, [modalState.data, updateHospital, createHospital, closeModal, setError]);
+
   const exportToCSV = useCallback(async (type) => {
-    setLoading('action', true);
+    setLoading('export', true); // Use specific export loading state
     setError(null);
     try {
-      let response;
-      let filename;
+      let csvContent = '';
+      let filename = '';
+      let dataToExport = [];
       
-      if (type === 'users') {
-        response = await userService.exportUserData('csv');
-        filename = 'users-export.csv';
-      } else if (type === 'donations') {
-        // Keep existing donation export logic
-        response = await axios.get(`${API_BASE_URL}/api/donations/export`, {
-          ...getAuthHeaders(),
-          responseType: 'blob'
+      // Convert array of objects to CSV format
+      const convertToCSV = (objArray) => {
+        // Extract column headers from the first object
+        const headers = Object.keys(objArray[0] || {}).filter(key => 
+          // Skip complex objects or arrays
+          typeof objArray[0][key] !== 'object' && 
+          typeof objArray[0][key] !== 'function' &&
+          key !== 'password'); 
+
+        // Create header row
+        const headerRow = headers.join(',');
+        
+        // Create data rows
+        const rows = objArray.map(item => {
+          return headers.map(header => {
+            // Handle special cases like nulls, quotes in text
+            const cell = item[header] === null || item[header] === undefined ? '' : String(item[header]);
+            // Escape quotes and wrap in quotes to handle commas in data
+            return `"${cell.replace(/"/g, '""')}"`;
+          }).join(',');
         });
-        filename = 'donations-export.csv';
+        
+        // Combine headers and rows
+        return [headerRow, ...rows].join('\n');
+      };
+      
+      // Fetch complete data sets based on export type
+      if (type === 'users') {
+        console.log('Fetching all users for export...');
+        try {
+          // Fetch all users without pagination
+          const response = await userService.getAllUsers(1, 999999, '');
+          if (response.data?.success || response.data?.users) {
+            const allUserData = response.data.users || [];
+            dataToExport = allUserData.map(user => ({
+              id: user._id || user.id,
+              username: user.username || user.name,
+              email: user.email || 'No email',
+              bloodType: user.bloodType || 'N/A',
+              location: user.location || 'N/A',
+              isDonor: user.isDonor ? 'Yes' : 'No',
+              isActive: user.isActive !== false ? 'Active' : 'Inactive',
+              role: user.role || ROLES.USER
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to fetch all users for export:', err);
+          setError('Failed to fetch all users for export. Using current page data instead.');
+          // Fall back to current page data
+          dataToExport = allUsers.map(user => ({
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            bloodType: user.bloodType || 'N/A',
+            location: user.location || 'N/A',
+            isDonor: user.isDonor ? 'Yes' : 'No',
+            isActive: user.isActive ? 'Active' : 'Inactive',
+            role: user.role
+          }));
+        }
+        filename = 'users-export.csv';
+      } else if (type === 'hospitals') {
+        console.log('Fetching all hospitals for export...');
+        try {
+          // Fetch all hospitals without pagination
+          const response = await hospitalService.getAllHospitals(1, 999999, '');
+          if (response.data?.success || response.data?.hospitals) {
+            const allHospitalData = response.data.hospitals || [];
+            dataToExport = allHospitalData.map(hospital => ({
+              id: hospital._id,
+              name: hospital.name,
+              structure: hospital.structure,
+              wilaya: hospital.wilaya,
+              telephone: hospital.telephone || 'N/A',
+              fax: hospital.fax || 'N/A',
+              latitude: hospital.location?.coordinates?.[1] || 'N/A',
+              longitude: hospital.location?.coordinates?.[0] || 'N/A',
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to fetch all hospitals for export:', err);
+          setError('Failed to fetch all hospitals for export. Using current page data instead.');
+          // Fall back to current page data
+          dataToExport = hospitals.map(hospital => ({
+            id: hospital._id,
+            name: hospital.name,
+            structure: hospital.structure,
+            wilaya: hospital.wilaya,
+            telephone: hospital.telephone || 'N/A',
+            fax: hospital.fax || 'N/A',
+            latitude: hospital.location?.coordinates?.[1] || 'N/A',
+            longitude: hospital.location?.coordinates?.[0] || 'N/A',
+          }));
+        }
+        filename = 'hospitals-export.csv';
+      } else if (type === 'admins') {
+        console.log('Fetching all admin accounts for export...');
+        try {
+          // Fetch all admins without pagination
+          const response = await adminService.getAllAdmins(1, 999999, '');
+          if (response.data?.success || response.data?.admins) {
+            const allAdminData = response.data.admins || [];
+            dataToExport = allAdminData.map(admin => ({
+              id: admin.id || admin._id,
+              username: admin.username || 'Unknown Admin',
+              email: admin.email || 'No email',
+              role: admin.role || ROLES.ADMIN,
+              isActive: admin.isActive !== false ? 'Active' : 'Inactive',
+              manageUsers: admin.permissions?.manageUsers ? 'Yes' : 'No',
+              manageDonations: admin.permissions?.manageDonations ? 'Yes' : 'No',
+              manageContent: admin.permissions?.manageContent ? 'Yes' : 'No',
+              manageSettings: admin.permissions?.manageSettings ? 'Yes' : 'No',
+              lastLogin: admin.lastLogin ? new Date(admin.lastLogin).toLocaleString() : 'Never'
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to fetch all admin accounts for export:', err);
+          setError('Failed to fetch all admin accounts for export. Using current page data instead.');
+          // Fall back to current page data
+          dataToExport = adminAccounts.map(admin => ({
+            id: admin.id,
+            username: admin.username,
+            email: admin.email,
+            role: admin.role,
+            isActive: admin.isActive ? 'Active' : 'Inactive',
+            manageUsers: admin.permissions?.manageUsers ? 'Yes' : 'No',
+            manageDonations: admin.permissions?.manageDonations ? 'Yes' : 'No',
+            manageContent: admin.permissions?.manageContent ? 'Yes' : 'No',
+            manageSettings: admin.permissions?.manageSettings ? 'Yes' : 'No',
+            lastLogin: admin.lastLogin ? new Date(admin.lastLogin).toLocaleString() : 'Never'
+          }));
+        }
+        filename = 'admin-accounts-export.csv';
       } else {
         throw new Error('Invalid export type');
       }
       
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Only continue if we have data to export
+      if (dataToExport.length === 0) {
+        setError(`No ${type} data to export`);
+        return;
+      }
+      
+      console.log(`Exporting ${dataToExport.length} ${type} records to CSV`);
+      
+      // Convert data to CSV
+      csvContent = convertToCSV(dataToExport);
+      
+      // Create a Blob and download link
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
-      link.remove();
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      console.log(`Successfully exported ${dataToExport.length} ${type} records to CSV`);
     } catch (err) {
-      handleApiError(`export ${type} data`, err);
+      console.error(`Error exporting ${type} to CSV:`, err);
+      setError(`Failed to export ${type}: ${err.message}`);
     } finally {
-      setLoading('action', false);
+      setLoading('export', false);
     }
-  }, [getAuthHeaders, handleApiError, setLoading]);
+  }, [adminAccounts, allUsers, hospitals, setError, setLoading]);
 
   // --- Render Functions ---
   const renderDashboard = useCallback(() => {
@@ -1027,6 +1471,7 @@ const AdminPage = () => {
         users={allUsers}
         loading={loadingStates.users}
         actionLoading={loadingStates.action}
+        exportLoading={loadingStates.export} // Add this
         searchTerm={searchTerm}
         pageInfo={pageInfo.users}
         translations={t}
@@ -1041,28 +1486,28 @@ const AdminPage = () => {
         LoadingIndicator={LoadingIndicator}
       />
     );
-  }, [t, allUsers, loadingStates.users, loadingStates.action, searchTerm, pageInfo.users, handleSearchChange, exportToCSV, openModal, deleteUser, handlePageChange]);
+  }, [t, allUsers, loadingStates, searchTerm, pageInfo.users, handleSearchChange, exportToCSV, openModal, deleteUser, handlePageChange]);
 
-  const renderDonations = useCallback(() => {
+  const renderHospitals = useCallback(() => {
     return (
-      <DonationManagement
-        donations={donations}
-        loading={loadingStates.donations}
+      <HospitalManagement
+        hospitals={hospitals}
+        loading={loadingStates.hospitals}
         actionLoading={loadingStates.action}
         searchTerm={searchTerm}
-        pageInfo={pageInfo.donations}
+        pageInfo={pageInfo.hospitals}
         translations={t}
         onSearchChange={handleSearchChange}
         onExportCSV={exportToCSV}
-        onUpdateStatus={updateDonationStatus}
+        onOpenModal={openModal}
+        onDeleteHospital={deleteHospital}
         onPageChange={handlePageChange}
         EmptyStateMessage={EmptyStateMessage}
         Pagination={Pagination}
         LoadingIndicator={LoadingIndicator}
-        STATUS={STATUS}
       />
     );
-  }, [t, donations, loadingStates.donations, loadingStates.action, searchTerm, pageInfo.donations, handleSearchChange, exportToCSV, updateDonationStatus, handlePageChange]);
+  }, [t, hospitals, loadingStates.hospitals, loadingStates.action, searchTerm, pageInfo.hospitals, handleSearchChange, exportToCSV, openModal, deleteHospital, handlePageChange]);
 
   const renderAdminManagement = useCallback(() => {
     return (
@@ -1074,13 +1519,14 @@ const AdminPage = () => {
         onSearchChange={handleSearchChange}
         onOpenModal={openModal}
         onDeleteAdmin={deleteAdmin}
+        onExportCSV={exportToCSV}  // Add this prop to pass export function
         modalType={MODAL_TYPE.ADMIN}
         roles={ROLES}
         EmptyStateMessage={EmptyStateMessage}
         LoadingIndicator={LoadingIndicator}
       />
     );
-  }, [t, adminAccounts, loadingStates.admins, searchTerm, handleSearchChange, openModal, deleteAdmin]);
+  }, [t, adminAccounts, loadingStates.admins, searchTerm, handleSearchChange, openModal, deleteAdmin, exportToCSV]);
 
   // Replace the existing render functions with component calls
   const renderContent = useCallback(() => {
@@ -1112,8 +1558,8 @@ const AdminPage = () => {
     switch (activeTab) {
       case 'dashboard': return renderDashboard();
       case 'users': return renderUsers();
+      case 'hospitals': return renderHospitals(); // Changed from 'donations'
       case 'adminManagement': return renderAdminManagement();
-      case 'donations': return renderDonations();
       case 'content': return renderContent();
       case 'settings': return renderSettings();
       default: return <p>Unknown tab selected.</p>;
@@ -1123,13 +1569,6 @@ const AdminPage = () => {
   return (
     <div className="admin-wrapper">
       <Navbar />
-      {error && (
-        <div className="error-banner">
-          <FontAwesomeIcon icon={faExclamationTriangle} />
-          <span>{error}</span>
-          <button onClick={() => setError(null)}>✕</button>
-        </div>
-      )}
       <div className="admin-page">
         <div className="admin-container">
           <AdminSidebar 
@@ -1137,7 +1576,6 @@ const AdminPage = () => {
             setActiveTab={setActiveTab} 
             translations={t} 
           />
-
           <div className="admin-content-area">
             {renderTabContent()}
           </div>
@@ -1148,10 +1586,13 @@ const AdminPage = () => {
         modalState={modalState}
         userFormData={userFormData}
         adminFormData={adminFormData}
+        hospitalFormData={hospitalFormData}
         handleUserFormChange={handleUserFormChange}
         handleAdminFormChange={handleAdminFormChange}
+        handleHospitalFormChange={handleHospitalFormChange}
         handleUserSubmit={handleUserSubmit}
         handleAdminSubmit={handleAdminSubmit}
+        handleHospitalSubmit={handleHospitalSubmit}
         closeModal={closeModal}
         loadingAction={loadingStates.action}
         translations={t}

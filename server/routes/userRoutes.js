@@ -16,7 +16,6 @@ const MOCK_USERS = [
 
 // Add debugging middleware
 router.use((req, res, next) => {
-  console.log(`User API request: ${req.method} ${req.originalUrl}`);
   next();
 });
 

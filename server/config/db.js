@@ -5,8 +5,6 @@ const connectDB = async () => {
     // Default to local MongoDB if MONGO_URI is not provided
     const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/redhope';
     
-    console.log('Attempting to connect to database...');
-    
     // Remove deprecated options
     await mongoose.connect(mongoURI, {
       serverSelectionTimeoutMS: 5000 // Timeout after 5s

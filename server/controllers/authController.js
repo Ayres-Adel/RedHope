@@ -15,13 +15,10 @@ const createToken = (id, role) => {
 
 // Login controller - handles both User and Admin authentication
 exports.login = async (req, res) => {
-  console.log('Login attempt with body:', req.body);
-  
   try {
     const { email, password } = req.body;
     
     if (!email || !password) {
-      console.log('Missing email or password in request');
       return res.status(400).json({
         success: false,
         message: 'Please provide both email and password'
@@ -34,23 +31,14 @@ exports.login = async (req, res) => {
     let isAdmin = false;
     
     try {
-      console.log('Checking admin collection for:', email);
       admin = await Admin.findOne({ email }).select('+password');
       
       if (admin) {
-        console.log('Found in admin collection:', admin._id);
         isAdmin = true;
         user = admin; // Use admin as the user object for login
       } else {
         // If not found in admin, check regular users
-        console.log('Not found in admin collection, checking users collection');
         user = await User.findOne({ email }).select('+password');
-        
-        if (user) {
-          console.log('Found in users collection:', user._id);
-        } else {
-          console.log('User not found in either collection');
-        }
       }
     } catch (dbError) {
       console.error('Database error:', dbError);
@@ -63,7 +51,6 @@ exports.login = async (req, res) => {
     
     // If no user found in either collection
     if (!user) {
-      console.log(`No user or admin found with email: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
@@ -74,7 +61,6 @@ exports.login = async (req, res) => {
     let isPasswordValid = false;
     try {
       isPasswordValid = await bcrypt.compare(password, user.password);
-      console.log('Password validation result:', isPasswordValid);
     } catch (bcryptError) {
       console.error('Bcrypt error:', bcryptError);
       return res.status(500).json({
@@ -85,7 +71,6 @@ exports.login = async (req, res) => {
     }
     
     if (!isPasswordValid) {
-      console.log('Invalid password provided');
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
@@ -104,8 +89,6 @@ exports.login = async (req, res) => {
       process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
       { expiresIn: '7d' }
     );
-    
-    console.log('Login successful as:', isAdmin ? 'admin' : 'user');
     
     // If admin, update last login time
     if (isAdmin) {

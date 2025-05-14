@@ -2,8 +2,6 @@ import api from './api';
 
 const userService = {
   getAllUsers: async (page = 1, limit = 10, search = '', sort = 'createdAt', order = 'desc') => {
-    console.log('Requesting users with params:', { page, limit, search, sort, order });
-    
     // Remove any isDonor filtering to show all users
     return api.get('/api/user/paginated', {
       params: {
@@ -18,7 +16,6 @@ const userService = {
       
       // Fall back to all users endpoint if paginated fails
       if (error.response?.status === 404 || error.response?.status === 500) {
-        console.log('Falling back to /api/user/all endpoint');
         return api.get('/api/user/all');
       }
       
@@ -31,7 +28,6 @@ const userService = {
   },
 
   createUser: async (userData) => {
-    console.log('userService createUser called with:', userData);
     // Make sure we're using the correct endpoint
     return api.post('/api/user/create', userData);
   },

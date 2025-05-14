@@ -1,14 +1,33 @@
-import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import '../styles/CitySelect.css';
 import { API_BASE_URL } from '../config';
 
-const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = false }) => {
+const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = false, language = 'en' }) => {
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const initialSelectionMade = useRef(false);
+  
+  // Translations
+  const translations = useMemo(() => ({
+    en: {
+      allCities: "All Cities",
+      loadingCities: "Loading cities...",
+      selectCity: "Select a city",
+      failedToLoadCities: "Failed to load cities:"
+    },
+    fr: {
+      allCities: "Toutes les Villes",
+      loadingCities: "Chargement des villes...",
+      selectCity: "Sélectionner une ville",
+      failedToLoadCities: "Échec du chargement des villes:"
+    }
+  }), []);
+
+  // Use the selected language translations
+  const t = translations[language] || translations.en;
 
   // Fetch cities data
   useEffect(() => {
@@ -22,21 +41,17 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
         // Handle 404 error specifically (try to seed data)
         if (!response.ok) {
           if (response.status === 404 && isMounted) {
-            console.log("Cities endpoint not found, trying to seed data...");
-            
             const seedResponse = await fetch(`${API_BASE_URL}/api/wilaya/seed`, {
               method: 'POST'
             });
             
             if (seedResponse.ok && isMounted) {
-              console.log("Successfully seeded cities data");
               const retryResponse = await fetch(`${API_BASE_URL}/api/wilaya/all`);
               
               if (retryResponse.ok) {
                 const retryData = await retryResponse.json();
                 if (!isMounted) return;
                 
-                console.log('Cities loaded after seeding:', retryData.data?.length || 0);
                 handleCitiesData(retryData);
                 return;
               }
@@ -91,7 +106,6 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
       return codeA - codeB;
     });
     
-    console.log('Cities sorted by code, count:', sortedCities.length);
     setCities(sortedCities);
   };
   
@@ -104,13 +118,12 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
       if (selectedCity === 'all') {
         // Delay to avoid race conditions
         const timer = setTimeout(() => {
-          console.log('Initial selection: All Cities');
           onLocationChange(
             {
               lat: 36.16215909617758,
               lng: 1.330560770492638
             }, 
-            "All Cities", 
+            t.allCities, 
             null
           );
         }, 100);
@@ -118,7 +131,7 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
         return () => clearTimeout(timer);
       }
     }
-  }, [isLoading, cities, selectedCity, onLocationChange]);
+  }, [isLoading, cities, selectedCity, onLocationChange, t]);
   
   // Handle city selection change
   const handleCityChange = useCallback((e) => {
@@ -126,8 +139,7 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
     setSelectedCity(cityId);
     
     if (cityId === "all") {
-      console.log('Selected: All Cities - keeping current map view');
-      onLocationChange(null, "All Cities", null);
+      onLocationChange(null, t.allCities, null);
       return;
     }
     
@@ -142,7 +154,6 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
     
     // Get the city code
     const cityCode = city.code || city.wilayaCode;
-    console.log(`Selected city: ${city.name}, code: ${cityCode}, id: ${cityId}`);
     
     // Handle location coordinates based on data format
     if (city.location && city.location.coordinates) {
@@ -158,12 +169,12 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
     } else {
       console.warn('Selected city has no valid coordinates:', city);
     }
-  }, [cities, onLocationChange]);
+  }, [cities, onLocationChange, t]);
   
   if (error) {
     return (
       <div className="city-selector-error" role="alert">
-        Failed to load cities: {error}
+        {t.failedToLoadCities} {error}
       </div>
     );
   }
@@ -175,9 +186,9 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
         onChange={handleCityChange} 
         disabled={isLoading}
         className={isDarkMode ? 'dark-mode' : 'light-mode'}
-        aria-label="Select a city"
+        aria-label={t.selectCity}
       >
-        <option value="all">All Cities</option>
+        <option value="all">{t.allCities}</option>
         
         {cities.map(city => (
           <option key={city._id || city.id} value={city._id || city.id}>
@@ -188,7 +199,7 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
       
       {isLoading && (
         <div className={`loading-indicator ${isDarkMode ? 'dark-mode' : ''}`} aria-live="polite">
-          Loading cities...
+          {t.loadingCities}
         </div>
       )}
     </div>
@@ -198,7 +209,8 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
 CitySelector.propTypes = {
   onLocationChange: PropTypes.func.isRequired,
   isDarkMode: PropTypes.bool,
-  includeAllCities: PropTypes.bool
+  includeAllCities: PropTypes.bool,
+  language: PropTypes.string
 };
 
 CitySelector.displayName = 'CitySelector';

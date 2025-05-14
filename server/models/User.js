@@ -168,8 +168,6 @@ UserSchema.statics.bulkUpdateCitiesFromCoordinates = async function(limit = 100)
       'location.coordinates.1': { $ne: 0 }
     }).limit(limit);
     
-    console.log(`Found ${users.length} users with coordinates but no city`);
-    
     let updatedCount = 0;
     for (const user of users) {
       const city = await user.updateCityFromCoordinates();

@@ -2,15 +2,15 @@
 
 .user-page {
   background: #f8f9fa;
-  min-height: 97.6vh;
-  padding-top: 60px;
+  min-height: 97.5vh;
+  padding-top: 80px;
 }
 
 .settings-wrapper {
   display: flex;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 20px;
 }
 
 /* Admin Sidebar - Consistent with AdminPage */

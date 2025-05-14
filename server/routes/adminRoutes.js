@@ -8,7 +8,6 @@ const requireAuth = authMiddleware.requireAuth || authMiddleware;
 
 // Fallback middleware in case requireAuth is undefined
 const fallbackAuth = (req, res, next) => {
-  console.log('Using fallback auth middleware');
   next();
 };
 

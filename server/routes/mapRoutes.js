@@ -18,13 +18,9 @@ const asyncHandler = (fn) => (req, res, next) => {
 
 // Get all hospitals for map
 router.get('/hospitals', asyncHandler(async (req, res) => {
-  console.log('Fetching hospitals for map...');
-  
   const hospitals = await Hospital.find()
     .select('name location address contactInfo wilaya type')
     .lean();
-  
-  console.log(`Found ${hospitals.length} hospitals`);
   
   return res.status(200).json({
     success: true,

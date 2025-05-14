@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
 
@@ -11,10 +11,26 @@ export const SearchBar = ({
   isDarkMode,
   suggestions, 
   showSuggestions,
-  handleSuggestionClick
+  handleSuggestionClick,
+  language = 'en'
 }) => {
   // Track hovered suggestion
   const [hoveredSuggestionIndex, setHoveredSuggestionIndex] = useState(null);
+
+  // Translations 
+  const translations = useMemo(() => ({
+    en: {
+      searchPlaceholder: "Search hospitals...",
+      searchHospitals: "Search hospitals"
+    },
+    fr: {
+      searchPlaceholder: "Rechercher des hôpitaux...",
+      searchHospitals: "Rechercher des hôpitaux"
+    }
+  }), []);
+
+  // Use the selected language translations
+  const t = translations[language] || translations.en;
 
   // Standard styling - minimal inline styles for positioning
   const searchIconStyle = {
@@ -76,19 +92,19 @@ export const SearchBar = ({
           setTimeout(() => searchInputRef.current?.focus(), 300);
         }
       }}
-      aria-label="Search hospitals"
+      aria-label={t.searchHospitals}
     >
       {showSearch ? (
         <>
           <input
             ref={searchInputRef}
             type="text"
-            placeholder="Search hospitals..."
+            placeholder={t.searchPlaceholder}
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
             className="map-search-input"
             style={searchInputStyle}
-            aria-label="Search for hospitals"
+            aria-label={t.searchHospitals}
           />
         </>
       ) : (

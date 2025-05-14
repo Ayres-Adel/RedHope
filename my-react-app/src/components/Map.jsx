@@ -33,6 +33,47 @@ export default function MapComponent() {
   const mapRef = useRef(null);
   const [selectedCityName, setSelectedCityName] = useState("National");
   
+  // Language state
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+  
+  // Translation object
+  const translations = useMemo(() => ({
+    en: {
+      pageTitle: "Hospitals & Blood Centers",
+      pageSubtitle: "Find hospitals and blood banks across Algeria",
+      loadingHospitals: "Loading hospitals data...",
+      errorLoadingHospitals: "Error loading hospitals",
+      tryAgainLater: "Please try again later",
+      acceptingDonations: "Accepting Donations",
+      notAvailable: "Not available",
+      hospital: "Hospital"
+    },
+    fr: {
+      pageTitle: "Hôpitaux & Centres de Sang",
+      pageSubtitle: "Trouvez des hôpitaux et des banques de sang à travers l'Algérie",
+      loadingHospitals: "Chargement des données des hôpitaux...",
+      errorLoadingHospitals: "Erreur de chargement des hôpitaux",
+      tryAgainLater: "Veuillez réessayer plus tard",
+      acceptingDonations: "Accepte les Dons",
+      notAvailable: "Non disponible",
+      hospital: "Hôpital"
+    }
+  }), []);
+
+  // Use the selected language translations
+  const t = translations[language];
+  
+  // Poll for language changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentLang = localStorage.getItem('language') || 'en';
+      if (currentLang !== language) {
+        setLanguage(currentLang);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [language]);
+
   // Use custom hooks for data fetching
   const { hospitals, isLoading, error } = useHospitals();
   const { 
@@ -67,8 +108,6 @@ export default function MapComponent() {
 
   // Handle location changes from CitySelector
   const handleLocationChange = useCallback((newLocation, cityName, cityId) => {
-    console.log(`Location change: ${cityName} (${cityId}), coordinates: ${JSON.stringify(newLocation)}`);
-    
     setSelectedCityName(cityName || "All Cities");
     
     // If All Cities is selected, only update stats
@@ -211,7 +250,7 @@ export default function MapComponent() {
         <Navbar />
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>Loading hospitals data...</p>
+          <p>{t.loadingHospitals}</p>
         </div>
       </>
     );
@@ -223,9 +262,9 @@ export default function MapComponent() {
       <>
         <Navbar />
         <div className="error-container">
-          <h2>Error loading hospitals</h2>
+          <h2>{t.errorLoadingHospitals}</h2>
           <p>{error}</p>
-          <p>Please try again later</p>
+          <p>{t.tryAgainLater}</p>
         </div>
       </>
     );
@@ -236,8 +275,8 @@ export default function MapComponent() {
       <Navbar />
       <div className="hospitals-page-container">
         <div className="hospitals-header">
-          <h1>Hospitals & Blood Centers</h1>
-          <p>Find hospitals and blood banks across Algeria</p>
+          <h1>{t.pageTitle}</h1>
+          <p>{t.pageSubtitle}</p>
         </div>
         
         <div className="map-section">
@@ -246,15 +285,15 @@ export default function MapComponent() {
               onLocationChange={handleLocationChange} 
               isDarkMode={isDarkMode} 
               includeAllCities={true}
+              language={language}
             />
           </div>
           
           <div className="map-container">
             <div className="hospital-map-content">
-              <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+              <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}>
                 <Map
                   className="google-map"
-                  // Remove the direct ref prop
                   mapId={isDarkMode ? "8f51571e39b5d5e" : "7e663c504dc4b013"}
                   options={{
                     gestureHandling: "cooperative",
@@ -297,6 +336,7 @@ export default function MapComponent() {
                     suggestions={suggestions}
                     showSuggestions={showSuggestions}
                     handleSuggestionClick={handleSuggestionClick}
+                    language={language}
                   />
                   
                   {hospitalMarkers}
@@ -312,17 +352,15 @@ export default function MapComponent() {
                         setSelectedMarker(null);
                       }}
                     >
+                      <div className="accepting-donations-label">{t.acceptingDonations}</div>
                       <div className="hospital-info-window">
+                        
                         <h3>{selectedMarker.name}</h3>
                         {selectedMarker.type === "hospital" && (
                           <>
-                            <p><FontAwesomeIcon icon={faMapMarkerAlt} /> {selectedMarker.address || 'Not available'}</p>
-                            <p><FontAwesomeIcon icon={faPhone} /> {selectedMarker.contact?.phone || 'Not available'}</p>
-                            <p><FontAwesomeIcon icon={faHospital} /> {selectedMarker.category || 'Hospital'}</p>
-                            <div className="hospital-info-buttons">
-                              <button className="donation-button accepting">Accepting Donations</button>
-                              <button className="donation-button emergency">Emergency Requests</button>
-                            </div>
+                            <p><FontAwesomeIcon icon={faMapMarkerAlt} /> {selectedMarker.address || t.notAvailable}</p>
+                            <p><FontAwesomeIcon icon={faPhone} /> {selectedMarker.contact?.phone || t.notAvailable}</p>
+                            <p><FontAwesomeIcon icon={faHospital} /> {selectedMarker.category || t.hospital}</p>
                           </>
                         )}
                       </div>
@@ -348,6 +386,7 @@ export default function MapComponent() {
               totalDonors={totalDonors}
               statsError={statsError}
               fetchBloodTypeStats={fetchBloodTypeStats}
+              language={language}
             />
           </div>
         </div>

@@ -5,7 +5,6 @@
     background-color: #ffffff; /* White background */
     width: 100%; /* Full width */
     overflow: hidden; /* Prevent horizontal overflow */
-    margin-top: 130px;
     margin-bottom: 50px;
 }
 
@@ -83,6 +82,10 @@
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
+    .infinite-scroll-container {
+        margin-bottom: 30px; /* Reduced margin for smaller screens */
+    }
+
     .tag {
         font-size: 1.2rem; /* Slightly smaller font size for tablets */
         padding: 0.8rem 1.2rem; /* Slightly smaller padding */
@@ -98,24 +101,5 @@
 
     .inner {
         gap: 1.5rem; /* Slightly smaller gap between tags */
-    }
-}
-
-@media (max-width: 480px) {
-    .tag {
-        font-size: 1rem; /* Smaller font size for mobile */
-        padding: 0.6rem 1rem; /* Smaller padding */
-    }
-
-    .tag i {
-        font-size: 1rem; /* Smaller icon size */
-    }
-
-    .tag span {
-        font-size: 1.2rem; /* Smaller hashtag size */
-    }
-
-    .inner {
-        gap: 1rem; /* Smaller gap between tags */
     }
 }
