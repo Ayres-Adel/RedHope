@@ -1,99 +1,249 @@
 const DonationRequest = require('../models/DonationRequest');
 const User = require('../models/User');
+const Guest = require('../models/Guest');
 
 module.exports = {
   // Create a new donation request
   createDonationRequest: async (req, res) => {
     try {
-      const {
-        patientName,
-        patientAge,
-        bloodType,
-        unitsNeeded,
-        hospitalId,
-        location,
-        urgency,
-        notes,
-        expiryDate,
-        contactPhone,
-        contactEmail,
-        preferredContactMethod
-      } = req.body;
+      const { bloodType, hospitalId, expiryDate, donorId } = req.body;
       
-      const donationRequest = await DonationRequest.create({
+      // Create request data
+      const requestData = {
         requester: req.user.userId,
-        patient: {
-          name: patientName,
-          age: patientAge
-        },
         bloodType,
-        unitsNeeded,
-        hospital: hospitalId,
-        location: {
-          type: 'Point',
-          coordinates: [location.longitude, location.latitude],
-          address: location.address
-        },
-        urgency,
         status: 'Active',
-        expiryDate: new Date(expiryDate),
-        notes,
-        contactInfo: {
-          phone: contactPhone,
-          email: contactEmail,
-          preferredContactMethod
-        }
-      });
+        expiryDate: new Date(expiryDate)
+      };
       
-      // Find potential donors with matching blood type in the area
-      const compatibleBloodTypes = getCompatibleBloodTypes(bloodType);
+      // Add hospital if provided
+      if (hospitalId) {
+        requestData.hospital = hospitalId;
+      }
       
-      const potentialDonors = await User.find({
-        isDonor: true,
-        bloodType: { $in: compatibleBloodTypes },
-        location: {
-          $near: {
-            $geometry: {
-              type: 'Point',
-              coordinates: [location.longitude, location.latitude]
-            },
-            $maxDistance: 50000 // 50km radius
-          }
+      // Add donor if provided
+      if (donorId) {
+        // Verify the donor exists
+        const donor = await User.findById(donorId);
+        if (!donor) {
+          return res.status(404).json({ 
+            success: false,
+            error: 'Selected donor not found' 
+          });
         }
-      }).limit(20);
+        
+        requestData.donor = donorId;
+      }
+      
+      const donationRequest = await DonationRequest.create(requestData);
+      
+      // Determine which donors to notify
+      let potentialDonors = [];
+      
+      if (donorId) {
+        // If a specific donor was selected, only notify that donor
+        potentialDonors = [{ _id: donorId }];
+      } else {
+        // Otherwise find potential donors with matching blood type
+        const compatibleBloodTypes = getCompatibleBloodTypes(bloodType);
+        
+        potentialDonors = await User.find({
+          isDonor: true,
+          bloodType: { $in: compatibleBloodTypes }
+        }).limit(20);
+      }
       
       // Create notifications for potential donors
-      const notificationPromises = potentialDonors.map(donor => 
-        Notification.create({
-          recipient: donor._id,
-          type: 'DonationRequest',
-          title: `${urgency} Need: ${bloodType} Blood Donation`,
-          message: `Someone near you needs ${bloodType} blood donation. Can you help?`,
-          relatedItem: {
-            itemType: 'DonationRequest',
-            itemId: donationRequest._id
-          },
-          priority: urgency === 'Critical' ? 'Urgent' : 'High'
-        })
-      );
+      if (global.Notification && potentialDonors.length > 0) {
+        const notificationPromises = potentialDonors.map(donor => 
+          global.Notification.create({
+            recipient: donor._id,
+            type: 'DonationRequest',
+            title: `Blood Donation Need: ${bloodType}`,
+            message: `Someone needs ${bloodType} blood donation. Can you help?`,
+            relatedItem: {
+              itemType: 'DonationRequest',
+              itemId: donationRequest._id
+            },
+            priority: donorId ? 'Urgent' : 'High' // Higher priority for directed requests
+          })
+        );
+        
+        await Promise.all(notificationPromises);
+      }
       
-      await Promise.all(notificationPromises);
-      
-      res.status(201).json(donationRequest);
+      res.status(201).json({
+        success: true,
+        donationRequest
+      });
     } catch (err) {
       console.error('Error creating donation request:', err);
-      res.status(500).json({ error: 'Server error' });
+      res.status(500).json({ 
+        success: false,
+        error: 'Server error',
+        message: err.message
+      });
+    }
+  },
+  
+  // Create donation request for guest users
+  createGuestDonationRequest: async (req, res) => {
+    try {
+      const {
+        guestId,
+        phoneNumber,
+        bloodType,
+        hospitalId,
+        expiryDate,
+        donorId  // Allow specifying a donor ID directly
+      } = req.body;
+      
+      // Validate either guestId or phoneNumber is provided
+      if (!guestId && !phoneNumber) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Either guest ID or phone number is required' 
+        });
+      }
+      
+      // Validate required fields
+      if (!bloodType) {
+        return res.status(400).json({
+          success: false,
+          error: 'Blood type is required'
+        });
+      }
+      
+      // Find or create guest
+      let guest;
+      if (guestId) {
+        guest = await Guest.findById(guestId);
+        if (!guest) {
+          return res.status(404).json({ 
+            success: false, 
+            error: 'Guest not found' 
+          });
+        }
+      } else {
+        // Try to find guest by phone number
+        guest = await Guest.findOne({ phoneNumber });
+        
+        // If guest doesn't exist, create a new guest
+        if (!guest) {
+          guest = new Guest({
+            phoneNumber,
+            location: req.body.location || { 
+              type: 'Point', 
+              coordinates: [0, 0] // Default coordinates if none provided
+            }
+          });
+          await guest.save();
+        }
+        
+        // Update last active time
+        guest.lastActive = Date.now();
+        await guest.save();
+      }
+      
+      // If donor ID is not provided, try to find compatible donors
+      let donorToAssign = donorId;
+      if (!donorToAssign) {
+        const compatibleDonors = await User.find({
+          isDonor: true,
+          bloodType: bloodType
+        }).limit(1);
+        
+        if (compatibleDonors.length > 0) {
+          donorToAssign = compatibleDonors[0]._id;
+        } else {
+          // If no compatible donor found, mark as blank initially
+          donorToAssign = null;
+        }
+      }
+      
+      // Prepare donation request data
+      const donationRequestData = {
+        guestRequester: guest._id,
+        bloodType,
+        status: 'Active',
+        expiryDate: expiryDate ? new Date(expiryDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Default to 7 days
+      };
+      
+      // Add hospital if provided
+      if (hospitalId) {
+        donationRequestData.hospital = hospitalId;
+      }
+      
+      // Add donor if found
+      if (donorToAssign) {
+        donationRequestData.donor = donorToAssign;
+      }
+      
+      // Create donation request
+      const donationRequest = await DonationRequest.create(donationRequestData);
+      
+      // If we have a donor, find potential donors with matching blood type for notifications
+      if (donorToAssign) {
+        try {
+          // Find potential donors with matching blood type
+          const compatibleBloodTypes = getCompatibleBloodTypes(bloodType);
+          
+          const potentialDonors = await User.find({
+            isDonor: true,
+            bloodType: { $in: compatibleBloodTypes }
+          }).limit(20);
+          
+          // Create notifications for potential donors (if notification system is implemented)
+          if (global.Notification) {
+            const notificationPromises = potentialDonors.map(donor => 
+              global.Notification.create({
+                recipient: donor._id,
+                type: 'DonationRequest',
+                title: `Blood Donation Need: ${bloodType}`,
+                message: `Someone needs ${bloodType} blood donation. Can you help?`,
+                relatedItem: {
+                  itemType: 'DonationRequest',
+                  itemId: donationRequest._id
+                },
+                priority: 'High'
+              })
+            );
+            
+            await Promise.all(notificationPromises);
+          }
+        } catch (notificationError) {
+          console.error('Error sending notifications:', notificationError);
+          // Continue even if notification sending fails
+        }
+      }
+      
+      res.status(201).json({ 
+        success: true,
+        donationRequest,
+        guest: {
+          id: guest._id,
+          phoneNumber: guest.phoneNumber,
+          createdAt: guest.createdAt
+        }
+      });
+    } catch (err) {
+      console.error('Error creating guest donation request:', err);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Server error',
+        message: err.message
+      });
     }
   },
   
   // Get all donation requests (with optional filtering)
   getDonationRequests: async (req, res) => {
     try {
-      const { bloodType, status, distance, latitude, longitude } = req.query;
+      const { bloodType, status } = req.query;
       
       const filter = {};
       
-      // Filter by blood type compatibility if the user is a donor
+      // Filter by blood type compatibility if specified
       if (bloodType) {
         filter.bloodType = bloodType;
       }
@@ -108,33 +258,11 @@ module.exports = {
       // Filter by expiry date
       filter.expiryDate = { $gt: new Date() };
       
-      let donationRequests;
-      
-      // Filter by location if coordinates are provided
-      if (latitude && longitude) {
-        const maxDistance = distance ? parseInt(distance) * 1000 : 50000; // Convert km to meters
-        
-        donationRequests = await DonationRequest.find({
-          ...filter,
-          location: {
-            $near: {
-              $geometry: {
-                type: 'Point',
-                coordinates: [parseFloat(longitude), parseFloat(latitude)]
-              },
-              $maxDistance: maxDistance
-            }
-          }
-        })
+      const donationRequests = await DonationRequest.find(filter)
         .populate('requester', 'username phoneNumber')
+        .populate('guestRequester', 'phoneNumber')
         .populate('hospital', 'name structure telephone wilaya')
-        .sort({ urgency: -1, createdAt: -1 });
-      } else {
-        donationRequests = await DonationRequest.find(filter)
-          .populate('requester', 'username phoneNumber')
-          .populate('hospital', 'name structure telephone wilaya')
-          .sort({ urgency: -1, createdAt: -1 });
-      }
+        .sort({ createdAt: -1 });
       
       res.json(donationRequests);
     } catch (err) {
@@ -150,8 +278,8 @@ module.exports = {
       
       const donationRequest = await DonationRequest.findById(requestId)
         .populate('requester', 'username phoneNumber')
-        .populate('hospital', 'name structure telephone wilaya')
-        .populate('donorResponses.donor', 'username phoneNumber bloodType');
+        .populate('guestRequester', 'phoneNumber')
+        .populate('hospital', 'name structure telephone wilaya');
       
       if (!donationRequest) {
         return res.status(404).json({ error: 'Donation request not found' });
@@ -160,68 +288,6 @@ module.exports = {
       res.json(donationRequest);
     } catch (err) {
       console.error('Error fetching donation request:', err);
-      res.status(500).json({ error: 'Server error' });
-    }
-  },
-  
-  // Respond to a donation request
-  respondToDonationRequest: async (req, res) => {
-    try {
-      const { requestId } = req.params;
-      const { status } = req.body;
-      
-      const validResponses = ['Interested', 'Confirmed', 'Cancelled'];
-      if (!validResponses.includes(status)) {
-        return res.status(400).json({ error: 'Invalid response status' });
-      }
-      
-      const donationRequest = await DonationRequest.findById(requestId);
-      
-      if (!donationRequest) {
-        return res.status(404).json({ error: 'Donation request not found' });
-      }
-      
-      if (donationRequest.status !== 'Active') {
-        return res.status(400).json({ error: 'This request is no longer active' });
-      }
-      
-      // Check if user already responded
-      const existingResponseIndex = donationRequest.donorResponses.findIndex(
-        response => response.donor.toString() === req.user.userId
-      );
-      
-      if (existingResponseIndex !== -1) {
-        // Update existing response
-        donationRequest.donorResponses[existingResponseIndex].status = status;
-        donationRequest.donorResponses[existingResponseIndex].responseDate = new Date();
-      } else {
-        // Add new response
-        donationRequest.donorResponses.push({
-          donor: req.user.userId,
-          status
-        });
-      }
-      
-      await donationRequest.save();
-      
-      // Create notification for requester
-      const donor = await User.findById(req.user.userId);
-      
-      await Notification.create({
-        recipient: donationRequest.requester,
-        type: 'DonationMatch',
-        title: 'Donation Response',
-        message: `${donor.username} has ${status.toLowerCase()} to your blood donation request`,
-        relatedItem: {
-          itemType: 'DonationRequest',
-          itemId: donationRequest._id
-        },
-        priority: 'High'
-      });
-      
-      res.json(donationRequest);
-    } catch (err) {
-      console.error('Error responding to donation request:', err);
       res.status(500).json({ error: 'Server error' });
     }
   },
@@ -244,36 +310,12 @@ module.exports = {
       }
       
       // Check if user is the requester
-      if (donationRequest.requester.toString() !== req.user.userId) {
+      if (donationRequest.requester && donationRequest.requester.toString() !== req.user.userId) {
         return res.status(403).json({ error: 'Not authorized' });
       }
       
       donationRequest.status = status;
       await donationRequest.save();
-      
-      // Notify responders if request is fulfilled or cancelled
-      if (status === 'Fulfilled' || status === 'Cancelled') {
-        const uniqueDonors = [...new Set(
-          donationRequest.donorResponses
-            .filter(response => response.status === 'Interested' || response.status === 'Confirmed')
-            .map(response => response.donor.toString())
-        )];
-        
-        const notificationPromises = uniqueDonors.map(donorId =>
-          Notification.create({
-            recipient: donorId,
-            type: 'DonationRequest',
-            title: `Donation Request ${status}`,
-            message: `A donation request you responded to has been marked as ${status.toLowerCase()}`,
-            relatedItem: {
-              itemType: 'DonationRequest',
-              itemId: donationRequest._id
-            }
-          })
-        );
-        
-        await Promise.all(notificationPromises);
-      }
       
       res.json(donationRequest);
     } catch (err) {

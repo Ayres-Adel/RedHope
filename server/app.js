@@ -12,11 +12,12 @@ const userRoutes = require('./routes/userRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const hospitalRoutes = require('./routes/hospitalRoutes');
 const wilayaRoutes = require('./routes/wilayaRoutes');
-const donationRoutes = require('./routes/donationRoutes');
 const donationRequestRoutes = require('./routes/donationRequestRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 // Add map routes
 const mapRoutes = require('./routes/mapRoutes');
+// Import guest routes
+const guestRoutes = require('./routes/guestRoutes');
 
 const app = express();
 
@@ -43,13 +44,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes); 
 app.use('/api/hospital', hospitalRoutes);
 app.use('/api/wilaya', wilayaRoutes);
-app.use('/api/donation', donationRoutes);
 app.use('/api/donation-request', donationRequestRoutes);
 // Use the admin routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/stats', statsRoutes);
 // Add map routes
 app.use('/api/map', mapRoutes);
+// Use guest routes
+app.use('/api/guest', guestRoutes);
 
 // Simple test route that doesn't require database
 app.get('/api/health', (req, res) => {

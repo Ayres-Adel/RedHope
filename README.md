@@ -12,6 +12,8 @@ RedHope is a life-saving platform that connects blood donors with those in urgen
 - **Real-Time Donor Availability**: Displays a list of ready-to-donate individuals.
 - **Interactive Map**: Shows nearby hospitals and donation centers.
 - **Secure Sign-In**: Users must sign in to access donation requests.
+- **Direct Donation Requests**: Users can send donation requests directly to specific donors.
+- **Guest Donation Requests**: Even non-registered users can make emergency donation requests.
 
 ## Technologies Used
 
@@ -63,5 +65,5 @@ RedHope is a life-saving platform that connects blood donors with those in urgen
 ## Contact
 - For questions or suggestions, contact us at support@redhope.com.
 
-## Saving lives, one donation at a time!  
+## Saving lives, one donation at a time!
 

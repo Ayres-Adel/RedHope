@@ -18,6 +18,7 @@ import '../styles/Search.css';
 import Navbar from './Navbar';
 import { API_BASE_URL } from '../config';
 import { getCurrentLocation, reverseGeocode, saveCoordinates, getSavedCoordinates } from '../utils/LocationService';
+import ContactDonorModal from './ContactDonorModal';
 
 export default function Search() {
   // Navigation and location
@@ -476,34 +477,79 @@ export default function Search() {
     });
   }, []);
 
-  // Contact message text - use the current language for message
-  const handleContactDonor = useCallback((method, donor) => {
+  // Update the handleContactDonor function to ensure correct donor information is passed
+  const handleContactDonor = useCallback(async (method, donor) => {
     if (!donor || !donor.phoneNumber) {
       console.error("Missing phone number for donor");
       return;
     }
     
-    // Improved phone number formatting for international numbers
-    let formattedPhone = donor.phoneNumber;
-    
-    // Format for Algeria (213)
-    if (formattedPhone.startsWith('0')) {
-      formattedPhone = `213${formattedPhone.substring(1)}`;
-    } else if (!formattedPhone.startsWith('213') && !formattedPhone.startsWith('+213')) {
-      formattedPhone = `213${formattedPhone}`;
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Non-registered users see the contact modal which handles the donation request creation
+      const donorForModal = {
+        ...donor,
+        contactMethod: method,
+        // Include these fields explicitly to ensure they're passed correctly
+        _id: donor._id,
+        username: donor.username,
+        bloodType: donor.bloodType,
+        phoneNumber: donor.phoneNumber,
+      };
+      
+      // Set the selected donor and show modal
+      setSelectedDonorContact(donorForModal);
+      setShowContactModal(true);
+      
+      // Debug logging to help track donor information
+      console.log("Opening modal for donor:", donorForModal.username, donorForModal);
+      return;
     }
     
-    // Remove any plus sign for services that don't need it
-    formattedPhone = formattedPhone.replace(/^\+/, '');
-    
-    // Use localized message if available
-    const messageText = encodeURIComponent(
-      language === 'fr' 
-        ? 'Bonjour, je vous ai trouvé sur RedHope. J\'ai besoin de votre aide pour un don de sang.'
-        : 'Hello, I found you on RedHope. I need your help with a blood donation.'
-    );
-    
+    // For logged in users, first create a donation request in the database
+    setIsLoading(true); // Show loading indicator
     try {
+      // Make API call to create donation request
+      await axios.post(
+        `${API_BASE_URL}/api/donation-request`, 
+        { 
+          donorId: donor._id,
+          bloodType: donor.bloodType,
+          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
+        },
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}` 
+          } 
+        }
+      );
+      
+      console.log(`Donation request created for donor: ${donor.username}`);
+      
+      // After successful request creation, proceed with the contact method
+      
+      // Format phone number for international dialing
+      let formattedPhone = donor.phoneNumber;
+      
+      // Format for Algeria (213)
+      if (formattedPhone.startsWith('0')) {
+        formattedPhone = `213${formattedPhone.substring(1)}`;
+      } else if (!formattedPhone.startsWith('213') && !formattedPhone.startsWith('+213')) {
+        formattedPhone = `213${formattedPhone}`;
+      }
+      
+      // Remove any plus sign for services that don't need it
+      formattedPhone = formattedPhone.replace(/^\+/, '');
+      
+      // Use localized message if available
+      const messageText = encodeURIComponent(
+        language === 'fr' 
+          ? 'Bonjour, je vous ai trouvé sur RedHope. J\'ai besoin de votre aide pour un don de sang.'
+          : 'Hello, I found you on RedHope. I need your help with a blood donation.'
+      );
+      
+      // Open the appropriate communication channel
       switch (method) {
         case 'whatsapp':
           window.open(`https://wa.me/${formattedPhone}?text=${messageText}`, '_blank');
@@ -525,9 +571,58 @@ export default function Search() {
           window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
       }
     } catch (error) {
-      console.error("Error opening contact method:", error);
+      console.error("Error creating donation request:", error);
+      
+      // Show error message
+      setError(error.response?.data?.message || 
+               error.response?.data?.error || 
+               "Failed to create donation request. Opening contact method anyway.");
+      
+      // Still try to open the contact method even if request creation fails
+      let formattedPhone = donor.phoneNumber;
+      if (formattedPhone.startsWith('0')) {
+        formattedPhone = `213${formattedPhone.substring(1)}`;
+      } else if (!formattedPhone.startsWith('213') && !formattedPhone.startsWith('+213')) {
+        formattedPhone = `213${formattedPhone}`;
+      }
+      
+      formattedPhone = formattedPhone.replace(/^\+/, '');
+      
+      const messageText = encodeURIComponent(
+        language === 'fr' 
+          ? 'Bonjour, je vous ai trouvé sur RedHope. J\'ai besoin de votre aide pour un don de sang.'
+          : 'Hello, I found you on RedHope. I need your help with a blood donation.'
+      );
+      
+      try {
+        switch (method) {
+          case 'whatsapp':
+            window.open(`https://wa.me/${formattedPhone}?text=${messageText}`, '_blank');
+            break;
+          case 'telegram':
+            window.open(`https://t.me/+${formattedPhone}`, '_blank');
+            break;
+          case 'sms':
+            window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
+            break;
+          case 'call':
+            window.open(`tel:${donor.phoneNumber}`, '_blank');
+            break;
+          default:
+            window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
+        }
+      } catch (contactErr) {
+        console.error("Error opening contact method:", contactErr);
+      }
+    } finally {
+      setIsLoading(false); // Hide loading indicator
+      
+      // Clear any error message after 3 seconds
+      if (error) {
+        setTimeout(() => setError(''), 3000);
+      }
     }
-  }, [language]); // Add language dependency
+  }, [language, API_BASE_URL]);
 
   // Improved page change handler with better scrolling coordination
   const handlePageChange = useCallback((newPage) => {
@@ -646,6 +741,16 @@ export default function Search() {
     boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
   }), []);
 
+  // Add these new state variables
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [selectedDonorContact, setSelectedDonorContact] = useState(null);
+  
+  // Add this function to handle contact button click
+  const handleContactClick = (donor) => {
+    setSelectedDonorContact(donor);
+    setShowContactModal(true);
+  };
+  
   // Main render
   return (
     <>
@@ -1090,6 +1195,19 @@ export default function Search() {
           )}
         </div>
       </div>
+      
+      {/* Add this at the end of your component */}
+      {showContactModal && selectedDonorContact && (
+        <ContactDonorModal
+          donor={selectedDonorContact}
+          isOpen={showContactModal}
+          language={language} // Pass the current language
+          onClose={() => {
+            setShowContactModal(false);
+            setSelectedDonorContact(null); // Clear the donor data when closing
+          }}
+        />
+      )}
     </>
   );
 }

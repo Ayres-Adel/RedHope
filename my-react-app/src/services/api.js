@@ -99,27 +99,34 @@ export const donationService = {
 // Donation Request service
 export const donationRequestService = {
   createDonationRequest: async (requestData) => {
-    return api.post('/api/donation-requests', requestData);
+    // requestData should contain: bloodType, hospitalId (optional), expiryDate, donorId (optional)
+    return api.post('/api/donation-request', requestData);
+  },
+  
+  createGuestDonationRequest: async (guestRequestData) => {
+    // guestRequestData should contain: phoneNumber OR guestId, bloodType, 
+    // hospitalId (optional), expiryDate
+    return api.post('/api/donation-request/guest', guestRequestData);
   },
   
   getDonationRequests: async (filters) => {
-    return api.get('/api/donation-requests', { params: filters });
+    return api.get('/api/donation-request', { params: filters });
   },
   
   getUserDonationRequests: async () => {
-    return api.get('/api/donation-requests/user');
+    return api.get('/api/donation-request/user');
   },
   
   getDonationRequestById: async (requestId) => {
-    return api.get(`/api/donation-requests/${requestId}`);
+    return api.get(`/api/donation-request/${requestId}`);
   },
   
   respondToDonationRequest: async (requestId, status) => {
-    return api.post(`/api/donation-requests/${requestId}/respond`, { status });
+    return api.post(`/api/donation-request/${requestId}/respond`, { status });
   },
   
   updateDonationRequestStatus: async (requestId, status) => {
-    return api.patch(`/api/donation-requests/${requestId}/status`, { status });
+    return api.patch(`/api/donation-request/${requestId}/status`, { status });
   }
 };
 
