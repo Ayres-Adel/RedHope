@@ -132,10 +132,10 @@ const ModalWrapper = memo(({ title, isOpen, onClose, onSubmit, children, isSubmi
         <form onSubmit={handleSubmit}>
           <div className="modal-body">{children}</div>
           <div className="modal-footer">
-            <button type="button" className="btn-cancel" onClick={onClose} disabled={isSubmitting}>
+            <button type="button" className="control-button" onClick={onClose} disabled={isSubmitting}>
               {translations.cancel}
             </button>
-            <button type="submit" className="btn-save" disabled={isSubmitting}>
+            <button type="submit" className="add-button" disabled={isSubmitting}>
               {isSubmitting ? translations.saving : (isUpdate ? translations.update : translations.create)}
             </button>
           </div>
