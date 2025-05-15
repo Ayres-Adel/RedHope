@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faTimes } from '@fortawesome/free-solid-svg-icons';
 import guestService from '../utils/guestService';
-import { getCurrentLocation } from '../utils/LocationService';
+import { getCurrentLocation, reverseGeocode } from '../utils/LocationService';
 import { donationRequestService } from '../services/api'; // Import donation request service
 import '../styles/ContactDonorModal.css';
 
@@ -62,7 +62,7 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
   
   if (!isOpen) return null;
 
-  // Update the handleSubmit function to work for both guests and logged-in users
+  // Update the handleSubmit function to include location for cityId extraction
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -84,6 +84,7 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
       
       // Get current location
       let location;
+      let cityId = null;
       try {
         location = await new Promise((resolve, reject) => {
           getCurrentLocation({
@@ -93,6 +94,25 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
             timeout: 10000
           });
         });
+        
+        // Get cityId from reverse geocoding
+        if (location && location.lat && location.lng) {
+          const geoResult = await reverseGeocode(location.lat, location.lng, language);
+          if (geoResult.success && geoResult.details && geoResult.details.cityId) {
+            cityId = geoResult.details.cityId;
+            console.log('Extracted cityId from location:', cityId);
+          } else if (geoResult.success && geoResult.components && geoResult.components.postcode) {
+            // Extract from postal code directly if cityId wasn't already set
+            const postalCode = geoResult.components.postcode;
+            if (postalCode && postalCode.length >= 2) {
+              const postalPrefix = postalCode.substring(0, 2);
+              if (/^\d{2}$/.test(postalPrefix)) {
+                cityId = postalPrefix;
+                console.log('Extracted cityId from postal code:', cityId);
+              }
+            }
+          }
+        }
       } catch (locError) {
         console.error('Error getting location:', locError);
         location = { lat: 0, lng: 0 };
@@ -101,55 +121,63 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
       // Check if user is logged in
       const token = localStorage.getItem('token');
       
+      // Prepare location data in the format the server expects
+      const locationData = {
+        type: 'Point',
+        coordinates: [location.lng || 0, location.lat || 0]
+      };
+      
       // Whether logged in or guest, create a donation request
       try {
         // Calculate default expiry date (7 days from now)
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + 7);
         
-        // Prepare donation request data
-        const donationRequestData = {
-          bloodType: donor.bloodType,
-          donorId: donor._id || donor.id, // Add the selected donor's ID
-          expiryDate: expiryDate.toISOString(),
-          location: {
-            type: 'Point',
-            coordinates: [location.lng || 0, location.lat || 0]
-          }
-        };
-        
         // For guests, we need to register them first
+        let guestInfo = {};
         if (!token) {
-          // 1. Register guest
-          const guestResponse = await guestService.registerGuest(formattedPhone, {
-            type: 'Point',
-            coordinates: [location.lng || 0, location.lat || 0]
-          });
+          // 1. Register guest with location data and cityId
+          const guestResponse = await guestService.registerGuest(formattedPhone, locationData, cityId);
           
           // Store registration info including timestamps
-          const guestInfo = {
-            guestId: guestResponse._id || guestResponse.id || guestResponse.guestId,
+          guestInfo = {
+            guestId: guestResponse.guestId || guestResponse._id || guestResponse.id,
             createdAt: guestResponse.createdAt,
-            lastActive: guestResponse.lastActive || new Date().toISOString()
+            lastActive: guestResponse.lastActive || new Date().toISOString(),
+            cityId: guestResponse.cityId || cityId
           };
           setRegistrationInfo(guestInfo);
           
-          // Add guest-specific fields to the request
-          donationRequestData.phoneNumber = formattedPhone;
-          donationRequestData.guestId = guestInfo.guestId;
+          // Prepare donation request data
+          const donationRequestData = {
+            bloodType: donor.bloodType,
+            donorId: donor._id || donor.id, // Add the selected donor's ID
+            expiryDate: expiryDate.toISOString(),
+            phoneNumber: formattedPhone,
+            guestId: guestInfo.guestId,
+            cityId: cityId, // Include the cityId for location context
+            location: locationData
+          };
           
           // Create guest donation request
           const requestResponse = await donationRequestService.createGuestDonationRequest(donationRequestData);
           console.log('Guest donation request created:', requestResponse.data);
+          setRequestCreated(true);
           
         } else {
           // For logged-in users, use the standard endpoint
+          const donationRequestData = {
+            bloodType: donor.bloodType,
+            donorId: donor._id || donor.id,
+            expiryDate: expiryDate.toISOString(),
+            cityId: cityId, // Include the cityId for location context
+            location: locationData
+          };
+          
           const requestResponse = await donationRequestService.createDonationRequest(donationRequestData);
           console.log('User donation request created:', requestResponse.data);
+          setRequestCreated(true);
         }
-        
-        setRequestCreated(true);
-        
       } catch (requestError) {
         console.error('Error creating donation request:', requestError);
         // Continue with the flow even if request creation fails
@@ -158,7 +186,7 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
       // Show success message
       setSuccess(true);
       
-      // Store registration timestamp in local storage to track guest history
+      // Store contact history in local storage
       if (!token) {
         try {
           const guestHistory = JSON.parse(localStorage.getItem('guestContactHistory') || '[]');
@@ -167,8 +195,9 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
             donorId: donor.id || donor._id,
             donorBloodType: donor.bloodType,
             timestamp: new Date().toISOString(),
-            registeredAt: registrationInfo?.createdAt,
-            requestCreated: requestCreated
+            registeredAt: registrationInfo?.createdAt || new Date().toISOString(),
+            requestCreated: requestCreated,
+            coordinates: [location.lng || 0, location.lat || 0]
           });
           localStorage.setItem('guestContactHistory', JSON.stringify(guestHistory));
         } catch (storageErr) {

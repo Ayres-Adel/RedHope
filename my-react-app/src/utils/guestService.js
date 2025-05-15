@@ -3,7 +3,7 @@ import { API_BASE_URL } from '../config.js';
 
 const guestService = {
   // Register a guest with phone number and location
-  registerGuest: async (phoneNumber, location) => {
+  registerGuest: async (phoneNumber, location, cityId = null) => {
     try {
       // Validate inputs
       if (!phoneNumber) {
@@ -21,6 +21,7 @@ const guestService = {
       const response = await axios.post(`${API_BASE_URL}/api/guest/register`, {
         phoneNumber,
         location,
+        cityId, // Include cityId if available
         timestamp: new Date().toISOString() // Include client timestamp
       });
       

@@ -26,6 +26,10 @@ const donationRequestSchema = new mongoose.Schema({
     ref: 'Hospital'
     // Not required, optional
   },
+  cityId: {
+    type: String,
+    default: null
+  },
   status: {
     type: String,
     enum: ['Active', 'Fulfilled', 'Expired', 'Cancelled'],
@@ -40,7 +44,8 @@ const donationRequestSchema = new mongoose.Schema({
 // Create text index for searching
 donationRequestSchema.index({ 
   'bloodType': 'text',
-  'donor': 1
+  'donor': 1,
+  'cityId': 1  // Add index for cityId to improve query performance
 });
 
 const DonationRequest = mongoose.model('DonationRequest', donationRequestSchema);

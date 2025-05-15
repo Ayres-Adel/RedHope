@@ -6,15 +6,29 @@ module.exports = {
   // Create a new donation request
   createDonationRequest: async (req, res) => {
     try {
-      const { bloodType, hospitalId, expiryDate, donorId } = req.body;
+      const { bloodType, hospitalId, expiryDate, donorId, cityId } = req.body;
       
       // Create request data
       const requestData = {
         requester: req.user.userId,
         bloodType,
         status: 'Active',
-        expiryDate: new Date(expiryDate)
+        expiryDate: new Date(expiryDate),
+        cityId: cityId || null // Add cityId from request or from user
       };
+      
+      // If no cityId provided directly, try to get it from user
+      if (!requestData.cityId) {
+        try {
+          const user = await User.findById(req.user.userId);
+          if (user && user.cityId) {
+            requestData.cityId = user.cityId;
+          }
+        } catch (userErr) {
+          console.error('Error getting user cityId:', userErr);
+          // Continue without cityId if there's an error
+        }
+      }
       
       // Add hospital if provided
       if (hospitalId) {
@@ -95,7 +109,8 @@ module.exports = {
         bloodType,
         hospitalId,
         expiryDate,
-        donorId  // Allow specifying a donor ID directly
+        donorId,
+        cityId  // Add cityId parameter to request body
       } = req.body;
       
       // Validate either guestId or phoneNumber is provided
@@ -166,7 +181,8 @@ module.exports = {
         guestRequester: guest._id,
         bloodType,
         status: 'Active',
-        expiryDate: expiryDate ? new Date(expiryDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Default to 7 days
+        expiryDate: expiryDate ? new Date(expiryDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default to 7 days
+        cityId: cityId || guest.cityId || null // Prioritize provided cityId, then fallback to guest's cityId
       };
       
       // Add hospital if provided

@@ -99,13 +99,13 @@ export const donationService = {
 // Donation Request service
 export const donationRequestService = {
   createDonationRequest: async (requestData) => {
-    // requestData should contain: bloodType, hospitalId (optional), expiryDate, donorId (optional)
+    // requestData should contain: bloodType, hospitalId (optional), expiryDate, donorId (optional), cityId (optional)
     return api.post('/api/donation-request', requestData);
   },
   
   createGuestDonationRequest: async (guestRequestData) => {
     // guestRequestData should contain: phoneNumber OR guestId, bloodType, 
-    // hospitalId (optional), expiryDate
+    // hospitalId (optional), expiryDate, cityId (optional)
     return api.post('/api/donation-request/guest', guestRequestData);
   },
   
