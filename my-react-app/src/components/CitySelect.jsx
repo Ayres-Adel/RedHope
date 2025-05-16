@@ -126,7 +126,7 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
             t.allCities, 
             null
           );
-        }, 100);
+        }, 300); // Increased from 100ms to 300ms
         
         return () => clearTimeout(timer);
       }

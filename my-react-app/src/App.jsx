@@ -11,7 +11,8 @@ import FlipCard from "./components/FlipCard.jsx";
 import PrivateRoute from './components/PrivateRoute';
 import Map from './components/Map.jsx';
 import Loading from "./components/Loading.jsx"; 
-import ScrollProgress from "./components/ScrollProgress.jsx"; // Import the ScrollProgress component
+import ScrollProgress from "./components/ScrollProgress.jsx";
+import './styles/AdminComponents.css';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import nprogress from 'nprogress';
 import './styles/nprogress.css';
@@ -22,11 +23,12 @@ const AppRoutes = () => {
 
   useEffect(() => {
     nprogress.start(); // Start the progress bar
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       nprogress.done(); // Stop the progress bar after route changes
-    }, 300); // You can adjust the time here for smoother effect
+    }, 500); // Increased from 300ms to 500ms for smoother effect
 
     return () => {
+      clearTimeout(timer); // Clear the timeout to avoid memory leaks
       nprogress.remove(); // Clean up progress bar on component unmount
     };
   }, [location]);
@@ -36,13 +38,17 @@ const AppRoutes = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/sign" element={<Sign />} />
       <Route path="/login" element={<Login />} />
-      <Route path="map" element={<Map />} />
+      <Route path="/map" element={<Map />} />
+      <Route path="/search" element={<Search />} />
 
       {/* Group protected routes including admin under PrivateRoute */}
       <Route element={<PrivateRoute />}>
-        <Route path="/search" element={<Search />} />
         <Route path="/user" element={<UserPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+      </Route>
+      
+      {/* Admin routes */}
+      <Route element={<PrivateRoute admin />}>
+        <Route path="/admin/*" element={<AdminPage />} />
       </Route>
 
       <Route path="*" element={<ErrorHandling />} />
@@ -53,46 +59,35 @@ const AppRoutes = () => {
 function App() {
   const [loading, setLoading] = useState(true); 
 
-  // Change the title on blur/focus
-  window.addEventListener("blur", () => {
-    document.title = "Come Back Hope ";
-  });
-
-  window.addEventListener("focus", () => {
-    document.title = "Red Hope";
-  });
-
-  // Simulate loading on app startup
+  // Add event listeners properly with cleanup
   useEffect(() => {
+    const handleBlur = () => {
+      document.title = "Come Back Hope ";
+    };
+
+    const handleFocus = () => {
+      document.title = "Red Hope";
+    };
+
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("focus", handleFocus);
+
+    // Simulate loading on app startup
     const timer = setTimeout(() => {
       setLoading(false); 
-    }, 1000); 
+    }, 800); // Reduced from 1000ms to 800ms for faster loading
 
-    return () => clearTimeout(timer); 
+    // Clean up event listeners and timer when component unmounts
+    return () => {
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
+      clearTimeout(timer); 
+    };
   }, []);
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/map" element={<Map />} />
-        
-        {/* Protected routes */}
-        <Route element={<PrivateRoute />}>
-          <Route path="/user" element={<UserPage />} />
-          {/* Other protected routes */}
-        </Route>
-        
-        {/* Admin routes */}
-        <Route element={<PrivateRoute admin />}>
-          <Route path="/admin/*" element={<AdminPage />} />
-        </Route>
-        
-        {/* Auth routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/sign" element={<Sign />} />
-      </Routes>
+      {loading ? <Loading /> : <AppRoutes />}
     </Router>
   );
 }

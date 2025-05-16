@@ -89,7 +89,7 @@ export const SearchBar = ({
       onClick={() => {
         if (!showSearch) {
           setShowSearch(true);
-          setTimeout(() => searchInputRef.current?.focus(), 300);
+          setTimeout(() => searchInputRef.current?.focus(), 500); // Increased from 300 to 500
         }
       }}
       aria-label={t.searchHospitals}

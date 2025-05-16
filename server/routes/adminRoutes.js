@@ -15,7 +15,7 @@ const fallbackAuth = (req, res, next) => {
 router.get('/profile', requireAuth || fallbackAuth, (req, res) => {
   try {
     // Get Admin model
-    const Admin = mongoose.models.Admin;
+    const Admin = mongoose.models.Admin || require('../models/Admin');
     
     if (!Admin) {
       return res.status(500).json({ error: 'Admin model not registered' });

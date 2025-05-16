@@ -1,10 +1,8 @@
-// controllers/authController.js
 const User = require('../models/User');
-const Admin = require('../models/Admin'); // Ensure Admin model is imported
+const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-// Helper function to create JWT token
 const createToken = (id, role) => {
   return jwt.sign(
     { id, role },
@@ -13,7 +11,6 @@ const createToken = (id, role) => {
   );
 };
 
-// Login controller - handles both User and Admin authentication
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -25,7 +22,6 @@ exports.login = async (req, res) => {
       });
     }
     
-    // First, try to find in Admin collection
     let admin = null;
     let user = null;
     let isAdmin = false;
@@ -35,9 +31,8 @@ exports.login = async (req, res) => {
       
       if (admin) {
         isAdmin = true;
-        user = admin; // Use admin as the user object for login
+        user = admin;
       } else {
-        // If not found in admin, check regular users
         user = await User.findOne({ email }).select('+password');
       }
     } catch (dbError) {

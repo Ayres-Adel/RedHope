@@ -134,11 +134,11 @@ export default function Sign() {
     }
 
     // Phone number validation: expecting exactly 10 digits
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(formData.phoneNumber)) {
+    const phoneRegex = /^(0|\+)?[0-9]{10,15}$/;
+    if (!phoneRegex.test(formData.phoneNumber.replace(/\D/g, ''))) {
       newErrors.phoneNumber = language === 'fr'
-        ? 'Le numéro de téléphone n\'est pas valide'
-        : 'Phone number is invalid';
+        ? 'Le numéro de téléphone doit comporter entre 10 et 15 chiffres'
+        : 'Phone number must be between 10 and 15 digits';
       valid = false;
     }
 
@@ -286,7 +286,7 @@ export default function Sign() {
         }));
       },
       enableHighAccuracy: true,
-      timeout: 10000,
+      timeout: 20000, // Increased from 10000 to 20000ms
       maximumAge: 0
     });
   };

@@ -41,29 +41,110 @@ exports.getUserStats = async (req, res) => {
 };
 
 /**
- * Get donation statistics
- * @route GET /api/stats/donations
+ * Get donation statistics (summary metrics only)
+ * @route GET /api/stats/donations/stats
  */
 exports.getDonationStats = async (req, res) => {
   try {
-    const donations = await Donation.find({})
-      .populate('donor', 'username email bloodType')
-      .populate('hospital', 'name location')
-      .lean(); // Convert to plain JS objects for better performance
+    // Connect to Donation model
+    const Donation = mongoose.model('Donation');
     
-    const totalDonations = donations.length;
-    const pendingRequests = donations.filter(d => d.status === 'Pending').length;
+    // Aggregate statistics without fetching all donation records
+    const stats = await Donation.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalDonations: { $sum: 1 },
+          pendingRequests: {
+            $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] }
+          },
+          completedDonations: {
+            $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] }
+          }
+        }
+      }
+    ]);
     
+    // Format the response
     return res.status(200).json({
       success: true,
-      data: {
-        donations,
-        totalDonations,
-        pendingRequests
+      data: stats.length > 0 ? {
+        totalDonations: stats[0].totalDonations,
+        pendingRequests: stats[0].pendingRequests,
+        completedDonations: stats[0].completedDonations
+      } : {
+        totalDonations: 0,
+        pendingRequests: 0, 
+        completedDonations: 0
       }
     });
   } catch (error) {
     return handleError(res, error, 'Error fetching donation statistics');
+  }
+};
+
+/**
+ * Get detailed donation list with pagination
+ * @route GET /api/stats/donations/list
+ */
+exports.getDonationsList = async (req, res) => {
+  try {
+    // Connect to Donation model
+    const Donation = mongoose.model('Donation');
+    
+    // Parse pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    // Build query based on filters
+    const query = {};
+    
+    // Add status filter if provided
+    if (req.query.status) {
+      query.status = req.query.status;
+    }
+    
+    // Add blood type filter if provided
+    if (req.query.bloodType) {
+      query.bloodType = req.query.bloodType;
+    }
+    
+    // Add date range filter if provided
+    if (req.query.startDate && req.query.endDate) {
+      query.createdAt = {
+        $gte: new Date(req.query.startDate),
+        $lte: new Date(req.query.endDate)
+      };
+    }
+    
+    // Fetch donations with pagination
+    const donations = await Donation.find(query)
+      .populate('donor', 'username email bloodType')
+      .populate('hospital', 'name location')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    
+    // Get total count for pagination
+    const totalDonations = await Donation.countDocuments(query);
+    
+    // Return the results
+    return res.status(200).json({
+      success: true,
+      data: {
+        donations,
+        pagination: {
+          total: totalDonations,
+          page,
+          pages: Math.ceil(totalDonations / limit),
+          limit
+        }
+      }
+    });
+  } catch (error) {
+    return handleError(res, error, 'Error fetching donation list');
   }
 };
 

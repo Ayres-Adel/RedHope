@@ -64,7 +64,7 @@ const INITIAL_USER_FORM_DATA = {
   isDonor: true, // Changed from false to true - users are donors by default
   isActive: true,
   password: '',
-  phoneNumber: '0500000000', // Default phone number to satisfy API requirements
+  phoneNumber: '0500000000', // Default phone number (10 digits)
   dateOfBirth: new Date('1990-01-01').toISOString().split('T')[0], // Default date of birth (YYYY-MM-DD)
   location: '0.000000, 0.000000', // Coordinated location format (latitude, longitude)
 };
@@ -432,7 +432,8 @@ const AdminPage = () => {
     const errorMessage = `Failed to ${operation}: ${error?.response?.data?.message || error?.message || 'Unknown error'}`;
     console.error(errorMessage, error);
     setError(errorMessage);
-    const timer = setTimeout(() => setError(null), 5000);
+    // Increase error message display time
+    const timer = setTimeout(() => setError(null), 10000); // Increased from 5000 to 10000ms
     return () => clearTimeout(timer);
   }, []);
 
@@ -735,7 +736,7 @@ const AdminPage = () => {
         bloodType: userData.bloodType || '',
         isDonor: userData.isDonor || true, // Default to true
         isActive: userData.isActive !== false,
-        phoneNumber: userData.phoneNumber || '0500000000', // Default phone number to satisfy API requirements
+        phoneNumber: userData.phoneNumber || '0500000000', // Default phone number (10 digits)
         dateOfBirth: userData.dateOfBirth || new Date('1990-01-01').toISOString().split('T')[0], // Default date of birth (YYYY-MM-DD)
         location: userData.location || 'N/A',
       });

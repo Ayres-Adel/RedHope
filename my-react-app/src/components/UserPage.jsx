@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
+import { formatLocation } from '../utils/LocationService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faSpinner, 
+  faThLarge, 
+  faTable 
+} from '@fortawesome/free-solid-svg-icons';
 import '../styles/UserPage.css';
 import Navbar from './Navbar';
 import Toast from './Toast';
-import { FiEye, FiEyeOff, FiUser, FiMail, FiPhone, FiMapPin, FiDroplet, FiLock, FiTrash2, FiSettings, FiHome, FiShield, FiHeart } from 'react-icons/fi';
-import { API_BASE_URL } from '../config';
-import { getCurrentLocation, reverseGeocode, formatLocation } from '../utils/LocationService';
+import { FiEye, FiEyeOff, FiUser, FiMail, FiPhone, FiMapPin, FiDroplet, FiLock, FiTrash2, FiSettings, FiHome, FiShield, FiHeart, FiCalendar, FiClock, FiCheckCircle, FiAlertCircle, FiX } from 'react-icons/fi';
+import { getCurrentLocation, reverseGeocode } from '../utils/LocationService';
+
+// Import our new components
+import DonationRequestsTable from './donation/DonationRequestsTable';
+import DonationRequestCard from './donation/DonationRequestCard';
+import DonationRequestDetail from './donation/DonationRequestDetail';
 
 const UserPage = () => {
   const navigate = useNavigate();
@@ -41,6 +53,12 @@ const UserPage = () => {
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   const [activeSection, setActiveSection] = useState('profile');
   const [updating, setUpdating] = useState(false);
+  const [donations, setDonations] = useState([]);
+  const [loadingDonations, setLoadingDonations] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [selectedDonation, setSelectedDonation] = useState(null);
+  const [showDonationDetail, setShowDonationDetail] = useState(false);
+  const [donationsError, setDonationsError] = useState('');
 
   // Translations
   const translations = {
@@ -87,7 +105,26 @@ const UserPage = () => {
       donor: 'Donor',
       nonDonor: 'Non-Donor',
       changeDonorStatus: 'Change Status',
-      donorStatusUpdated: 'Donor status updated successfully!'
+      donorStatusUpdated: 'Donor status updated successfully!',
+      donationDate: 'Request Date',
+      donationStatus: 'Status',
+      donationLocation: 'Location',
+      donationBloodType: 'Blood Type Required',
+      donationDetails: 'View Details',
+      cancelRequest: 'Cancel Request',
+      confirmRequest: 'Confirm',
+      pending: 'Pending',
+      approved: 'Approved',
+      completed: 'Completed',
+      rejected: 'Rejected',
+      loadingDonations: 'Loading your donation requests...',
+      donationRequests: 'Donation Requests',
+      noDonations: 'No donation requests found',
+      completeRequest: 'Complete',
+      deleteRequest: 'Delete',
+      confirmDeleteRequest: 'Are you sure you want to delete this request?',
+      requestCompleted: 'Request marked as completed',
+      requestDeleted: 'Request deleted successfully'
     },
     fr: {
       accountSettings: 'Paramètres du Compte',
@@ -132,7 +169,26 @@ const UserPage = () => {
       donor: 'Donneur',
       nonDonor: 'Non-Donneur',
       changeDonorStatus: 'Changer le statut',
-      donorStatusUpdated: 'Statut de donneur mis à jour avec succès!'
+      donorStatusUpdated: 'Statut de donneur mis à jour avec succès!',
+      donationDate: 'Date de demande',
+      donationStatus: 'Statut',
+      donationLocation: 'Emplacement',
+      donationBloodType: 'Groupe sanguin requis',
+      donationDetails: 'Voir les détails',
+      cancelRequest: 'Annuler la demande',
+      confirmRequest: 'Confirmer',
+      pending: 'En attente',
+      approved: 'Approuvé',
+      completed: 'Terminé',
+      rejected: 'Rejeté',
+      loadingDonations: 'Chargement de vos demandes de don...',
+      donationRequests: 'Demandes de Don',
+      noDonations: 'Aucune demande de don trouvée',
+      completeRequest: 'Compléter',
+      deleteRequest: 'Supprimer',
+      confirmDeleteRequest: 'Êtes-vous sûr de vouloir supprimer cette demande?',
+      requestCompleted: 'Demande marquée comme complétée',
+      requestDeleted: 'Demande supprimée avec succès'
     }
   };
 
@@ -199,7 +255,7 @@ const UserPage = () => {
           if (error.response?.status === 401) {
             localStorage.removeItem('token');
             addMessage(t.sessionExpired, 'error');
-            setTimeout(() => navigate('/login'), 1500);
+            setTimeout(() => navigate('/login'), 3000);
             return;
           }
           
@@ -604,6 +660,228 @@ const UserPage = () => {
     });
   };
 
+  // Update the fetchUserDonations function to get all related requests
+  const fetchUserDonations = async () => {
+    setLoadingDonations(true);
+    setDonationsError('');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      // Use the all-user endpoint to get both requests made by the user and requests where user is a donor
+      const response = await axios.get(
+        `${API_BASE_URL}/api/donation-request/all-user`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data && Array.isArray(response.data)) {
+        // API returns an array of donation requests
+        setDonations(response.data);
+      } else if (response.data && Array.isArray(response.data.data)) {
+        // API returns an object with a data property containing the array
+        setDonations(response.data.data);
+      } else {
+        console.error('Unexpected API response format:', response.data);
+        setDonationsError('Unexpected data format received from server');
+        setDonations([]);
+      }
+    } catch (error) {
+      console.error('Error fetching donation requests:', error);
+      setDonationsError(error.response?.data?.message || 'Failed to load donation requests');
+      setDonations([]);
+    } finally {
+      setLoadingDonations(false);
+    }
+  };
+
+  // Fetch donation requests when the user navigates to the donations section
+  useEffect(() => {
+    if (activeSection === 'donations') {
+      fetchUserDonations();
+    }
+  }, [activeSection]);
+
+  // Function to handle canceling a donation request
+  const handleCancelDonation = async (donationId) => {
+    try {
+      setActionLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      // Call the API to cancel the donation request
+      const response = await axios.put(
+        `${API_BASE_URL}/api/donation-request/${donationId}/cancel`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data && response.data.success) {
+        // Update the local state with the canceled donation
+        setDonations(prevDonations => 
+          prevDonations.map(donation => 
+            donation._id === donationId 
+              ? { ...donation, status: 'Cancelled' } 
+              : donation
+          )
+        );
+        addMessage('Donation request canceled successfully', 'success');
+      } else {
+        throw new Error(response.data?.message || 'Failed to cancel donation request');
+      }
+    } catch (error) {
+      console.error('Error canceling donation request:', error);
+      addMessage(error.response?.data?.message || 'Failed to cancel donation request', 'error');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Add function to handle confirming a donation request
+  const handleConfirmDonation = async (donationId) => {
+    try {
+      setActionLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      // Call the API to confirm the donation request
+      const response = await axios.put(
+        `${API_BASE_URL}/api/donation-request/${donationId}/fulfill`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data && response.data.success) {
+        // Update the local state with the confirmed donation
+        setDonations(prevDonations => 
+          prevDonations.map(donation => 
+            donation._id === donationId 
+              ? { ...donation, status: 'Fulfilled' } 
+              : donation
+          )
+        );
+        addMessage('Donation request confirmed successfully', 'success');
+      } else {
+        throw new Error(response.data?.message || 'Failed to confirm donation request');
+      }
+    } catch (error) {
+      console.error('Error confirming donation request:', error);
+      addMessage(error.response?.data?.message || 'Failed to confirm donation request', 'error');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Add function to handle completing a donation request
+  const handleCompleteDonation = async (donationId) => {
+    try {
+      setActionLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      // Call the API to mark donation request as completed
+      const response = await axios.put(
+        `${API_BASE_URL}/api/donation-request/${donationId}/complete`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data && response.data.success) {
+        // Update the local state with the completed donation
+        setDonations(prevDonations => 
+          prevDonations.map(donation => 
+            donation._id === donationId 
+              ? { ...donation, status: 'Completed' } 
+              : donation
+          )
+        );
+        addMessage(t.requestCompleted, 'success');
+      } else {
+        throw new Error(response.data?.message || 'Failed to complete donation request');
+      }
+    } catch (error) {
+      console.error('Error completing donation request:', error);
+      addMessage(error.response?.data?.message || 'Failed to complete donation request', 'error');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Add function to handle deleting a donation request
+  const handleDeleteDonation = async (donationId) => {
+    // Show confirmation prompt before deleting
+    if (!window.confirm(t.confirmDeleteRequest)) {
+      return;
+    }
+    
+    try {
+      setActionLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      // Call the API to delete the donation request
+      const response = await axios.delete(
+        `${API_BASE_URL}/api/donation-request/${donationId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data && response.data.success) {
+        // Remove the donation from the local state
+        setDonations(prevDonations => 
+          prevDonations.filter(donation => donation._id !== donationId)
+        );
+        
+        addMessage(t.requestDeleted, 'success');
+      } else {
+        throw new Error(response.data?.message || 'Failed to delete donation request');
+      }
+    } catch (error) {
+      console.error('Error deleting donation request:', error);
+      addMessage(error.response?.data?.message || 'Failed to delete donation request', 'error');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Add these functions before the return statement:
+
+  // Function to handle viewing donation details
+  const handleViewDonationDetails = (donation) => {
+    setSelectedDonation(donation);
+    setShowDonationDetail(true);
+  };
+
+  // Function to handle closing donation details
+  const handleCloseDonationDetails = () => {
+    setShowDonationDetail(false);
+    setSelectedDonation(null);
+  };
+
+  // In the render section, replace the donation container with our new components
   return (
     <>
       <Navbar />
@@ -627,6 +905,13 @@ const UserPage = () => {
               >
                 <FiUser />
                 <span>{t.myProfile}</span>
+              </li>
+              <li 
+                className={activeSection === 'donations' ? 'active' : ''}
+                onClick={() => setActiveSection('donations')}
+              >
+                <FiHeart />
+                <span>{t.myDonations}</span>
               </li>
               <li 
                 className={activeSection === 'security' ? 'active' : ''}
@@ -836,13 +1121,92 @@ const UserPage = () => {
                               className="edit-info-btn"
                               disabled={updating}
                             >
-                              {updating ? t.updating : t.saveChanges}
+                              {updating ? t.changing : t.saveChanges}
                             </button>
                           </div>
                         </form>
                       )}
                     </div>
                   </section>
+                )}
+
+                {activeSection === 'donations' && (
+                  <div className="donations-container">
+                    <h2>{t.donationRequests}</h2>
+                    
+                    {donationsError && (
+                      <div className="error-message">{donationsError}</div>
+                    )}
+                    
+                    {/* Add responsive styles for table/cards display */}
+                    <style>
+                      {`
+                        @media screen and (min-width: 701px) {
+                          .donations-table-wrapper { display: block; }
+                          .donations-cards { display: none; }
+                        }
+                        
+                        @media screen and (max-width: 700px) {
+                          .donations-table-wrapper { display: none; }
+                          .donations-cards { display: block; }
+                        }
+                      `}
+                    </style>
+                    
+                    {loadingDonations ? (
+                      <div className="donations-loading">
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                        <p>{t.loadingDonations}</p>
+                      </div>
+                    ) : donations.length === 0 ? (
+                      <div className="no-donations-message">
+                        <p>{t.noDonations}</p>
+                      </div>
+                    ) : (
+                      <div className="table-wrapper">
+                        {/* Table view - will be shown only on larger screens via CSS */}
+                        <div className="donations-table-wrapper">
+                          <DonationRequestsTable
+                            donationRequests={donations}
+                            onCancel={handleCancelDonation}
+                            onConfirm={handleConfirmDonation}
+                            onViewDetails={handleViewDonationDetails}
+                            onComplete={handleCompleteDonation} // Add this handler
+                            onDelete={handleDeleteDonation} // Add this handler
+                            translations={t}
+                            isActionLoading={actionLoading}
+                            loadingDonations={false}
+                          />
+                        </div>
+                        
+                        {/* Card view - will be shown only on smaller screens via CSS */}
+                        <div className="donations-cards">
+                          {donations.map(donation => (
+                            <DonationRequestCard
+                              key={donation._id}
+                              donationRequest={donation}
+                              onCancel={handleCancelDonation}
+                              onConfirm={handleConfirmDonation}
+                              onComplete={handleCompleteDonation} // Add this handler
+                              onDelete={handleDeleteDonation} // Add this handler
+                              onViewDetails={handleViewDonationDetails}
+                              translations={t}
+                              isActionLoading={actionLoading}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Details modal */}
+                    {showDonationDetail && selectedDonation && (
+                      <DonationRequestDetail
+                        donationRequest={selectedDonation}
+                        onClose={handleCloseDonationDetails}
+                        translations={t}
+                      />
+                    )}
+                  </div>
                 )}
 
                 {activeSection === 'security' && (
@@ -855,63 +1219,57 @@ const UserPage = () => {
                         </div>
                         <h3>{t.changePassword}</h3>
                       </div>
-                      
-                      <div className="security-content">
-                        <div className="form-field">
-                          <label>{t.currentPassword}</label>
-                          <div className="password-input-container">
-                            <input
-                              type={showCurrentPassword ? "text" : "password"}
-                              value={currentPassword}
-                              onChange={(e) => setCurrentPassword(e.target.value)}
-                              placeholder={t.currentPassword}
-                            />
-                            <span 
-                              className="password-toggle"
-                              onClick={() => togglePasswordVisibility('current')}
-                            >
-                              {showCurrentPassword ? <FiEyeOff /> : <FiEye />}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="form-field">
-                          <label>{t.newPassword}</label>
-                          <div className="password-input-container">
-                            <input
-                              type={showNewPassword ? "text" : "password"}
-                              value={newPassword}
-                              onChange={(e) => setNewPassword(e.target.value)}
-                              placeholder={t.newPassword}
-                            />
-                            <span 
-                              className="password-toggle"
-                              onClick={() => togglePasswordVisibility('new')}
-                            >
-                              {showNewPassword ? <FiEyeOff /> : <FiEye />}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="form-field">
-                          <label>{t.confirmPassword}</label>
-                          <div className="password-input-container">
-                            <input
-                              type={showConfirmPassword ? "text" : "password"}
-                              value={confirmPassword}
-                              onChange={(e) => setConfirmPassword(e.target.value)}
-                              placeholder={t.confirmPassword}
-                            />
-                            <span 
-                              className="password-toggle"
-                              onClick={() => togglePasswordVisibility('confirm')}
-                            >
-                              {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-                            </span>
-                          </div>
+                      <div className="form-field">
+                        <label>{t.currentPassword}</label>
+                        <div className="password-input-container">
+                          <input
+                            type={showCurrentPassword ? "text" : "password"}
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            placeholder={t.currentPassword}
+                          />
+                          <span 
+                            className="password-toggle"
+                            onClick={() => togglePasswordVisibility('current')}
+                          >
+                            {showCurrentPassword ? <FiEyeOff /> : <FiEye />}
+                          </span>
                         </div>
                       </div>
-                      
+                      <div className="form-field">
+                        <label>{t.newPassword}</label>
+                        <div className="password-input-container">
+                          <input
+                            type={showNewPassword ? "text" : "password"}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder={t.newPassword}
+                          />
+                          <span 
+                            className="password-toggle"
+                            onClick={() => togglePasswordVisibility('new')}
+                          >
+                            {showNewPassword ? <FiEyeOff /> : <FiEye />}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="form-field">
+                        <label>{t.confirmPassword}</label>
+                        <div className="password-input-container">
+                          <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder={t.confirmPassword}
+                          />
+                          <span 
+                            className="password-toggle"
+                            onClick={() => togglePasswordVisibility('confirm')}
+                          >
+                            {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                          </span>
+                        </div>
+                      </div>
                       <div className="security-footer">
                         <button 
                           className="password-submit-btn" 
@@ -929,9 +1287,6 @@ const UserPage = () => {
                   <section>
                     <h2>{t.deleteAccount}</h2>
                     <div className="danger-box">
-                      <div className="danger-icon">
-                        <FiTrash2 />
-                      </div>
                       <p>{t.deleteWarning}</p>
                       <button className="danger-action-btn" onClick={() => setShowDeleteModal(true)}>
                         <FiTrash2 /> {t.deleteButton}
@@ -943,7 +1298,7 @@ const UserPage = () => {
             )}
           </div>
         </div>
-
+        
         {showDeleteModal && (
           <div className="modal-overlay" onClick={handleModalOverlayClick}>
             <div className="modal">

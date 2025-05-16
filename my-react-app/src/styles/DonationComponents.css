@@ -1,0 +1,719 @@
+/* Donation Components Styling */
+
+/* ===== Table Styling ===== */
+.donations-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+/* Enhanced table header styling */
+.donations-table thead {
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+}
+
+.donations-table thead th {
+  color: #495057;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.donations-table thead th:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, rgba(255,71,71,0.5), transparent);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+
+.donations-table thead th:hover:after {
+  transform: scaleX(1);
+}
+
+.donations-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.donations-table tbody tr:hover {
+  background-color: rgba(255, 71, 71, 0.03);
+}
+
+.donations-table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.donations-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.icon-spacing {
+  margin-right: 8px;
+  color: #ff4747;
+}
+
+/* Blood type styling */
+.blood-type-cell {
+  font-weight: 600;
+  text-align: center;
+}
+
+.blood-type-badge {
+  background: #ff4747;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.blood-icon {
+  margin-right: 4px;
+  font-size: 0.7rem;
+}
+
+/* Location cell styling */
+.location-cell {
+  display: flex;
+  align-items: center;
+}
+
+/* Phone cell styling */
+.phone-cell {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* Requester cell styling */
+.requester-cell {
+  font-weight: 600;
+}
+
+/* Status badge styling */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  background-color: #fff8e6;
+  color: #b58105;
+  border: 1px solid #ffeeba;
+}
+
+.status-approved {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #c8e6c9;
+}
+
+.status-rejected {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+/* Specific Table Button Styling */
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.table-actions button {
+  font-size: 12px;
+  padding: 6px 12px;
+  height: 32px;
+  min-width: 80px;
+  margin-right: 4px;
+}
+
+.table-actions button svg {
+  font-size: 12px;
+}
+
+/* Unified Action Button Styling */
+
+/* Common button base styles */
+.donation-actions button,
+.card-actions button,
+.table-actions button,
+.action-btn,
+.action-cancel-btn,
+.action-confirm-btn,
+.action-complete-btn,
+.action-delete-btn,
+.action-details-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.3px;
+}
+
+/* Table specific button sizes */
+.table-actions button,
+.table-actions .action-btn,
+.table-actions .action-cancel-btn,
+.table-actions .action-confirm-btn,
+.table-actions .action-complete-btn,
+.table-actions .action-delete-btn,
+.table-actions .action-details-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  height: 32px;
+  min-width: 80px;
+}
+
+/* Card specific button sizes - keeping original size */
+.donation-actions button,
+.card-actions button {
+  min-width: 100px;
+  height: 38px;
+}
+
+/* Icon spacing */
+.donation-actions button svg,
+.card-actions button svg,
+.table-actions button svg,
+.action-btn svg,
+.action-cancel-btn svg,
+.action-confirm-btn svg,
+.action-complete-btn svg,
+.action-delete-btn svg,
+.action-details-btn svg {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+/* Button container positioning */
+.donation-actions,
+.card-actions,
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Cancel button styling */
+.action-cancel-btn {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.action-cancel-btn:hover {
+  background-color: #f5c6cb;
+}
+
+/* Confirm button styling */
+.action-confirm-btn {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.action-confirm-btn:hover {
+  background-color: #c3e6cb;
+}
+
+/* Complete button styling */
+.action-complete-btn {
+  background-color: #28a745;
+  color: white;
+  border: 1px solid #218838;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-complete-btn:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Delete button styling */
+.action-delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.action-delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Details button styling */
+.action-details-btn {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.action-details-btn:hover {
+  background-color: #d6d8db;
+}
+
+/* Disabled state */
+.donation-actions button:disabled,
+.card-actions button:disabled,
+.table-actions button:disabled,
+.action-btn:disabled,
+.action-cancel-btn:disabled,
+.action-confirm-btn:disabled,
+.action-complete-btn:disabled,
+.action-delete-btn:disabled,
+.action-details-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== Card Styling ===== */
+.donation-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative; /* Add position relative for absolute positioning of children */
+}
+
+.donation-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.donation-header {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f7f9fc;
+  border-bottom: 1px solid #edf0f7;
+}
+
+.donation-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.donation-date {
+  color: #6c757d;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.donation-date svg {
+  color: #ff4747;
+}
+
+.donation-details {
+  padding: 15px;
+}
+
+.donation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.donation-info > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.donation-info svg {
+  color: #ff4747;
+  font-size: 1rem;
+}
+
+.donation-blood-type {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #ff4747;
+}
+
+.donation-requester {
+  font-weight: 600;
+  color: #343a40;
+}
+
+.donation-hospital, .donation-location {
+  color: #495057;
+}
+
+.donation-phone {
+  color: #6c757d;
+}
+
+.donation-expiry {
+  color: #dc3545;
+  font-style: italic;
+}
+
+.donation-donor {
+  font-weight: 500;
+  color: #28a745;
+}
+
+.donation-actions {
+  display: flex;
+  justify-content: flex-start; /* Change from space-between to flex-start */
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px; /* Increased gap for better spacing */
+  margin-top: 12px;
+  padding: 12px 15px; /* Add consistent padding */
+  border-top: 1px solid #eaeaea;
+}
+
+.donation-actions button {
+  padding: 8px 14px; /* Slightly larger padding */
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500; /* Add font weight for emphasis */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Add subtle shadow */
+}
+
+/* Improve hover effects */
+.donation-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0,0,0,0.15);
+}
+
+/* Style for the complete button - make it green */
+.complete-request-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.complete-request-btn:hover {
+  background-color: #218838;
+}
+
+.cancel-request-btn {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.confirm-request-btn {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.delete-request-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Position the details button in the bottom right corner */
+.details-icon-wrapper {
+  position: absolute;
+  top: 57px;
+  right: 5px;
+  z-index: 2; /* Ensure it appears above other content */
+}
+
+.view-details-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  color: #343a40;
+  border: 1px solid #e9ecef;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.view-details-icon:hover {
+  background-color: #e9ecef;
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.view-details-icon svg {
+  font-size: 16px;
+}
+
+/* Dark theme styles for the details icon */
+body.dark-theme .view-details-icon {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+}
+
+body.dark-theme .view-details-icon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark theme modal improvements */
+body.dark-theme .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+body.dark-theme .donation-detail-modal {
+  background-color: #1e1e1e;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
+}
+
+body.dark-theme .donation-detail-header {
+  background: linear-gradient(135deg, #e03333 0%, #c42323 100%);
+}
+
+body.dark-theme .donation-detail-header.status-pending {
+  background: linear-gradient(135deg, #e6a800 0%, #cc8400 100%);
+}
+
+body.dark-theme .donation-detail-header.status-approved {
+  background: linear-gradient(135deg, #218838 0%, #1a7430 100%);
+}
+
+body.dark-theme .donation-detail-header.status-rejected {
+  background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+}
+
+body.dark-theme .confirm-request-btn {
+  color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.15);
+  border-color: rgba(76, 175, 80, 0.2);
+}
+
+body.dark-theme .confirm-request-btn:hover {
+  background-color: rgba(76, 175, 80, 0.25);
+  border-color: rgba(76, 175, 80, 0.35);
+}
+
+/* Dark theme styles */
+body.dark-theme .donations-table {
+  background-color: #1e1e1e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-theme .donations-table thead {
+  background: linear-gradient(to right, #252525, #1e1e1e);
+}
+
+body.dark-theme .donations-table thead th {
+  background-color: #252525;
+  color: #e0e0e0;
+  border-bottom-color: #333;
+}
+
+body.dark-theme .donations-table thead th:after {
+  background: linear-gradient(to right, rgba(255,71,71,0.5), transparent);
+}
+
+body.dark-theme .donations-table td {
+  border-bottom-color: #333;
+  color: #e0e0e0;
+}
+
+body.dark-theme .donations-table tbody tr:hover {
+  background-color: rgba(255, 71, 71, 0.1);
+}
+
+/* Dark theme table button styles */
+body.dark-theme .table-actions button {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+body.dark-theme .table-actions button:hover {
+  background-color: #3a3a3a;
+}
+
+body.dark-theme .table-actions .action-cancel-btn {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #f77;
+}
+
+body.dark-theme .table-actions .action-confirm-btn {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #6d6;
+}
+
+body.dark-theme .table-actions .action-complete-btn {
+  background-color: rgba(40, 167, 69, 0.3);
+  color: #6d6;
+}
+
+body.dark-theme .table-actions .action-delete-btn {
+  background-color: rgba(220, 53, 69, 0.3);
+  color: #f77;
+}
+
+body.dark-theme .table-actions .action-details-btn {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: #ddd;
+}
+
+/* Add improved dark theme styles for donation cards */
+body.dark-theme .donation-card {
+  background-color: #2a2a2a;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-theme .donation-header {
+  background: #222222;
+  border-bottom-color: #333333;
+}
+
+body.dark-theme .donation-info > span {
+  color: #e0e0e0;
+}
+
+body.dark-theme .donation-blood-type {
+  color: #ff6b6b;
+}
+
+body.dark-theme .donation-requester {
+  color: #f0f0f0;
+}
+
+body.dark-theme .donation-hospital, 
+body.dark-theme .donation-location {
+  color: #cccccc;
+}
+
+body.dark-theme .donation-phone {
+  color: #bbbbbb;
+}
+
+body.dark-theme .donation-actions {
+  border-top-color: #333333;
+}
+
+body.dark-theme .view-details-btn {
+  background-color: #333333;
+  color: #e0e0e0;
+}
+
+body.dark-theme .view-details-btn:hover {
+  background-color: #444444;
+}
+
+body.dark-theme .cancel-request-btn {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #ff8888;
+}
+
+body.dark-theme .cancel-request-btn:hover {
+  background-color: rgba(220, 53, 69, 0.3);
+}
+
+body.dark-theme .confirm-request-btn {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #88dd88;
+}
+
+body.dark-theme .confirm-request-btn:hover {
+  background-color: rgba(40, 167, 69, 0.3);
+}
+
+body.dark-theme .complete-request-btn {
+  background-color: rgba(40, 167, 69, 0.3);
+  color: #88dd88;
+  border-color: rgba(40, 167, 69, 0.5);
+}
+
+body.dark-theme .complete-request-btn:hover {
+  background-color: rgba(40, 167, 69, 0.4);
+}
+
+body.dark-theme .delete-request-btn {
+  background-color: rgba(220, 53, 69, 0.3);
+  color: #ff8888;
+}
+
+body.dark-theme .delete-request-btn:hover {
+  background-color: rgba(220, 53, 69, 0.4);
+}
+
+/* Responsive adjustments for tables */
+@media (max-width: 768px) {
+  .table-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .table-actions button {
+    margin-bottom: 4px;
+    width: 100%;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .donations-table th, 
+  .donations-table td {
+    padding: 10px;
+  }
+  
+  .donation-detail-modal {
+    width: 95%;
+  }
+  
+  .status-update-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+

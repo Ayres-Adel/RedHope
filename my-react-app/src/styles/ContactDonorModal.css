@@ -4,104 +4,168 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .contact-modal {
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  cursor: default;
+  border: 1px solid #edf0f7;
+  animation: modal-in 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-modal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
+  padding: 16px 20px;
   background-color: #ff4747;
   color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
 }
 
 .close-btn {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
   font-size: 1.2rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 24px;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #444;
 }
 
 .form-group input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+  border-color: #ff4747;
+  box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.1);
+  outline: none;
 }
 
 .contact-btn {
   background-color: #ff4747;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
+  padding: 12px 20px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-btn:hover {
+  background-color: #e53e3e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 71, 71, 0.3);
 }
 
 .contact-btn:disabled {
-  background-color: #999;
+  background-color: #aaa;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .error-message {
   color: #ff4747;
   margin: 10px 0;
+  padding: 8px;
+  background-color: rgba(255, 71, 71, 0.1);
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .success-message {
   text-align: center;
   padding: 20px 0;
+  color: #2ed573;
+  font-weight: 500;
 }
 
 .donor-info {
   background-color: #f9f9f9;
-  padding: 10px;
-  border-radius: 4px;
+  padding: 15px;
+  border-radius: 8px;
   margin: 15px 0;
+  border-left: 4px solid #ff4747;
 }
 
 /* Dark theme support */
 body.dark-theme .contact-modal {
-  background-color: #222;
+  background-color: #1e1e1e;
   color: #f0f0f0;
+  border-color: #333;
+}
+
+body.dark-theme .form-group label {
+  color: #ccc;
 }
 
 body.dark-theme .form-group input {
@@ -110,6 +174,24 @@ body.dark-theme .form-group input {
   color: #f0f0f0;
 }
 
+body.dark-theme .form-group input:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
 body.dark-theme .donor-info {
   background-color: #333;
+  border-left-color: #ff6b6b;
+}
+
+/* Match animation with other modals */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

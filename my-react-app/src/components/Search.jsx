@@ -384,9 +384,10 @@ export default function Search() {
           clearTimeout(window.filterTimeout);
         }
         
+        // Increase debounce timeout
         window.filterTimeout = setTimeout(() => {
           handleFindDonorsClick(1, newFilters);
-        }, 300); // 300ms debounce
+        }, 500); // Increased from 300ms to 500ms for better performance
       }
       
       return newFilters;

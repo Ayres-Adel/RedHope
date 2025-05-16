@@ -30,8 +30,8 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
       providePhoneNumber: 'To contact this donor, please provide your phone number:',
       donorBloodType: 'Donor Blood Type:',
       location: 'Location:',
-      yourPhoneNumber: 'Your Phone Number',
-      enterPhoneNumber: 'Enter your phone number',
+      yourPhoneNumber: 'Your Phone Number:',
+      enterPhoneNumber: 'Enter your phone number (10-15 digits)',
       saving: 'Saving...',
       submit: 'Submit',
       invalidPhone: 'Please enter a valid phone number',
@@ -91,7 +91,7 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
             onSuccess: (position) => resolve(position),
             onError: (error) => reject(error),
             enableHighAccuracy: true,
-            timeout: 10000
+            timeout: 20000 // Increased from 10000 to 20000
           });
         });
         

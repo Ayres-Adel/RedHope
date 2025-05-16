@@ -99,34 +99,108 @@ export const donationService = {
 // Donation Request service
 export const donationRequestService = {
   createDonationRequest: async (requestData) => {
-    // requestData should contain: bloodType, hospitalId (optional), expiryDate, donorId (optional), cityId (optional)
-    return api.post('/api/donation-request', requestData);
+    try {
+      const response = await api.post('/api/donation-request', requestData);
+      return response;
+    } catch (error) {
+      console.error('Error creating donation request:', error);
+      throw error;
+    }
   },
   
   createGuestDonationRequest: async (guestRequestData) => {
-    // guestRequestData should contain: phoneNumber OR guestId, bloodType, 
-    // hospitalId (optional), expiryDate, cityId (optional)
-    return api.post('/api/donation-request/guest', guestRequestData);
+    try {
+      const response = await api.post('/api/donation-request/guest', guestRequestData);
+      return response;
+    } catch (error) {
+      console.error('Error creating guest donation request:', error);
+      throw error;
+    }
   },
   
   getDonationRequests: async (filters) => {
-    return api.get('/api/donation-request', { params: filters });
+    try {
+      const response = await api.get('/api/donation-request', { params: filters });
+      return response;
+    } catch (error) {
+      console.error('Error fetching donation requests:', error);
+      throw error;
+    }
   },
   
-  getUserDonationRequests: async () => {
-    return api.get('/api/donation-request/user');
+  getUserDonationRequests: async (filters = {}) => {
+    try {
+      const response = await api.get('/api/donation-request/user', { params: filters });
+      return response;
+    } catch (error) {
+      console.error('Error fetching user donation requests:', error);
+      throw error;
+    }
+  },
+  
+  // Add new methods for donor requests
+  getUserDonorRequests: async (filters = {}) => {
+    try {
+      const response = await api.get('/api/donation-request/donor', { params: filters });
+      return response;
+    } catch (error) {
+      console.error('Error fetching user donor requests:', error);
+      throw error;
+    }
+  },
+  
+  // Get all requests where user is either requester or donor
+  getAllUserRequests: async (filters = {}) => {
+    try {
+      const response = await api.get('/api/donation-request/all-user', { params: filters });
+      return response;
+    } catch (error) {
+      console.error('Error fetching all user requests:', error);
+      throw error;
+    }
   },
   
   getDonationRequestById: async (requestId) => {
-    return api.get(`/api/donation-request/${requestId}`);
+    try {
+      const response = await api.get(`/api/donation-request/${requestId}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching donation request ${requestId}:`, error);
+      throw error;
+    }
   },
   
-  respondToDonationRequest: async (requestId, status) => {
-    return api.post(`/api/donation-request/${requestId}/respond`, { status });
+  cancelDonationRequest: async (requestId) => {
+    return api.put(`/api/donation-request/${requestId}/cancel`);
   },
   
-  updateDonationRequestStatus: async (requestId, status) => {
-    return api.patch(`/api/donation-request/${requestId}/status`, { status });
+  completeDonationRequest: async (requestId) => {
+    return api.put(`/api/donation-request/${requestId}/complete`);
+  },
+  
+  fulfillDonationRequest: async (requestId) => {
+    return api.put(`/api/donation-request/${requestId}/fulfill`);
+  },
+  
+  updateDonationRequest: async (requestId, updateData) => {
+    return api.put(`/api/donation-request/update/${requestId}`, updateData);
+  },
+  
+  deleteDonationRequest: async (requestId) => {
+    return api.delete(`/api/donation-request/${requestId}`);
+  },
+  
+  updateDonationRequestStatus: async (requestId, newStatus) => {
+    // This is a generalized method that calls the appropriate endpoint based on status
+    if (newStatus === 'Fulfilled') {
+      return donationRequestService.fulfillDonationRequest(requestId);
+    } else if (newStatus === 'Completed') {
+      return donationRequestService.completeDonationRequest(requestId); 
+    } else if (newStatus === 'Cancelled') {
+      return donationRequestService.cancelDonationRequest(requestId);
+    } else {
+      throw new Error(`Unsupported status change: ${newStatus}`);
+    }
   }
 };
 
@@ -152,19 +226,23 @@ export const notificationService = {
 // Wilaya service
 export const wilayaService = {
   getAllWilayas: async () => {
-    return api.get('/api/wilayas');
+    return api.get('/api/wilaya/all');
   },
   
   getWilayaByCode: async (code) => {
-    return api.get(`/api/wilayas/${code}`);
+    return api.get(`/api/wilaya/code/${code}`);
+  },
+  
+  getWilayaById: async (id) => {
+    return api.get(`/api/wilaya/${id}`);
   },
   
   getBloodCenters: async () => {
-    return api.get('/api/wilayas/blood-centers/all');
+    return api.get('/api/wilaya/blood-centers/all');
   },
   
   getBloodCentersByWilaya: async (code) => {
-    return api.get(`/api/wilayas/${code}/blood-centers`);
+    return api.get(`/api/wilaya/${code}/blood-centers`);
   }
 };
 

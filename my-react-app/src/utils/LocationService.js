@@ -23,7 +23,7 @@ export const getCurrentLocation = (options = {}) => {
     onSuccess,
     onError,
     enableHighAccuracy = true,
-    timeout = 10000,
+    timeout = 20000, // Increase from 10000 to 20000 (20s)
     maximumAge = 0
   } = options;
 
@@ -144,6 +144,85 @@ const findCityIdByState = (stateName) => {
   
   // No match found
   return null;
+};
+
+/**
+ * Convert cityId (wilaya code) to wilaya name
+ * @param {string} cityId - The wilaya code to convert
+ * @param {Object} options - Optional settings
+ * @param {boolean} options.normalized - Whether to return normalized name (default: false)
+ * @returns {string|null} - Wilaya name or null if not found
+ */
+export const cityIdToWilaya = (cityId, options = { normalized: false }) => {
+  if (!cityId) return null;
+  
+  // Ensure cityId is a string and padded to 2 digits if needed
+  const formattedCityId = String(cityId).padStart(2, '0');
+  
+  // Map of wilaya codes to normalized names
+  const wilayaCodeToName = {
+    "01": "Adrar",
+    "02": "Chlef",
+    "03": "Laghouat",
+    "04": "Oum El Bouaghi",
+    "05": "Batna",
+    "06": "Béjaïa",
+    "07": "Biskra",
+    "08": "Béchar",
+    "09": "Blida",
+    "10": "Bouira",
+    "11": "Tamanrasset",
+    "12": "Tébessa",
+    "13": "Tlemcen",
+    "14": "Tiaret",
+    "15": "Tizi Ouzou",
+    "16": "Alger",
+    "17": "Djelfa",
+    "18": "Jijel",
+    "19": "Sétif",
+    "20": "Saïda",
+    "21": "Skikda",
+    "22": "Sidi Bel Abbès",
+    "23": "Annaba",
+    "24": "Guelma",
+    "25": "Constantine",
+    "26": "Médéa",
+    "27": "Mostaganem",
+    "28": "M'Sila",
+    "29": "Mascara",
+    "30": "Ouargla",
+    "31": "Oran",
+    "32": "El Bayadh",
+    "33": "Illizi",
+    "34": "Bordj Bou Arréridj",
+    "35": "Boumerdès",
+    "36": "El Tarf",
+    "37": "Tindouf",
+    "38": "Tissemsilt",
+    "39": "El Oued",
+    "40": "Khenchela",
+    "41": "Souk Ahras",
+    "42": "Tipaza",
+    "43": "Mila",
+    "44": "Aïn Defla",
+    "45": "Naâma",
+    "46": "Aïn Témouchent",
+    "47": "Ghardaïa",
+    "48": "Relizane",
+    "49": "El M'ghair",
+    "50": "El Meniaa",
+    "51": "Ouled Djellal",
+    "52": "Bordj Badji Mokhtar",
+    "53": "Béni Abbès",
+    "54": "Timimoun",
+    "55": "Touggourt",
+    "56": "Djanet",
+    "57": "In Salah",
+    "58": "In Guezzam"
+  };
+  
+  // Return the wilaya name or null if not found
+  return wilayaCodeToName[formattedCityId] || null;
 };
 
 /**

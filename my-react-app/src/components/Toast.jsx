@@ -5,15 +5,15 @@ const Toast = ({ message, type, onClose }) => {
   const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
-    // Start fade out animation after 2.7 seconds
+    // Start fade out animation after 3.7 seconds (increased from 2.7)
     const fadeTimeout = setTimeout(() => {
       setIsFading(true);
-    }, 2700);
+    }, 3700);
 
-    // Remove toast after 3 seconds
+    // Remove toast after 4 seconds (increased from 3)
     const closeTimeout = setTimeout(() => {
       onClose();
-    }, 3000);
+    }, 4000);
 
     // Cleanup timeouts
     return () => {

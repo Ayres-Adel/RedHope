@@ -102,6 +102,16 @@ app.use((err, req, res, next) => {
     });
   }
   
+  // Handle timeout errors
+  if (err.name === 'MongooseError' && err.message.includes('timed out')) {
+    return res.status(503).json({
+      success: false,
+      message: 'Database operation timed out. Please try again later.',
+      error: 'database_timeout',
+      details: err.message
+    });
+  }
+  
   // Generic error response
   res.status(err.status || 500).json({
     success: false,

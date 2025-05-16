@@ -1,4 +1,3 @@
-// models/User.js
 const mongoose = require('mongoose');
 const { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
@@ -8,8 +7,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please enter a username'],
     trim: true,
-    unique: false,
-    minlength: [3, 'Minimum username length is 3 characters']
+    unique: true
   },
   email: {
     type: String,
@@ -18,54 +16,48 @@ const UserSchema = new mongoose.Schema({
     lowercase: true,
     validate: [isEmail, 'Please enter a valid email']
   },
-  dateOfBirth: {
-    type: Date,
-    required: [true, 'Please enter your date of birth']
-  },
-  location: {
-    type: String,
-    required: [true, 'Please enter your location']
-  },
-  bloodType: {
-    type: String,
-    required: [true, 'Please select your blood type'],
-    enum: ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']
-  },
   password: {
     type: String,
     required: [true, 'Please enter a password'],
     minlength: [6, 'Minimum password length is 6 characters'],
-  },
-  isDonor: {
-    type: Boolean,
-    required: [true, 'Please specify if you want to be a donor']
+    select: false
   },
   phoneNumber: {
     type: String,
     required: [true, 'Please enter a phone number'],
     validate: {
       validator: function(v) {
-        // Updated regex to allow phone numbers starting with '0' or '+', followed by digits
-        return /^(0|\+)[1-9]\d{8,14}$/.test(v);
+        return /^(0|\+)?[0-9]{10,15}$/.test(v.replace(/\D/g, ''));
       },
       message: props => `${props.value} is not a valid phone number!`
     }
   },
-  // Keep the cityId field for backward compatibility if needed
-  cityId: {
+  bloodType: {
     type: String,
-    default: null
+    required: [true, 'Please select your blood type'],
+    enum: ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
+    default: 'Unknown'
   },
-  // Add lastCityUpdate timestamp to track when city was last determined
-  lastCityUpdate: {
+  location: {
+    type: String
+  },
+  cityId: {
+    type: String
+  },
+  isDonor: {
+    type: Boolean,
+    default: false
+  },
+  role: {
+    type: String,
+    default: 'user'
+  },
+  lastLogin: {
     type: Date,
-    default: null
+    default: Date.now
   }
-});
+}, { timestamps: true });
 
-// Password hashing and login method (same as before)
-
-// fire a function before doc saved to db
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
@@ -75,9 +67,8 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
-// static method to login user (same as before)
 UserSchema.statics.login = async function (email, password) {
-  const user = await this.findOne({ email });
+  const user = await this.findOne({ email }).select('+password');
   if (user) {
     const auth = await bcrypt.compare(password, user.password);
     if (auth) {
@@ -183,5 +174,5 @@ UserSchema.statics.bulkUpdateCitiesFromCoordinates = async function(limit = 100)
   }
 };
 
-const User = mongoose.model('user', UserSchema);
+const User = mongoose.model('User', UserSchema);
 module.exports = User;

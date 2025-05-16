@@ -103,7 +103,7 @@ router.get('/profile', async (req, res) => {
         role: userData.role || userRole || 'user',
         bloodType: userData.bloodType || 'Not specified',
         location: userData.location || userData.address || 'Not specified',
-        phoneNumber: userData.phoneNumber || 'Not specified', // Changed key from 'phone' to 'phoneNumber'ng as 'phone'
+        phoneNumber: userData.phoneNumber || 'Not specified', // Changed key from 'phone' to 'phoneNumber'
         isActive: userData.isActive !== false,
         isDonor: userData.isDonor || false
       };

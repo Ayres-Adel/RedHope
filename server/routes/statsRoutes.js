@@ -25,24 +25,30 @@ const asyncHandler = (fn) => (req, res, next) => {
 router.get('/user/stats', authMiddleware, asyncHandler(statsController.getUserStats));
 router.get('/user/all', authMiddleware, asyncHandler(statsController.getUserStats));
 
-// Fix donations endpoints with better error handling
+// Organize donation endpoints with better error handling
 router.get('/donations/stats', authMiddleware, asyncHandler(statsController.getDonationStats));
-router.get('/donations', authMiddleware, asyncHandler(statsController.getDonationStats));
+// Remove duplicate endpoint and use more descriptive path
+router.get('/donations/list', authMiddleware, asyncHandler(statsController.getDonationsList));
 router.get('/blood-supply', asyncHandler(statsController.getBloodSupply));
 
-// Add a fallback route for donations to prevent 404 errors
+// Add a fallback route for donations with improved response structure
 router.get('/donations/*', authMiddleware, (req, res) => {
   return res.status(200).json({ 
     success: true, 
-    message: "No donations data found",
-    data: { donations: [], total: 0, empty: true } 
+    message: "No donations data found for this endpoint",
+    data: { 
+      donations: [], 
+      total: 0, 
+      empty: true,
+      requestPath: req.path
+    } 
   });
 });
 
-// Add blood type distribution stats endpoint (separate from blood-supply used by admin)
+// Blood type distribution stats endpoint 
 router.get('/blood-types', asyncHandler(statsController.getBloodTypeStats));
 
-// Add a route to update user cities based on coordinates
+// Route to update user cities based on coordinates
 router.get('/update-user-cities', authMiddleware, asyncHandler(statsController.updateUserCities));
 
 module.exports = router;
