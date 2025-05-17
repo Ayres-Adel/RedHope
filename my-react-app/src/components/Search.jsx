@@ -146,6 +146,18 @@ export default function Search() {
       oMinus: 'O-',
       bloodTypeLabel: 'Blood Type',
       locationLabel: 'Location',
+      donationRequest: 'Donation Request',
+      active: 'Active',
+      fulfilled: 'Fulfilled',
+      expired: 'Expired',
+      cancelled: 'Cancelled',
+      urgent: 'Urgent',
+      highPriority: 'High Priority',
+      requestExpiry: 'Request expires on',
+      requestExpired: 'Request expired',
+      makeRequest: 'Make Donation Request',
+      requestHelp: 'Request Blood Donation',
+      noCompatibleDonors: 'No compatible donors found'
     },
     fr: {
       findNearby: 'Trouver des donneurs à proximité',
@@ -193,6 +205,18 @@ export default function Search() {
       oMinus: 'O-',
       bloodTypeLabel: 'Groupe sanguin',
       locationLabel: 'Localisation',
+      donationRequest: 'Demande de Don',
+      active: 'Active',
+      fulfilled: 'Accomplie',
+      expired: 'Expirée',
+      cancelled: 'Annulée',
+      urgent: 'Urgente',
+      highPriority: 'Haute priorité',
+      requestExpiry: 'La demande expire le',
+      requestExpired: 'Demande expirée',
+      makeRequest: 'Faire une Demande de Don',
+      requestHelp: 'Demander un Don de Sang',
+      noCompatibleDonors: 'Aucun donneur compatible trouvé'
     },
   }), []);
 

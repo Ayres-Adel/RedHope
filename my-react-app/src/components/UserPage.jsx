@@ -124,7 +124,24 @@ const UserPage = () => {
       deleteRequest: 'Delete',
       confirmDeleteRequest: 'Are you sure you want to delete this request?',
       requestCompleted: 'Request marked as completed',
-      requestDeleted: 'Request deleted successfully'
+      requestDeleted: 'Request deleted successfully',
+      active: 'Active',
+      fulfilled: 'Fulfilled',
+      expired: 'Expired',
+      cancelled: 'Cancelled',
+      expiryDate: 'Expiry Date',
+      expiresIn: 'Expires in',
+      days: 'days',
+      createDonationRequest: 'Create Donation Request',
+      fulfillDonationRequest: 'Fulfill Donation Request',
+      donationRequestStatus: 'Request Status',
+      viewDonationDetails: 'View Details',
+      editDonationRequest: 'Edit Request',
+      requestNotFound: 'Request not found',
+      requestFor: 'Request for',
+      searchDonations: 'Search donations',
+      resultsFound: 'results found',
+      all: 'All'
     },
     fr: {
       accountSettings: 'Paramètres du Compte',
@@ -188,7 +205,24 @@ const UserPage = () => {
       deleteRequest: 'Supprimer',
       confirmDeleteRequest: 'Êtes-vous sûr de vouloir supprimer cette demande?',
       requestCompleted: 'Demande marquée comme complétée',
-      requestDeleted: 'Demande supprimée avec succès'
+      requestDeleted: 'Demande supprimée avec succès',
+      active: 'Active',
+      fulfilled: 'Accomplie',
+      expired: 'Expirée',
+      cancelled: 'Annulée',
+      expiryDate: 'Date d\'expiration',
+      expiresIn: 'Expire dans',
+      days: 'jours',
+      createDonationRequest: 'Créer une Demande de Don',
+      fulfillDonationRequest: 'Accomplir la Demande de Don',
+      donationRequestStatus: 'Statut de la Demande',
+      viewDonationDetails: 'Voir les Détails',
+      editDonationRequest: 'Modifier la Demande',
+      requestNotFound: 'Demande non trouvée',
+      requestFor: 'Demande pour',
+      searchDonations: 'Rechercher des dons',
+      resultsFound: 'résultats trouvés',
+      all: 'Tous'
     }
   };
 
