@@ -105,15 +105,13 @@ const AdminManagement = ({
         ) : (
           <div className="table-wrapper">
             <table className="data-table">
-              <thead>
-                <tr>
+              <thead><tr>
                   <th>{translations.name}</th>
                   <th>{translations.email}</th>
                   <th>{translations.role}</th>
                   <th>Permissions</th>
                   <th>{translations.actions}</th>
-                </tr>
-              </thead>
+              </tr></thead>
               <tbody>
                 {admins.map(admin => (
                   <tr key={admin.id}>

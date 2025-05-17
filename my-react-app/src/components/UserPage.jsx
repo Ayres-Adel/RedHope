@@ -653,7 +653,7 @@ const UserPage = () => {
           location: locationString
         }));
         
-        // Use the improved formatLocation function instead of separate reverse geocoding
+        // Use the improved formatLocation function to extract cityId
         formatLocation(position, language)
           .then(locationInfo => {
             if (locationInfo.success) {
@@ -664,14 +664,29 @@ const UserPage = () => {
               if (cityId) {
                 setEditForm(prev => ({
                   ...prev,
-                  cityId: cityId // Add cityId to form data
+                  location: locationString, 
+                  cityId: cityId // Explicitly set cityId in the form data
                 }));
+                addMessage(`Location updated with city ID: ${cityId}`, 'success');
+                addMessage(`Location updated: ${locationInfo.formatted}`, 'success');
+              } else {
+                // Try to extract from postal code if cityId wasn't available directly
+                const postalCode = locationInfo.details?.postalCode || 
+                                  locationInfo.components?.postcode;
+                                  
+                if (postalCode && postalCode.length >= 2) {
+                  const extractedCityId = postalCode.substring(0, 2);
+                  setEditForm(prev => ({
+                    ...prev,
+                    location: locationString,
+                    cityId: extractedCityId
+                  }));
+                  addMessage(`Location updated with city ID from postal code: ${extractedCityId}`, 'success');
+                } else {
+                  addMessage(`Location updated: ${locationInfo.formatted}`, 'success');
+                }
               }
-              
-              // Show the formatted address in a success message
-              addMessage(`Location updated: ${locationInfo.formatted}`, 'success');
             } else {
-              console.warn('Could not get formatted location:', locationInfo.message);
               addMessage('Location coordinates saved, but address details could not be retrieved', 'warning');
             }
             setUpdating(false);

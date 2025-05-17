@@ -1014,15 +1014,13 @@ export default function Search() {
                   <h3 className="nearby-donors-heading">{translations[language].nearbyDonors}</h3>
                   <div className={`donor-table-wrapper ${showTable ? 'show' : ''}`}>
                     <table className="donor-table" aria-label="Blood donor information">
-                      <thead>
-                        <tr>
+                      <thead><tr>
                           <th scope="col" className="responsive-header">{translations[language].username}</th>
                           <th scope="col" className="responsive-header">{translations[language].bloodType}</th>
                           <th scope="col" className="responsive-header">{translations[language].location}</th>
                           <th scope="col" className="responsive-header">{translations[language].distance}</th>
                           <th scope="col" className="responsive-header">{translations[language].contact}</th>
-                        </tr>
-                      </thead>
+                      </tr></thead>
                       <tbody>
                         {donors.length > 0 ? (
                           donors.map((donor, index) => (
@@ -1034,7 +1032,6 @@ export default function Search() {
                               </td>
                               <td>{donor.distance ? `${donor.distance.toFixed(1)} km` : 'N/A'}</td>
                               <td className="contact-buttons-cell">
-                                {/* Contact buttons */}
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleContactDonor('sms', donor); }} 
                                   className="contact-btn sms-btn" 

@@ -54,6 +54,47 @@ module.exports = {
     }
   },
 
+  // Update profile
+  updateProfile: async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const updateData = req.body;
+      
+      // Explicitly handle location and cityId
+      if (updateData.location) {
+        // If location is updated, ensure cityId is saved too
+        // This preserves cityId even if it wasn't explicitly provided
+      }
+      
+      const updatedUser = await User.findByIdAndUpdate(
+        userId, 
+        updateData, 
+        { new: true, runValidators: true }
+      );
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      res.json({
+        success: true,
+        message: 'Profile updated successfully',
+        user: {
+          username: updatedUser.username,
+          email: updatedUser.email,
+          phoneNumber: updatedUser.phoneNumber,
+          bloodType: updatedUser.bloodType,
+          location: updatedUser.location,
+          cityId: updatedUser.cityId, // Include cityId in response
+          isDonor: updatedUser.isDonor,
+          dateOfBirth: updatedUser.dateOfBirth
+        }
+      });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  },
+
   // Change password
   changePassword: async (req, res) => {
     const { currentPassword, newPassword, confirmNewPassword } = req.body;

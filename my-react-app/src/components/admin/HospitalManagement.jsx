@@ -106,16 +106,14 @@ const HospitalManagement = ({
         ) : (
           <div className="table-wrapper">
             <table className="data-table">
-              <thead>
-                <tr>
+              <thead><tr>
                   <th>{translations.name}</th>
                   <th>{translations.structure}</th>
                   <th>{translations.wilaya}</th>
                   <th>{translations.telephone}</th>
                   <th>{translations.coordinates}</th>
                   <th>{translations.actions}</th>
-                </tr>
-              </thead>
+              </tr></thead>
               <tbody>
                 {hospitals.map(hospital => (
                   <tr key={hospital._id}>

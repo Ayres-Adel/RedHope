@@ -57,8 +57,7 @@ const UserManagement = ({
           <div className="table-wrapper">
             {/* Regular table for desktop view */}
             <table className="data-table">
-              <thead>
-                <tr>
+              <thead><tr>
                   <th>{translations.id}</th>
                   <th>{translations.name}</th>
                   <th>{translations.email}</th>
@@ -66,8 +65,7 @@ const UserManagement = ({
                   <th>{translations.location}</th>
                   <th>{translations.status}</th>
                   <th>{translations.actions}</th>
-                </tr>
-              </thead>
+              </tr></thead>
               <tbody>
                 {users.map(user => (
                   <tr key={user._id}>

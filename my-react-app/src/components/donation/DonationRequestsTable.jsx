@@ -144,16 +144,14 @@ const DonationRequestsTable = ({
 
   return (
     <table className="donations-table">
-      <thead>
-        <tr>
+      <thead><tr>
           <th><FontAwesomeIcon icon={faCalendarAlt} className="icon-spacing" />{translations.donationDate}</th>
           <th><FontAwesomeIcon icon={faTint} className="icon-spacing" />{translations.bloodType}</th>
           <th><FontAwesomeIcon icon={faMapMarkerAlt} className="icon-spacing" />Wilaya</th>
-          <th><FontAwesomeIcon icon={faUserCircle} className="icon-spacing" />{translations.requester || 'Requester'}</th> {/* Updated header with translation */}
+          <th><FontAwesomeIcon icon={faUserCircle} className="icon-spacing" />{translations.requester || 'Requester'}</th>
           <th><FontAwesomeIcon icon={faExclamationCircle} className="icon-spacing" />{translations.donationStatus}</th>
-          <th>{translations.actions || 'Actions'}</th> {/* Added optional fallback */}
-        </tr>
-      </thead>
+          <th>{translations.actions || 'Actions'}</th>
+      </tr></thead>
       <tbody>
         {donationRequests.map(request => (
           <tr key={request._id}>
@@ -216,7 +214,6 @@ const DonationRequestsTable = ({
                       {translations.cancelRequest}
                     </button>
                     
-                    {/* Complete button */}
                     <button 
                       className="action-complete-btn"
                       onClick={() => onComplete(request._id)}
@@ -226,7 +223,6 @@ const DonationRequestsTable = ({
                       {translations.completeRequest || 'Complete'}
                     </button>
                     
-                    {/* Show confirm button conditionally */}
                     {(request.userIsDonor || request.donorId) && (
                       <button 
                         className="action-confirm-btn" 
@@ -239,7 +235,6 @@ const DonationRequestsTable = ({
                     )}
                   </>
                 )}
-                {/* Delete button removed from here */}
                 
                 <button 
                   className="action-details-btn" 

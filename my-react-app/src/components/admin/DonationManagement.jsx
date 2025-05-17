@@ -107,8 +107,7 @@ const DonationManagement = ({
           <div className="table-wrapper">
             {/* Enhanced table for desktop view */}
             <table className="data-table">
-              <thead>
-                <tr>
+              <thead><tr>
                   <th>{translations.id}</th>
                   <th>{translations.donorEmail}</th>
                   <th>{translations.bloodType}</th>
@@ -116,8 +115,7 @@ const DonationManagement = ({
                   <th>{translations.location}</th>
                   <th>{translations.status}</th>
                   <th>{translations.actions}</th>
-                </tr>
-              </thead>
+              </tr></thead>
               <tbody>
                 {donations.map(donation => (
                   <tr key={donation._id} className={`status-${donation.status?.toLowerCase()}`}>

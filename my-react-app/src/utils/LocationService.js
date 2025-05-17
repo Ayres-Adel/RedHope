@@ -353,83 +353,95 @@ export const reverseGeocode = async (latitude, longitude, language = 'en') => {
 };
 
 /**
- * Format coordinates into a human-readable address
- * @param {String|Object} location - Coordinates string "lat,lng" or {lat, lng} object
- * @param {String} language - Preferred language for results
- * @returns {Promise} Promise with formatted address
+ * Format location data with improved cityId extraction
+ * @param {Object} position - Position object with lat/lng or latitude/longitude
+ * @param {string} language - Language code for localization
+ * @returns {Promise} Promise resolving to formatted location data
  */
-export const formatLocation = async (location, language = 'en') => {
+export const formatLocation = async (position, language = 'en') => {
   try {
-    let lat, lng;
+    // Normalize position format
+    const lat = position.lat || position.latitude;
+    const lng = position.lng || position.longitude;
     
-    if (typeof location === 'string') {
-      const parts = location.split(',');
-      if (parts.length === 2) {
-        lat = parseFloat(parts[0].trim());
-        lng = parseFloat(parts[1].trim());
-      }
-    } else if (location && typeof location === 'object') {
-      lat = location.lat;
-      lng = location.lng;
-    }
-    
-    if (isNaN(lat) || isNaN(lng)) {
-      return { 
-        success: false, 
-        formatted: 'Invalid location format', 
-        coordinates: null 
+    if (!lat || !lng) {
+      return {
+        success: false,
+        formatted: `Invalid coordinates`,
+        message: 'Missing latitude or longitude'
       };
     }
     
-    const geoResult = await reverseGeocode(lat, lng, language);
+    // Get geocoding result
+    const result = await reverseGeocode(lat, lng, language);
     
-    // Create custom formatted address with only road, city, and state
-    let customFormatted = `${lat},${lng}`;
+    if (!result.success) {
+      return {
+        success: false,
+        formatted: `${lat},${lng}`,
+        message: result.message || 'Geocoding failed'
+      };
+    }
     
-    if (geoResult.success && geoResult.components) {
-      const components = geoResult.components;
-      const addressParts = [];
-      
-      // Add road if available
-      if (components.road) {
-        addressParts.push(components.road);
+    // Enhanced cityId extraction logic
+    let cityId = null;
+    
+    // Try to get cityId from the result details
+    if (result.details && result.details.cityId) {
+      cityId = result.details.cityId;
+    }
+    // Try extracting from postal code
+    else if (result.components && result.components.postcode) {
+      const postalCode = result.components.postcode;
+      if (postalCode && postalCode.length >= 2) {
+        cityId = postalCode.substring(0, 2);
       }
-      
-      // Add city if available (try multiple city-like fields)
-      if (components.city) {
-        addressParts.push(components.city);
-      } else if (components.town) {
-        addressParts.push(components.town);
-      } else if (components.village) {
-        addressParts.push(components.village);
-      }
-      
-      // Add state if available
-      if (components.state) {
-        addressParts.push(components.state);
-      }
-      
-      // If we have address parts, join them to create formatted address
-      if (addressParts.length > 0) {
-        customFormatted = addressParts.join(', ');
+    }
+    // Try mapping from city/state name
+    else if (result.components) {
+      // Map wilaya names to codes if available
+      const wilayaName = result.components.state || result.components.city;
+      if (wilayaName) {
+        // This would map known wilaya names to codes
+        const wilayaMapping = {
+          'Adrar': '01', 'Chlef': '02', 'Laghouat': '03', 'Oum El Bouaghi': '04',
+          'Batna': '05', 'Béjaïa': '06', 'Biskra': '07', 'Béchar': '08',
+          'Blida': '09', 'Bouira': '10', // etc. - could be expanded with all wilayas
+        };
+        
+        // Normalize names for comparison: lowercase, remove accents, trim
+        const normalizedName = wilayaName.toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .trim();
+          
+        for (const [key, value] of Object.entries(wilayaMapping)) {
+          const normalizedKey = key.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .trim();
+            
+          if (normalizedName.includes(normalizedKey) || normalizedKey.includes(normalizedName)) {
+            cityId = value;
+            break;
+          }
+        }
       }
     }
     
     return {
-      success: geoResult.success,
-      formatted: customFormatted,
-      details: geoResult.details || {},
-      coordinates: { lat, lng },
-      // Include original formatted address as a fallback
-      originalFormatted: geoResult.formatted
+      success: true,
+      formatted: result.formatted || `${lat},${lng}`,
+      details: {
+        ...result.details,
+        cityId: cityId
+      },
+      components: result.components
     };
   } catch (error) {
     console.error('Error formatting location:', error);
-    return { 
-      success: false, 
-      formatted: 'Error formatting location', 
-      error: true,
-      message: error.message
+    return {
+      success: false,
+      formatted: position.lat ? `${position.lat},${position.lng}` : String(position),
+      message: error.message || 'Unknown error formatting location'
     };
   }
 };

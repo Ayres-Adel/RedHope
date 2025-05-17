@@ -72,6 +72,23 @@ const DonationRequestSearch = ({
     handleSearch('', activeFilter);
   };
 
+  // Function to safely render children with filtered requests
+  const renderChildren = () => {
+    // Check if children is a React element that can accept props
+    // If it's a DOM element or has no type, render as is
+    if (!React.isValidElement(children)) {
+      return children;
+    }
+
+    // For React components, we can safely clone and pass props
+    if (typeof children.type === 'function' || typeof children.type === 'object') {
+      return React.cloneElement(children, { donationRequests: filteredRequests });
+    }
+
+    // For DOM elements, just render as is without adding props
+    return children;
+  };
+
   return (
     <div className="donation-search-container">
       <div className="donation-search-wrapper">
@@ -137,8 +154,8 @@ const DonationRequestSearch = ({
         )}
       </div>
 
-      {/* Render children (table or cards) */}
-      {React.cloneElement(children, { donationRequests: filteredRequests })}
+      {/* Render children with data */}
+      {renderChildren()}
     </div>
   );
 };
