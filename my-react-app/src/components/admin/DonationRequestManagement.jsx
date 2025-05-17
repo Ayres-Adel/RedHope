@@ -58,7 +58,6 @@ const DonationRequestManagement = ({
       
       // Get all donation requests using the getDonationRequests API
       const response = await donationRequestService.getDonationRequests(queryParams);
-      console.log('Donation requests response:', response);
       
       if (response?.data) {
         // Extract data correctly depending on API response format

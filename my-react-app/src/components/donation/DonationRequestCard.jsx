@@ -161,7 +161,6 @@ const DonationRequestCard = ({
               {translations.cancelRequest}
             </button>
             
-            {/* Complete button with consistent styling */}
             <button 
               className="complete-request-btn" 
               onClick={() => onComplete(donationRequest._id)}
@@ -171,7 +170,7 @@ const DonationRequestCard = ({
               {translations.completeRequest || 'Complete'}
             </button>
             
-            {/* Conditional rendering of confirm button */}
+            {/* Show confirm button conditionally */}
             {(donationRequest.userIsDonor || donationRequest.donorId) && (
               <button 
                 className="confirm-request-btn" 
@@ -184,16 +183,6 @@ const DonationRequestCard = ({
             )}
           </>
         )}
-        
-        {/* Delete button with consistent styling */}
-        <button 
-          className="delete-request-btn" 
-          onClick={() => onDelete(donationRequest._id)}
-          disabled={isActionLoading}
-        >
-          <FontAwesomeIcon icon={faTrash} />
-          {translations.deleteRequest || 'Delete'}
-        </button>
         
         <button 
           className="view-details-btn" 

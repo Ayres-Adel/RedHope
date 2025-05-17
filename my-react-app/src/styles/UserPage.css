@@ -335,11 +335,6 @@ section h2 {
   padding: 20px;
 }
 
-.form-field {
-  margin-bottom: 18px;
-  margin:20px;
-}
-
 .form-field label {
   display: block;
   color: #666;
@@ -391,29 +386,26 @@ section h2 {
 
 /* Make the password-submit-btn match the danger-action-btn exactly */
 .password-submit-btn {
-  background: #fff;
-  color: #ff4747;
-  border: 1px solid #ff4747;
-  padding: 10px 20px;
-  /* Match the danger-action-btn padding */
-  border-radius: 8px;
-  font-size: 14px;
-  /* Match the danger-action-btn font-size */
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 0;
-  /* No margin-top like danger-action-btn */
+  background: #fff !important;
+  color: #ff4747 !important;
+  border: 1px solid #ff4747 !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 0 !important;
 }
 
 .password-submit-btn:hover {
-  background: #ff4747;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2);
+  background: #ff4747 !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2) !important;
 }
 
 .danger-box {
@@ -446,26 +438,26 @@ section h2 {
 }
 
 .danger-action-btn {
-  background: #fff;
-  color: #dc3545;
-  border: 1px solid #dc3545;
-  padding: 10px 24px; /* Increased padding for bigger button */
-  border-radius: 8px;
-  font-size: 15px; /* Increased font size */
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
+  background: #fff !important;
+  color: #dc3545 !important;
+  border: 1px solid #dc3545 !important;
+  padding: 10px 24px !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 8px !important;
 }
 
 .danger-action-btn:hover {
-  background: #dc3545;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+  background: #dc3545 !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2) !important;
 }
 
 /* Modal Styling */
@@ -957,54 +949,56 @@ input:checked + .toggle-slider:before {
 }
 
 .get-location-btn {
-  background: #fff;
-  color: #ff4747;
-  border: 1px solid #ff4747;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  white-space: nowrap;
+  background: #fff !important;
+  color: #ff4747 !important;
+  border: 1px solid #ff4747 !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  white-space: nowrap !important;
 }
 
 .get-location-btn:hover {
-  background: #ff4747;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2);
+  background: #ff4747 !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2) !important;
 }
 
 .get-location-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  background: #f8f8f8;
-  color: #999;
-  border-color: #ddd;
-  box-shadow: none;
-  transform: none;
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+  background: #f8f8f8 !important;
+  color: #999 !important;
+  border-color: #ddd !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 /* Dark theme styles for the location button */
 .dark-theme .get-location-btn {
-  background-color: transparent;
-  color: #ff4747;
-  border-color: #ff4747;
+  background-color: transparent !important;
+  color: #ff4747 !important;
+  border-color: #ff4747 !important;
 }
 
 .dark-theme .get-location-btn:hover {
-  background: #ff4747;
-  color: white;
+  background: #ff4747 !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2) !important;
 }
 
 .dark-theme .get-location-btn:disabled {
-  background: #333;
-  color: #777;
-  border-color: #555;
+  background: #333 !important;
+  color: #777 !important;
+  border-color: #555 !important;
 }
 
 /* Media queries for responsive design */
@@ -1058,6 +1052,12 @@ input:checked + .toggle-slider:before {
 
   .donations-table {
     display: table;
+    min-width: 600px; /* Ensure minimum width */
+  }
+  
+  .donations-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     width: 100%;
   }
 }
@@ -1261,11 +1261,33 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.edit-info-btn {
+  background: #fff !important;
+  color: #ff4747 !important;
+  border: 1px solid #ff4747 !important;
+  padding: 10px 22px !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.edit-info-btn:hover {
+  background: #ff4747 !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2) !important;
+}
+
 .edit-info-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Donation Cards and Table Styling */
@@ -1948,12 +1970,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* Additional table styles */
-.blood-type-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-}
+
 
 .blood-icon {
   margin-right: 6px;
@@ -2031,6 +2048,11 @@ input:checked + .toggle-slider:before {
   font-weight: 500;
 }
 
+.security-box .form-field {
+  margin-bottom: 18px;
+  margin:20px;
+}
+
 /* Enhance card hover state */
 .donation-card:hover {
   transform: translateY(-5px);
@@ -2097,4 +2119,87 @@ input:checked + .toggle-slider:before {
 
 .dark-theme .detail-notes {
   color: #ccc;
+}
+
+/* Dark Theme Enhancements for Edit Form */
+.dark-theme .edit-form .form-field {
+  background-color: #252525;
+  border-color: #3a3a3a;
+}
+
+.dark-theme .edit-form .form-field:hover {
+  background-color: #2a2a2a;
+  border-color: #444;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .profile-input,
+.dark-theme .profile-select {
+  background-color: #333;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.dark-theme .profile-input:focus,
+.dark-theme .profile-select:focus {
+  border-color: #ff6b6b;
+  background-color: #383838;
+  box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.2);
+}
+
+.dark-theme .edit-form label {
+  color: #bbb;
+}
+
+.dark-theme .edit-form .info-icon {
+  color: #ff6b6b;
+}
+
+/* Dark theme styles with !important flags for the buttons */
+.dark-theme .edit-info-btn,
+.dark-theme .password-submit-btn,
+.dark-theme .danger-action-btn {
+  background-color: transparent !important;
+}
+
+.dark-theme .edit-info-btn {
+  color: #ff4747 !important;
+  border-color: #ff4747 !important;
+  font-size: 15px !important;
+  padding: 10px 22px !important;
+}
+
+.dark-theme .edit-info-btn:hover {
+  background-color: #ff4747 !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2) !important;
+}
+
+.dark-theme .password-submit-btn {
+  color: #ff4747 !important;
+  border: 1px solid #ff4747 !important;
+  font-size: 14px !important;
+  padding: 8px 20px !important;
+}
+
+.dark-theme .password-submit-btn:hover {
+  background: #ff4747 !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2) !important;
+}
+
+.dark-theme .danger-action-btn {
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  font-size: 15px !important;
+  padding: 10px 24px !important;
+}
+
+.dark-theme .danger-action-btn:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2) !important;
 }

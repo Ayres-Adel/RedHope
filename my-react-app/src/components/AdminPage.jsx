@@ -583,13 +583,10 @@ const AdminPage = () => {
     setLoading('users', true);
     setError(null);
     try {
-      console.log('Fetching users with params:', { page, limit, searchQuery });
       const response = await userService.getAllUsers(page, limit, searchQuery);
-      console.log('User API response:', response);
 
       if (response.data && (response.data.success || response.data.users)) {
         const userData = response.data.users || [];
-        console.log('User data extracted:', userData);
 
         const normalizedUsers = userData.map(user => ({
           _id: user._id || user.id,

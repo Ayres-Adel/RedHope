@@ -47,9 +47,7 @@ const DonationRequestsTable = ({
       
       setCityNames(newCityNames);
       setCityNamesLoaded(true);
-      console.log("City names loaded:", newCityNames);
     } catch (error) {
-      console.error("Error loading city names:", error);
     }
   }, [donationRequests]);
 
@@ -150,7 +148,7 @@ const DonationRequestsTable = ({
         <tr>
           <th><FontAwesomeIcon icon={faCalendarAlt} className="icon-spacing" />{translations.donationDate}</th>
           <th><FontAwesomeIcon icon={faTint} className="icon-spacing" />{translations.bloodType}</th>
-          <th><FontAwesomeIcon icon={faMapMarkerAlt} className="icon-spacing" />{translations.donationLocation}</th>
+          <th><FontAwesomeIcon icon={faMapMarkerAlt} className="icon-spacing" />Wilaya</th>
           <th><FontAwesomeIcon icon={faUserCircle} className="icon-spacing" />{translations.requester || 'Requester'}</th> {/* Updated header with translation */}
           <th><FontAwesomeIcon icon={faExclamationCircle} className="icon-spacing" />{translations.donationStatus}</th>
           <th>{translations.actions || 'Actions'}</th> {/* Added optional fallback */}
@@ -241,15 +239,7 @@ const DonationRequestsTable = ({
                     )}
                   </>
                 )}
-                {/* Add delete button (accessible for any status) */}
-                <button 
-                  className="action-delete-btn" 
-                  onClick={() => onDelete(request._id)}
-                  disabled={isActionLoading}
-                >
-                  <FontAwesomeIcon icon={faTrash} />
-                  {translations.deleteRequest || 'Delete'}
-                </button>
+                {/* Delete button removed from here */}
                 
                 <button 
                   className="action-details-btn" 

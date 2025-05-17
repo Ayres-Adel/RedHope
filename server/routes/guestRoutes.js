@@ -24,7 +24,6 @@ router.post('/register', async (req, res) => {
         if (cityId) {
           guest.cityId = cityId;
           guest.lastCityUpdate = new Date();
-          console.log(`Updated existing guest cityId to ${cityId} from client data`);
         } else {
           // Try to update cityId from new coordinates
           try {

@@ -5,13 +5,14 @@ import {
   faMapMarkerAlt, faUser, faNotesMedical,
   faClock, faTimes, faPhone, faIdCard,
   faUserCircle, faShieldAlt, faCheckCircle,
-  faTimesCircle, faClock as faClockSolid
+  faTimesCircle, faClock as faClockSolid,
+  faTrash // Add trash icon for delete button
 } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
 import { getCityNameSync } from '../../utils/cityUtils';
 import '../../styles/DonationComponents.css'; // Import the new CSS file
 
-const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdateStatus }) => {
+const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdateStatus, onDelete }) => {
   const modalRef = useRef(null);
   
   // Handle click outside to close modal
@@ -334,9 +335,27 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
             </div>
           )}
           
-          <button className="close-detail-btn" onClick={onClose}>
-            {translations.close || 'Close'}
-          </button>
+          <div className="modal-action-buttons">
+            {/* Delete button added here */}
+            {onDelete && (
+              <button 
+                className="delete-request-btn"
+                onClick={() => {
+                  if (window.confirm(translations.confirmDeleteRequest || 'Are you sure you want to delete this request?')) {
+                    onDelete(donationRequest._id);
+                    onClose();
+                  }
+                }}
+              >
+                <FontAwesomeIcon icon={faTrash} />
+                {translations.deleteRequest || 'Delete'}
+              </button>
+            )}
+            
+            <button className="close-detail-btn" onClick={onClose}>
+              {translations.close || 'Close'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -347,7 +366,8 @@ DonationRequestDetail.propTypes = {
   donationRequest: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
   translations: PropTypes.object.isRequired,
-  onUpdateStatus: PropTypes.func
+  onUpdateStatus: PropTypes.func,
+  onDelete: PropTypes.func // Add onDelete prop
 };
 
 export default DonationRequestDetail;

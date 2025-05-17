@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  // Keep minimal logging for server requests but without details
   next();
 });
 

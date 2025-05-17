@@ -11,6 +11,9 @@
   overflow: hidden;
   background: #fff;
   font-size: 0.9rem;
+  /* Improved responsiveness */
+  table-layout: fixed;
+  min-width: 650px; /* Ensure minimum width for readability */
 }
 
 /* Enhanced table header styling */
@@ -29,24 +32,18 @@
   border-bottom: 1px solid #e9ecef;
   transition: background-color 0.2s ease;
   position: relative;
+  white-space: nowrap; /* Keep headers on one line */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
 }
 
-.donations-table thead th:after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, rgba(255,71,71,0.5), transparent);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-  transform-origin: left;
-}
-
-.donations-table thead th:hover:after {
-  transform: scaleX(1);
-}
+/* Define dynamic column widths */
+.donations-table th:nth-child(1) { width: 15%; } /* Date */
+.donations-table th:nth-child(2) { width: 10%; } /* Blood Type */
+.donations-table th:nth-child(3) { width: 15%; } /* Location */
+.donations-table th:nth-child(4) { width: 20%; } /* Requester */
+.donations-table th:nth-child(5) { width: 15%; } /* Status */
+.donations-table th:nth-child(6) { width: 25%; } /* Actions */
 
 .donations-table tbody tr {
   transition: background-color 0.15s ease;
@@ -59,15 +56,58 @@
 .donations-table td {
   padding: 1rem;
   vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+  white-space: normal; /* Allow text to wrap */
 }
 
-.donations-table tbody tr:last-child td {
-  border-bottom: none;
+/* Create a table container to enable horizontal scrolling */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 5px; /* Space for scrollbar */
+  border-radius: 10px;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
-.icon-spacing {
-  margin-right: 8px;
-  color: #ff4747;
+/* Adjust table container styles */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+  background-color: #f1f1f1;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background-color: #a8a8a8;
+}
+
+/* Responsive adjustments for medium screens */
+@media (max-width: 992px) {
+  .donations-table {
+    font-size: 0.85rem;
+  }
+  
+  .donations-table td, 
+  .donations-table th {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  /* More compact button styling for medium screens */
+  .table-actions button {
+    padding: 5px 10px;
+    font-size: 11px;
+    min-width: 70px;
+    height: 28px;
+  
+  }
+  
+  .table-actions button svg {
+    font-size: 11px;
+  }
 }
 
 /* Blood type styling */
@@ -141,168 +181,106 @@
   border: 1px solid #ffcdd2;
 }
 
-/* Specific Table Button Styling */
+/* Specific Table Button Styling - Improved positioning and layout */
 .table-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* Prevent unwrapping to keep all buttons in a single row */
   align-items: center;
+  justify-content: center; /* Align buttons to the right */
   gap: 6px;
+  min-width: 150px; /* Ensure minimum width for consistency */
 }
 
 .table-actions button {
-  font-size: 12px;
+  font-size: 11px;
   padding: 6px 12px;
-  height: 32px;
-  min-width: 80px;
-  margin-right: 4px;
+  height: 28px;
+  min-width: 30px; /* Reduced min-width for smaller buttons */
+  margin-right: 0; /* Remove right margin, use gap instead */
+  border-radius: 4px;
+}
+
+/* Make icon-only buttons more compact */
+.table-actions button.icon-only {
+  width: 32px;
+  min-width: 32px;
+  padding: 6px;
+  justify-content: center;
 }
 
 .table-actions button svg {
   font-size: 12px;
 }
 
-/* Unified Action Button Styling */
-
-/* Common button base styles */
-.donation-actions button,
-.card-actions button,
-.table-actions button,
-.action-btn,
-.action-cancel-btn,
-.action-confirm-btn,
-.action-complete-btn,
-.action-delete-btn,
-.action-details-btn {
+/* Enhanced filter label styling */
+.filter-label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 8px 14px;
+  background-color: #f0f2f5;
+  color: #495057;
   border-radius: 6px;
-  border: none;
+  padding: 6px 10px;
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e4e8;
+}
+
+.filter-label svg {
   margin-right: 6px;
-  white-space: nowrap;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  letter-spacing: 0.3px;
-}
-
-/* Table specific button sizes */
-.table-actions button,
-.table-actions .action-btn,
-.table-actions .action-cancel-btn,
-.table-actions .action-confirm-btn,
-.table-actions .action-complete-btn,
-.table-actions .action-delete-btn,
-.table-actions .action-details-btn {
+  color: #ff4747;
   font-size: 12px;
-  padding: 6px 12px;
-  height: 32px;
-  min-width: 80px;
 }
 
-/* Card specific button sizes - keeping original size */
-.donation-actions button,
-.card-actions button {
-  min-width: 100px;
-  height: 38px;
+/* Dark theme table header improvements */
+body.dark-theme .donations-table thead {
+  background: linear-gradient(to bottom, #2c2c2c, #242424);
+  border-bottom: 1px solid #333;
 }
 
-/* Icon spacing */
-.donation-actions button svg,
-.card-actions button svg,
-.table-actions button svg,
-.action-btn svg,
-.action-cancel-btn svg,
-.action-confirm-btn svg,
-.action-complete-btn svg,
-.action-delete-btn svg,
-.action-details-btn svg {
-  margin-right: 8px;
-  font-size: 14px;
+body.dark-theme .donations-table thead th {
+  color: #e0e0e0;
+  border-bottom: none;
 }
 
-/* Button container positioning */
+body.dark-theme .donations-table thead th:hover {
+  color: #ff6b6b;
+  background: linear-gradient(to bottom, #333, #2a2a2a);
+}
+
+/* Dark theme filter label fixes */
+body.dark-theme .filter-label {
+  background-color: #333;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+body.dark-theme .filter-label svg {
+  color: #ff6b6b;
+}
+
+/* Improved button styling for tables in dark mode */
+body.dark-theme .table-actions button {
+  background-color: #333;
+  border: 1px solid #444;
+  color: #e0e0e0;
+}
+
+body.dark-theme .table-actions button:hover {
+  background-color: #444;
+}
+
+/* Make buttons in tables more consistent with card buttons */
 .donation-actions,
 .card-actions,
 .table-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 8px;
-  margin-top: 12px;
-}
-
-/* Cancel button styling */
-.action-cancel-btn {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-.action-cancel-btn:hover {
-  background-color: #f5c6cb;
-}
-
-/* Confirm button styling */
-.action-confirm-btn {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.action-confirm-btn:hover {
-  background-color: #c3e6cb;
-}
-
-/* Complete button styling */
-.action-complete-btn {
-  background-color: #28a745;
-  color: white;
-  border: 1px solid #218838;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.action-complete-btn:hover {
-  background-color: #218838;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Delete button styling */
-.action-delete-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
-.action-delete-btn:hover {
-  background-color: #c82333;
-}
-
-/* Details button styling */
-.action-details-btn {
-  background-color: #e2e3e5;
-  color: #383d41;
-}
-
-.action-details-btn:hover {
-  background-color: #d6d8db;
-}
-
-/* Disabled state */
-.donation-actions button:disabled,
-.card-actions button:disabled,
-.table-actions button:disabled,
-.action-btn:disabled,
-.action-cancel-btn:disabled,
-.action-confirm-btn:disabled,
-.action-complete-btn:disabled,
-.action-delete-btn:disabled,
-.action-details-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  margin-top: 8px;
+  padding-right: 0; /* Remove right padding to avoid layout issues */
 }
 
 /* ===== Card Styling ===== */
@@ -434,72 +412,155 @@
   box-shadow: 0 3px 5px rgba(0,0,0,0.15);
 }
 
-/* Style for the complete button - make it green */
-.complete-request-btn {
-  background-color: #28a745;
+/* Cancel Button - Red */
+.cancel-request-btn {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border: 1px solid #ffcdd2;
+}
+
+.cancel-request-btn:hover {
+  background-color: #d32f2f;
   color: white;
+  box-shadow: 0 2px 5px rgba(211, 47, 47, 0.3);
+}
+
+/* Complete Button - Green (Light Theme) */
+.complete-request-btn {
+  background-color: #e8f5e9;  /* Light green background */
+  color: #2e7d32;  /* Dark green text */
+  border: 1px solid #c8e6c9;
 }
 
 .complete-request-btn:hover {
-  background-color: #218838;
+  background-color: #2e7d32;  /* Dark green on hover */
+  color: white;
+  box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
 }
 
-.cancel-request-btn {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
+/* Confirm Button */
 .confirm-request-btn {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
 }
 
+.confirm-request-btn:hover {
+  background-color: #1976d2;
+  color: white;
+  box-shadow: 0 2px 5px rgba(25, 118, 210, 0.3);
+}
+
+/* Delete Button */
 .delete-request-btn {
-  background-color: #dc3545;
+  background-color: #feeceb;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.delete-request-btn:hover {
+  background-color: #c62828;
+  color: white;
+  box-shadow: 0 2px 5px rgba(198, 40, 40, 0.3);
+}
+
+/* View Details Button */
+.view-details-btn {
+  background-color: #f5f5f5;
+  color: #424242;
+  border: 1px solid #e0e0e0;
+}
+
+.view-details-btn:hover {
+  background-color: #424242;
+  color: white;
+  box-shadow: 0 2px 5px rgba(66, 66, 66, 0.3);
+}
+
+/* Ensure table buttons match card buttons */
+.donations-table .cancel-request-btn,
+.donations-table .complete-request-btn,
+.donations-table .confirm-request-btn,
+.donations-table .delete-request-btn,
+.donations-table .view-details-btn {
+  padding: 6px 10px;
+  font-size: 0.9em;
+}
+
+/* Keep buttons in a row with equal spacing */
+.donation-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  border-top: 1px solid #eee;
+}
+
+/* ===== Table Icon Styling Improvements ===== */
+.donations-table th svg,
+.donations-table td svg {
+  margin-right: 6px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+/* Dark Theme Button Adjustments */
+body.dark-theme .cancel-request-btn {
+  background-color: rgba(211, 47, 47, 0.15);
+  color: #ff8a80;
+  border: 1px solid rgba(211, 47, 47, 0.3);
+}
+
+body.dark-theme .cancel-request-btn:hover {
+  background-color: rgba(211, 47, 47, 0.7);
   color: white;
 }
 
-/* Position the details button in the bottom right corner */
-.details-icon-wrapper {
-  position: absolute;
-  top: 57px;
-  right: 5px;
-  z-index: 2; /* Ensure it appears above other content */
+body.dark-theme .complete-request-btn {
+  background-color: rgba(46, 125, 50, 0.2);  /* Green background with transparency */
+  color: #81c784;  /* Light green text */
+  border: 1px solid rgba(46, 125, 50, 0.4);
 }
 
-.view-details-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f8f9fa;
-  color: #343a40;
-  border: 1px solid #e9ecef;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+body.dark-theme .complete-request-btn:hover {
+  background-color: rgba(46, 125, 50, 0.7);  /* More solid green on hover */
+  color: white;
 }
 
-.view-details-icon:hover {
-  background-color: #e9ecef;
-  transform: scale(1.15) rotate(5deg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+body.dark-theme .confirm-request-btn {
+  background-color: rgba(25, 118, 210, 0.15);
+  color: #90caf9;
+  border: 1px solid rgba(25, 118, 210, 0.3);
 }
 
-.view-details-icon svg {
-  font-size: 16px;
+body.dark-theme .confirm-request-btn:hover {
+  background-color: rgba(25, 118, 210, 0.7);
+  color: white;
 }
 
-/* Dark theme styles for the details icon */
-body.dark-theme .view-details-icon {
-  background-color: rgba(255, 255, 255, 0.1);
+body.dark-theme .delete-request-btn {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: #ef9a9a;
+  border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+body.dark-theme .delete-request-btn:hover {
+  background-color: rgba(198, 40, 40, 0.7);
+  color: white;
+}
+
+body.dark-theme .view-details-btn {
+  background-color: rgba(66, 66, 66, 0.3);
   color: #e0e0e0;
+  border: 1px solid rgba(97, 97, 97, 0.3);
 }
 
-body.dark-theme .view-details-icon:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+body.dark-theme .view-details-btn:hover {
+  background-color: rgba(97, 97, 97, 0.7);
+  color: white;
 }
 
 /* Dark theme modal improvements */
@@ -551,61 +612,19 @@ body.dark-theme .donations-table thead {
 }
 
 body.dark-theme .donations-table thead th {
-  background-color: #252525;
   color: #e0e0e0;
   border-bottom-color: #333;
+}
+
+body.dark-theme .donations-table thead th:hover {
+  color: #ff6b6b;
 }
 
 body.dark-theme .donations-table thead th:after {
-  background: linear-gradient(to right, rgba(255,71,71,0.5), transparent);
+  background: linear-gradient(to right, rgba(255,107,107,0.6), transparent 80%);
 }
 
-body.dark-theme .donations-table td {
-  border-bottom-color: #333;
-  color: #e0e0e0;
-}
-
-body.dark-theme .donations-table tbody tr:hover {
-  background-color: rgba(255, 71, 71, 0.1);
-}
-
-/* Dark theme table button styles */
-body.dark-theme .table-actions button {
-  background-color: #2d2d2d;
-  color: #e0e0e0;
-  border: 1px solid #333;
-}
-
-body.dark-theme .table-actions button:hover {
-  background-color: #3a3a3a;
-}
-
-body.dark-theme .table-actions .action-cancel-btn {
-  background-color: rgba(220, 53, 69, 0.2);
-  color: #f77;
-}
-
-body.dark-theme .table-actions .action-confirm-btn {
-  background-color: rgba(40, 167, 69, 0.2);
-  color: #6d6;
-}
-
-body.dark-theme .table-actions .action-complete-btn {
-  background-color: rgba(40, 167, 69, 0.3);
-  color: #6d6;
-}
-
-body.dark-theme .table-actions .action-delete-btn {
-  background-color: rgba(220, 53, 69, 0.3);
-  color: #f77;
-}
-
-body.dark-theme .table-actions .action-details-btn {
-  background-color: rgba(108, 117, 125, 0.2);
-  color: #ddd;
-}
-
-/* Add improved dark theme styles for donation cards */
+/* Improved Dark Theme Card Styling */
 body.dark-theme .donation-card {
   background-color: #2a2a2a;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
@@ -637,66 +656,367 @@ body.dark-theme .donation-phone {
   color: #bbbbbb;
 }
 
+body.dark-theme .donation-expiry {
+  color: #ff8080;
+}
+
+body.dark-theme .donation-donor {
+  color: #8aff8a;
+}
+
 body.dark-theme .donation-actions {
+  background-color: #222222;
   border-top-color: #333333;
 }
 
-body.dark-theme .view-details-btn {
-  background-color: #333333;
-  color: #e0e0e0;
+/* Improved responsive design for donation cards */
+@media screen and (max-width: 480px) {
+  .donation-actions {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    gap: 8px;
+  }
+  
+  .donation-actions button {
+    width: 100%;
+    margin-right: 0;
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  .details-icon-wrapper {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .view-details-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .donation-details {
+    padding: 12px;
+    padding-top: 20px;
+  }
+
+  .donation-info > span {
+    font-size: 14px;
+  }
+  
+  .donation-blood-type {
+    font-size: 1rem;
+  }
+  
+  /* Improve spacing on smaller screens */
+  .donation-card {
+    padding-bottom: 0;
+  }
 }
 
-body.dark-theme .view-details-btn:hover {
-  background-color: #444444;
+@media screen and (max-width: 360px) {
+  .donation-actions button {
+    font-size: 11px;
+  }
+  
+  .donation-header {
+    padding: 12px 10px;
+  }
+  
+  .donation-status {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+  
+  .donation-date {
+    font-size: 0.8rem;
+  }
 }
 
+/* Button styling for dark mode - improve contrast and visibility */
 body.dark-theme .cancel-request-btn {
   background-color: rgba(220, 53, 69, 0.2);
-  color: #ff8888;
+  color: #ff9999;
+  border: 1px solid rgba(220, 53, 69, 0.4);
 }
 
 body.dark-theme .cancel-request-btn:hover {
-  background-color: rgba(220, 53, 69, 0.3);
+  background-color: rgba(220, 53, 69, 0.4);
+  color: white;
 }
 
 body.dark-theme .confirm-request-btn {
   background-color: rgba(40, 167, 69, 0.2);
-  color: #88dd88;
+  color: #8aff8a;
+  border: 1px solid rgba(40, 167, 69, 0.4);
 }
 
 body.dark-theme .confirm-request-btn:hover {
-  background-color: rgba(40, 167, 69, 0.3);
+  background-color: rgba(40, 167, 69, 0.4);
+  color: white;
 }
 
 body.dark-theme .complete-request-btn {
-  background-color: rgba(40, 167, 69, 0.3);
-  color: #88dd88;
-  border-color: rgba(40, 167, 69, 0.5);
+  background-color: rgba(46, 125, 50, 0.2);  /* Green background with transparency */
+  color: #81c784;  /* Light green text */
+  border: 1px solid rgba(46, 125, 50, 0.4);
 }
 
 body.dark-theme .complete-request-btn:hover {
-  background-color: rgba(40, 167, 69, 0.4);
+  background-color: rgba(46, 125, 50, 0.7);  /* More solid green on hover */
+  color: white;
 }
 
 body.dark-theme .delete-request-btn {
-  background-color: rgba(220, 53, 69, 0.3);
-  color: #ff8888;
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #ff9999;
+  border: 1px solid rgba(220, 53, 69, 0.4);
 }
 
 body.dark-theme .delete-request-btn:hover {
   background-color: rgba(220, 53, 69, 0.4);
+  color: white;
+}
+
+body.dark-theme .view-details-btn {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: #e0e0e0;
+  border: 1px solid rgba(108, 117, 125, 0.4);
+}
+
+body.dark-theme .view-details-btn:hover {
+  background-color: rgba(108, 117, 125, 0.4);
+  color: white;
+}
+
+/* Ensure popup details have proper contrast in dark mode */
+body.dark-theme .donation-detail-item {
+  color: #e0e0e0;
+}
+
+body.dark-theme .donation-detail-item:hover {
+  background-color: #383838;
+  border-color: #444;
+}
+
+body.dark-theme .donation-detail-item.highlight {
+  background-color: rgba(255, 107, 107, 0.1);
+  border-left: 3px solid #ff6b6b;
+}
+
+body.dark-theme .donation-detail-item.highlight:hover {
+  background-color: rgba(255, 107, 107, 0.15);
+}
+
+/* Donation Request Search Styling */
+.donation-search-container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.donation-search-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.donation-search-input-container {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+.donation-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.donation-search-input {
+  width: 100%;
+  padding: 10px 40px 10px 35px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.donation-search-input:focus {
+  border-color: #ff4747;
+  box-shadow: 0 0 0 2px rgba(255, 71, 71, 0.25);
+  outline: none;
+}
+
+.donation-search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  font-size: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.donation-search-clear:hover {
+  background-color: #f0f0f0;
+  color: #dc3545;
+}
+
+.donation-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+/* Dark theme filter label styling */
+body.dark-theme .filter-label {
+  color: #e0e0e0;
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background-color: #e9ecef;
+}
+
+.filter-btn.active {
+  background-color: #ff4747;
+  border-color: #ff4747;
+  color: white;
+}
+
+.search-results-info {
+  margin-bottom: 10px;
+}
+
+.search-results-count {
+  font-size: 13px;
+  color: #6c757d;
+  margin: 0;
+  padding: 0 5px;
+}
+
+/* Dark theme styling for search */
+body.dark-theme .donation-search-input {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-theme .donation-search-icon,
+body.dark-theme .donation-search-clear {
+  color: #aaa;
+}
+
+body.dark-theme .donation-search-input:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.25);
+}
+
+body.dark-theme .donation-search-clear:hover {
+  background-color: #3a3a3a;
+  color: #ff6b6b;
+}
+
+body.dark-theme .filter-btn {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-theme .filter-btn:hover {
+  background-color: #3a3a3a;
+}
+
+body.dark-theme .filter-btn.active {
+  background-color: #ff6b6b;
+  border-color: #ff6b6b;
+  color: #fff;
+}
+
+/* Media Queries for Responsive Design */
+@media screen and (max-width: 768px) {
+  .donation-search-wrapper {
+    flex-direction: column;
+  }
+  
+  .donation-filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* Responsive adjustments for tables */
 @media (max-width: 768px) {
+  /* Table actions should be full width on mobile */
   .table-actions {
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    padding: 8px 0;
   }
   
   .table-actions button {
-    margin-bottom: 4px;
-    width: 100%;
+    flex: 1;
+    font-size: 10px;
+    padding: 5px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Card actions should stack on very small screens */
+  @media (max-width: 380px) {
+    .donation-actions button {
+      max-width: none;
+      width: 100%;
+    }
   }
 }
 
@@ -717,3 +1037,262 @@ body.dark-theme .delete-request-btn:hover {
   }
 }
 
+/* Responsive Display Logic - Simplified and Fixed */
+/* Default state - Show tables, hide cards */
+.donations-table-wrapper {
+  display: block;
+}
+
+.donation-cards-container {
+  display: none;
+}
+
+/* Clean up media queries and make them consistent */
+@media screen and (max-width: 768px) {
+  .donations-table-wrapper {
+    display: none !important;
+  }
+  .donation-cards-container {
+    display: block !important;
+  }
+}
+
+.view-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.view-toggle button {
+  padding: 8px 16px;
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-toggle button.active {
+  background-color: #ff4747;
+  color: white;
+  border-color: #ff4747;
+}
+
+body.dark-theme .view-toggle button {
+  background-color: #333;
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+body.dark-theme .view-toggle button.active {
+  background-color: #ff4747;
+  border-color: #ff4747;
+}
+
+/* Fix details modal close button */
+.donation-detail-footer .close-detail-btn {
+  background-color: #e2e3e5;
+  color: #383d41;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.donation-detail-footer .close-detail-btn:hover {
+  background-color: #d6d8db;
+  transform: translateY(-2px);
+}
+
+body.dark-theme .donation-detail-footer .close-detail-btn {
+  background-color: #343a40;
+  color: #e0e0e0;
+}
+
+body.dark-theme .donation-detail-footer .close-detail-btn:hover {
+  background-color: #444;
+}
+
+/* Add styling for the modal action buttons container */
+.modal-action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* Style the delete button in the modal */
+.modal-action-buttons .delete-request-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.modal-action-buttons .delete-request-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+}
+
+/* Dark theme styling for the modal delete button */
+body.dark-theme .modal-action-buttons .delete-request-btn {
+  background-color: rgba(220, 53, 69, 0.3);
+  color: #f77;
+  border: 1px solid rgba(220, 53, 69, 0.5);
+}
+
+body.dark-theme .modal-action-buttons .delete-request-btn:hover {
+  background-color: rgba(220, 53, 69, 0.5);
+}
+
+/* Apply card button styling to table button classes */
+/* Table specific button sizes - keeping compact size */
+.table-actions button,
+.table-actions .action-btn,
+.table-actions .action-cancel-btn,
+.table-actions .action-confirm-btn,
+.table-actions .action-complete-btn,
+.table-actions .action-delete-btn,
+.table-actions .action-details-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  height: 32px;
+  min-width: 80px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Apply the same hover effect for table buttons as card buttons */
+.table-actions button:hover,
+.table-actions .action-btn:hover,
+.table-actions .action-cancel-btn:hover,
+.table-actions .action-confirm-btn:hover,
+.table-actions .action-complete-btn:hover,
+.table-actions .action-delete-btn:hover,
+.table-actions .action-details-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0,0,0,0.15);
+}
+
+/* Override existing dark theme styles to match card styles */
+body.dark-theme .table-actions .action-cancel-btn {
+  background-color: rgba(211, 47, 47, 0.15);
+  color: #ff8a80;
+  border: 1px solid rgba(211, 47, 47, 0.3);
+}
+
+body.dark-theme .table-actions .action-cancel-btn:hover {
+  background-color: rgba(211, 47, 47, 0.7);
+  color: white;
+}
+
+body.dark-theme .table-actions .action-complete-btn {
+  background-color: rgba(46, 125, 50, 0.15);
+  color: #81c784;
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+body.dark-theme .table-actions .action-complete-btn:hover {
+  background-color: rgba(46, 125, 50, 0.7);
+  color: white;
+}
+
+body.dark-theme .table-actions .action-delete-btn {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: #ef9a9a;
+  border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+body.dark-theme .table-actions .action-delete-btn:hover {
+  background-color: rgba(198, 40, 40, 0.7);
+  color: white;
+}
+
+body.dark-theme .table-actions .action-details-btn {
+  background-color: rgba(66, 66, 66, 0.3);
+  color: #e0e0e0;
+  border: 1px solid rgba(97, 97, 97, 0.3);
+}
+
+body.dark-theme .table-actions .action-details-btn:hover {
+  background-color: rgba(97, 97, 97, 0.7);
+  color: white;
+}
+
+/* Table Button Specific Styles to match card buttons */
+.table-actions .action-cancel-btn {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border: 1px solid #ffcdd2;
+}
+
+.table-actions .action-cancel-btn:hover {
+  background-color: #d32f2f;
+  color: white;
+  box-shadow: 0 2px 5px rgba(211, 47, 47, 0.3);
+}
+
+.table-actions .action-complete-btn {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.table-actions .action-complete-btn:hover {
+  background-color: #2e7d32;
+  color: white;
+  box-shadow: 0 2px 5px rgba(46, 125, 50, 0.3);
+}
+
+.table-actions .action-delete-btn {
+  background-color: #feeceb;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.table-actions .action-delete-btn:hover {
+  background-color: #c62828;
+  color: white;
+  box-shadow: 0 2px 5px rgba(198, 40, 40, 0.3);
+}
+
+.table-actions .action-details-btn {
+  background-color: #f5f5f5;
+  color: #424242;
+  border: 1px solid #e0e0e0;
+}
+
+.table-actions .action-details-btn:hover {
+  background-color: #424242;
+  color: white;
+  box-shadow: 0 2px 5px rgba(66, 66, 66, 0.3);
+}
+
+body.dark-theme .status-pending {
+  background-color: rgba(181, 129, 5, 0.15);
+  color: #ffc107;
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+body.dark-theme .status-approved {
+  background-color: rgba(27, 94, 32, 0.15);
+  color: #4caf50;
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+body.dark-theme .status-rejected {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: #f44336;
+  border-color: rgba(244, 67, 54, 0.3);
+}

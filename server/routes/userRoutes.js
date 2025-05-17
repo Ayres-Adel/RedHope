@@ -22,20 +22,17 @@ router.use((req, res, next) => {
 // Get all users from actual MongoDB Atlas database
 router.get('/all', async (req, res) => {
   try {
-    console.log('Attempting to fetch users from MongoDB Atlas...');
-    
+    // Remove console.log and proceed directly with the function
     // Try to get real users from the database
     const users = await User.find({});
     
     if (users && users.length > 0) {
-      console.log(`Successfully retrieved ${users.length} users from database`);
       return res.status(200).json({
         success: true,
         users: users,
         source: 'database'
       });
     } else {
-      console.log('No users found in database, falling back to mock data');
       return res.status(200).json({
         success: true,
         users: MOCK_USERS,
@@ -43,7 +40,6 @@ router.get('/all', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error fetching users from database:', error);
     // Fall back to mock data on error
     return res.status(200).json({
       success: true,

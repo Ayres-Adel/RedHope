@@ -384,7 +384,6 @@
   border-radius: 4px;
   padding: 8px 12px;
   font-size: 14px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -758,6 +757,11 @@ body.dark-theme .search-component .contact-donor-button:hover {
   vertical-align: middle;
 }
 
+.search-component .donor-table tr {
+  border-bottom: 1px solid #eee !important;
+  height: fit-content;
+}
+
 /* Column Width Settings */
 .search-component .donor-table th:nth-child(1),
 .search-component .donor-table td:nth-child(1) {
@@ -1075,7 +1079,7 @@ body.dark-theme .search-component .contact-donor-button:hover {
 }
 
 .dark-theme .search-component .blood-type-cell {
-  color: var(--primary-light);
+  color: var(--primary-light) !important;
 }
 
 .dark-theme .search-component .map-legend {

@@ -736,7 +736,7 @@
 }
 
 .data-table th {
-  background-color: var(--primary);
+  background-color: var(--primary) !important;
   color: white;
   text-align: left;
   padding: 14px 16px;
@@ -971,7 +971,6 @@
 }
 
 .section-content h4 {
-  color: var(--text-dark);
   font-size: 16px;
   margin: 12px 0;
   font-weight: 500;

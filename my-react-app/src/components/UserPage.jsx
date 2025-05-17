@@ -6,8 +6,6 @@ import { formatLocation } from '../utils/LocationService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSpinner, 
-  faThLarge, 
-  faTable 
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/UserPage.css';
 import Navbar from './Navbar';
@@ -19,6 +17,7 @@ import { getCurrentLocation, reverseGeocode } from '../utils/LocationService';
 import DonationRequestsTable from './donation/DonationRequestsTable';
 import DonationRequestCard from './donation/DonationRequestCard';
 import DonationRequestDetail from './donation/DonationRequestDetail';
+import DonationRequestSearch from './donation/DonationRequestSearch';
 
 const UserPage = () => {
   const navigate = useNavigate();
@@ -54,6 +53,7 @@ const UserPage = () => {
   const [activeSection, setActiveSection] = useState('profile');
   const [updating, setUpdating] = useState(false);
   const [donations, setDonations] = useState([]);
+  const [filteredDonationRequests, setFilteredDonationRequests] = useState([]);
   const [loadingDonations, setLoadingDonations] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [selectedDonation, setSelectedDonation] = useState(null);
@@ -474,7 +474,6 @@ const UserPage = () => {
           if (locationInfo.success && locationInfo.details?.cityId) {
             // Add cityId to the data being sent to the API
             editForm.cityId = locationInfo.details.cityId;
-            console.log('Setting cityId from postal code:', locationInfo.details.cityId);
           }
         } catch (geoError) {
           console.error('Error extracting cityId from location:', geoError);
@@ -682,18 +681,22 @@ const UserPage = () => {
       if (response.data && Array.isArray(response.data)) {
         // API returns an array of donation requests
         setDonations(response.data);
+        setFilteredDonationRequests(response.data); // Initialize filtered results
       } else if (response.data && Array.isArray(response.data.data)) {
         // API returns an object with a data property containing the array
         setDonations(response.data.data);
+        setFilteredDonationRequests(response.data.data); // Initialize filtered results
       } else {
         console.error('Unexpected API response format:', response.data);
         setDonationsError('Unexpected data format received from server');
         setDonations([]);
+        setFilteredDonationRequests([]); // Clear filtered results on error
       }
     } catch (error) {
       console.error('Error fetching donation requests:', error);
       setDonationsError(error.response?.data?.message || 'Failed to load donation requests');
       setDonations([]);
+      setFilteredDonationRequests([]); // Clear filtered results on error
     } finally {
       setLoadingDonations(false);
     }
@@ -705,6 +708,11 @@ const UserPage = () => {
       fetchUserDonations();
     }
   }, [activeSection]);
+
+  // Handle search results
+  const handleSearchResults = (results) => {
+    setFilteredDonationRequests(results);
+  };
 
   // Function to handle canceling a donation request
   const handleCancelDonation = async (donationId) => {
@@ -1088,7 +1096,7 @@ const UserPage = () => {
                             </div>
                             
                             <div className="form-field">
-                              <label><FiDroplet className="info-icon" /> {t.donorStatus}</label>
+                              <label><FiHeart className="info-icon" /> {t.donorStatus}</label>
                               <div className="donor-toggle-container">
                                 <label className="toggle-switch">
                                   <input
@@ -1138,21 +1146,7 @@ const UserPage = () => {
                       <div className="error-message">{donationsError}</div>
                     )}
                     
-                    {/* Add responsive styles for table/cards display */}
-                    <style>
-                      {`
-                        @media screen and (min-width: 701px) {
-                          .donations-table-wrapper { display: block; }
-                          .donations-cards { display: none; }
-                        }
-                        
-                        @media screen and (max-width: 700px) {
-                          .donations-table-wrapper { display: none; }
-                          .donations-cards { display: block; }
-                        }
-                      `}
-                    </style>
-                    
+                    {/* Remove inline styles and use CSS classes */}
                     {loadingDonations ? (
                       <div className="donations-loading">
                         <FontAwesomeIcon icon={faSpinner} spin />
@@ -1163,39 +1157,45 @@ const UserPage = () => {
                         <p>{t.noDonations}</p>
                       </div>
                     ) : (
-                      <div className="table-wrapper">
-                        {/* Table view - will be shown only on larger screens via CSS */}
-                        <div className="donations-table-wrapper">
-                          <DonationRequestsTable
-                            donationRequests={donations}
-                            onCancel={handleCancelDonation}
-                            onConfirm={handleConfirmDonation}
-                            onViewDetails={handleViewDonationDetails}
-                            onComplete={handleCompleteDonation} // Add this handler
-                            onDelete={handleDeleteDonation} // Add this handler
-                            translations={t}
-                            isActionLoading={actionLoading}
-                            loadingDonations={false}
-                          />
-                        </div>
-                        
-                        {/* Card view - will be shown only on smaller screens via CSS */}
-                        <div className="donations-cards">
-                          {donations.map(donation => (
-                            <DonationRequestCard
-                              key={donation._id}
-                              donationRequest={donation}
-                              onCancel={handleCancelDonation}
-                              onConfirm={handleConfirmDonation}
-                              onComplete={handleCompleteDonation} // Add this handler
-                              onDelete={handleDeleteDonation} // Add this handler
-                              onViewDetails={handleViewDonationDetails}
-                              translations={t}
-                              isActionLoading={actionLoading}
-                            />
-                          ))}
-                        </div>
-                      </div>
+                      <>
+                        <DonationRequestSearch 
+                          donationRequests={donations}
+                          onSearchResults={handleSearchResults}
+                          translations={t}
+                        >
+                          <div className="donations-wrapper">
+                            {/* Remove style conditionals based on viewMode */}
+                            <div className="donations-table-wrapper">
+                              <DonationRequestsTable
+                                donationRequests={filteredDonationRequests}
+                                onCancel={handleCancelDonation}
+                                onConfirm={handleConfirmDonation}
+                                onViewDetails={handleViewDonationDetails}
+                                onComplete={handleCompleteDonation}
+                                onDelete={handleDeleteDonation}
+                                translations={t}
+                                isActionLoading={actionLoading}
+                                loadingDonations={false}
+                              />
+                            </div>
+                            <div className="donation-cards-container">
+                              {filteredDonationRequests.map(request => (
+                                <DonationRequestCard
+                                  key={request._id}
+                                  donationRequest={request}
+                                  onCancel={handleCancelDonation}
+                                  onConfirm={handleConfirmDonation}
+                                  onViewDetails={handleViewDonationDetails}
+                                  onComplete={handleCompleteDonation}
+                                  onDelete={handleDeleteDonation}
+                                  translations={t}
+                                  isActionLoading={actionLoading}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </DonationRequestSearch>
+                      </>
                     )}
                     
                     {/* Details modal */}
@@ -1204,6 +1204,7 @@ const UserPage = () => {
                         donationRequest={selectedDonation}
                         onClose={handleCloseDonationDetails}
                         translations={t}
+                        onDelete={handleDeleteDonation} // Add the delete handler
                       />
                     )}
                   </div>

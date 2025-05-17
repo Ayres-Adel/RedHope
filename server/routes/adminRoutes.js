@@ -131,8 +131,6 @@ router.get('/blood-supply', requireAuth || fallbackAuth, (req, res) => {
 // Get all admin accounts with pagination, filtering and sorting
 router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
   try {
-    console.log('Admin accounts API endpoint called');
-    
     // Extract query parameters with defaults
     const { 
       page = 1, 
@@ -191,8 +189,6 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       .sort({ [sortBy]: finalSortOrder })
       .skip(skip)
       .limit(limitNum);
-    
-    console.log(`Found ${admins.length} admin accounts matching query on page ${pageNum}`);
     
     // Format admin accounts for response
     const formattedAdmins = admins.map(admin => ({
