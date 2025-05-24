@@ -74,10 +74,33 @@ The backend uses the MVC (Model-View-Controller) pattern for clean code structur
 ## 🖼️ Screenshots
 
 - **Landing Page** – Welcome interface with navigation.
+
+<div align="center">
+   <a href="https://imgbb.com/"><img src="https://i.ibb.co/RTh5XywJ/image.png" alt="image" border="0"></a>
+</div>
+
+
+
 - **Map Page** – Interactive map showing hospitals in Algeria.
+
+<div align="center">
+    <a href="https://imgbb.com/"><img src="https://i.ibb.co/xSs9RGgg/image.png" alt="image" border="0"></a>
+</div>
+
+
 - **Search Page** – Proximity-based donor lookup.
-- **Admin Dashboard** – CRUD actions on users and hospitals.
+  
+ <div align="center">
+ <a href="https://imgbb.com/"><img src="https://i.ibb.co/DPvByzDZ/image.png" alt="image" border="0"></a>
+</div>
+
 - **Mobile View** – Fully responsive layout.
+  
+<div align="center">
+  <a href="https://imgbb.com/"><img src="https://i.ibb.co/q3hMbyj2/image.png" alt="image" border="0"></a>
+</div>
+
+
 
 ---
 
