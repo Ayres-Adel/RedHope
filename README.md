@@ -173,7 +173,7 @@ This project is dedicated to:
 
 🩸 Every volunteer donor who selflessly gives a part of themselves to save others.
 
-👨‍👩‍👧‍👦 Our families and friends (Mehdi) — for their unwavering support, love, and encouragement throughout our academic journey.
+👨‍👩‍👧‍👦 Our families and friends — for their unwavering support, love, and encouragement throughout our academic journey.
 
 🎓 Our mentors, especially Dr. Djabour Djamel — for inspiring us to combine technology with compassion in the service of humanity.
 
