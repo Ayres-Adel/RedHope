@@ -24,7 +24,10 @@
     "validator": "^13.12.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clear-users": "node scripts/clearUsers.js",
+    "populate-users": "node scripts/populateUsers.js",
+    "reset-demo-data": "npm run clear-users && npm run populate-users"
   },
   "repository": {
     "url": "git+https://github.com/iamshaunjp/node-express-jwt-auth.git"

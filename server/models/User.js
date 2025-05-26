@@ -25,6 +25,7 @@ const UserSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     required: [true, 'Please enter a phone number'],
+    unique: true,
     validate: {
       validator: function(v) {
         return /^(0|\+)?[0-9]{10,15}$/.test(v.replace(/\D/g, ''));
@@ -83,21 +84,10 @@ UserSchema.statics.checkExisting = async function ({ email, phoneNumber, passwor
     throw Error('Email already exists');
   }
 
-
   const phoneExists = await this.findOne({ phoneNumber });
   if (phoneExists) {
     throw Error('Phone number already exists');
   }
-
-
-  const existingUsers = await this.find({}); 
-  for (let user of existingUsers) {
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (isPasswordMatch) {
-      throw Error('Password already exists');
-    }
-  }
-
 
   return null;
 };
