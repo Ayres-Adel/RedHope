@@ -80,7 +80,6 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
   
   const formatCityCode = (code) => {
     if (!code) return '';
-    // Ensure code is a string and pad with leading zero if needed
     return String(code).padStart(2, '0');
   };
   
@@ -161,7 +160,6 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
       return;
     }
     
-    // Get the city code and ensure it's properly formatted
     const cityCode = formatCityCode(city.code || city.wilayaCode);
     
     if (city.location && city.location.coordinates) {

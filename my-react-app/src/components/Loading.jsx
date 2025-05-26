@@ -1,4 +1,3 @@
-// src/components/Loading.jsx
 import React, { useEffect } from 'react';
 import '../styles/loading.css';
 import RedHopeLogo from '../assets/images/RedHope_Logo.png';

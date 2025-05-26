@@ -11,7 +11,6 @@ import { useJumpToSection } from "./JumpPages.jsx";
 import ScrollTracker from './ScrollTracker';
 import RedHopeLogo from "../assets/images/RedHope_Logo.png";
 
-// Memoized navigation link component for better performance
 const NavLink = memo(({ 
   reference, 
   isActive, 
@@ -27,38 +26,32 @@ const NavLink = memo(({
   </div>
 ));
 
-// Main Navbar component
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Page detection constants
   const isHomePage = location.pathname === "/";
   const isMapPage = location.pathname === "/map";
-  const isSearchPage = location.pathname === "/search"; // Add this constant
+  const isSearchPage = location.pathname === "/search";
   const isSignPage = location.pathname === "/sign";
   const isLoginPage = location.pathname === "/login";
   const isUserPage = location.pathname === "/user";
   const isAdminPage = location.pathname === "/admin";
-  const isUnrelatedPage = !isHomePage && !isMapPage && !isAdminPage && !isSearchPage; // Update this line
+  const isUnrelatedPage = !isHomePage && !isMapPage && !isAdminPage && !isSearchPage;
 
-  // Authentication state
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Navigation state
   const { jump, activeSection: hookActiveSection } = useJumpToSection();
   const [currentSection, setCurrentSection] = useState('home');
   const activeSection = isHomePage ? currentSection : hookActiveSection;
 
-  // UI state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState(
     localStorage.getItem("language") || "en"
   );
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
 
-  // Element references
   const navLinksRef = useRef(null);
   const hamburgerRef = useRef(null);
   const homeRef = useRef(null);
@@ -67,18 +60,15 @@ export default function Navbar() {
   const mapRef = useRef(null);
   const adminRef = useRef(null);
 
-  // Handle section changes from ScrollTracker
   const handleSectionChange = useCallback((section) => {
     setCurrentSection(section);
   }, []);
 
-  // Theme toggle handler with useCallback
   const handleToggleChange = useCallback((event) => {
     const isChecked = event.target.checked;
     document.body.classList.toggle("dark-theme", isChecked);
     localStorage.setItem("darkMode", isChecked);
     
-    // Sync theme toggles
     const allToggles = [
       document.getElementById("toggle"), 
       document.getElementById("mobile-toggle")
@@ -91,7 +81,6 @@ export default function Navbar() {
     });
   }, []);
 
-  // Menu management functions
   const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
     if (hamburgerRef.current) {
@@ -109,7 +98,6 @@ export default function Navbar() {
     });
   }, []);
 
-  // Navigation handler with optimization
   const handleNavigation = useCallback(
     (section) => {
       if (isHomePage) {
@@ -128,7 +116,6 @@ export default function Navbar() {
     [isHomePage, jump, navigate, closeMenu]
   );
 
-  // Specialized navigation handlers
   const handleMapNavigation = useCallback(() => {
     navigate("/map");
     closeMenu();
@@ -139,13 +126,11 @@ export default function Navbar() {
     closeMenu();
   }, [navigate, closeMenu]);
 
-  // Add search navigation handler
   const handleSearchNavigation = useCallback(() => {
     navigate("/search");
     closeMenu();
   }, [navigate, closeMenu]);
 
-  // Authentication functions
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
@@ -157,7 +142,6 @@ export default function Navbar() {
     return userRole === "admin" || localStorage.getItem("isAdmin") === "true";
   }, []);
 
-  // Language management
   const changeLanguage = useCallback(() => {
     const newLanguage = language === "en" ? "fr" : "en";
     setLanguage(newLanguage);
@@ -170,9 +154,7 @@ export default function Navbar() {
     );
   }, [language]);
 
-  // Effect hooks - consolidated for better performance
   useEffect(() => {
-    // Update login state
     const hasToken = !!localStorage.getItem("token");
     setIsLoggedIn(hasToken);
     
@@ -182,13 +164,11 @@ export default function Navbar() {
       setIsAdmin(false);
     }
     
-    // Handle navigation when returning to home
     if (isHomePage && location.state?.scrollTo) {
       jump(location.state.scrollTo);
       navigate("/", { replace: true, state: {} });
     }
     
-    // Setup theme toggle
     const setupThemeToggle = () => {
       const toggle = document.getElementById("toggle");
       const mobileToggle = document.getElementById("mobile-toggle");
@@ -203,7 +183,6 @@ export default function Navbar() {
     
     setupThemeToggle();
     
-    // Click outside handler for menu closing
     const handleClickOutside = (event) => {
       if (isMenuOpen && 
           navLinksRef.current && 
@@ -222,19 +201,16 @@ export default function Navbar() {
     };
   }, [location.pathname, checkAdminStatus, isHomePage, location.state, jump, navigate, isMenuOpen, closeMenu]);
 
-  // Translation helper
   const t = useCallback((en, fr) => language === "en" ? en : fr, [language]);
 
   return (
     <header>
-      {/* ScrollTracker for section detection */}
       <ScrollTracker 
         onSectionChange={handleSectionChange}
         isHomePage={isHomePage} 
       />
       
       <nav className={isMenuOpen ? 'expanded' : ''}>
-        {/* Logo */}
         <div className="nav-logo">
           <a href="/">
             <img src= {RedHopeLogo} alt="RedHope Logo" />
@@ -242,7 +218,6 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* Hamburger menu button */}
         <div
           ref={hamburgerRef}
           className="hamburger"
@@ -258,12 +233,10 @@ export default function Navbar() {
           <div></div>
         </div>
 
-        {/* Navigation links */}
         <div 
           ref={navLinksRef}
           className={`nav-links ${isMenuOpen ? "active" : ""}`}
         >
-          {/* Home link */}
           <NavLink 
             reference={homeRef}
             isActive={!isUnrelatedPage && !(isMapPage || isAdminPage || isSearchPage) && 
@@ -273,7 +246,6 @@ export default function Navbar() {
             {t("Home", "Accueil")}
           </NavLink>
           
-          {/* Search link - Added between Home and Map */}
           <NavLink 
             isActive={!isUnrelatedPage && isSearchPage}
             onClick={handleSearchNavigation}
@@ -281,7 +253,6 @@ export default function Navbar() {
             {t("Search", "Recherche")}
           </NavLink>
           
-          {/* Map link */}
           <NavLink 
             reference={mapRef}
             isActive={!isUnrelatedPage && isMapPage}
@@ -306,7 +277,6 @@ export default function Navbar() {
             {t("About Us", "À Propos")}
           </NavLink>
 
-          {/* Admin panel link - conditionally rendered */}
           {isAdmin && (
             <NavLink 
               reference={adminRef}
@@ -317,10 +287,8 @@ export default function Navbar() {
             </NavLink>
           )}
           
-          {/* Active line indicator */}
           <div className="active-line" style={lineStyle} />
           
-          {/* Mobile utility section */}
           <div className="mobile-utility-section">
             <div className="language-switcher">
               <FontAwesomeIcon
@@ -331,7 +299,6 @@ export default function Navbar() {
               />
             </div>
 
-            {/* Mobile theme toggle */}
             <div className="toggle-container">
               <input 
                 type="checkbox" 
@@ -353,13 +320,10 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Right-side icons */}
         <div className={`nav-icons ${isMenuOpen ? "active" : ""}`}>
-          {/* Auth section */}
           <div className="auth">
             {isLoggedIn || isUserPage ? (
               <>
-                {/* User profile icon */}
                 <FontAwesomeIcon
                   icon={faUser}
                   className="login-icon"
@@ -370,7 +334,6 @@ export default function Navbar() {
                   tabIndex={0}
                   onKeyDown={(e) => e.key === "Enter" && navigate("/user")}
                 />
-                {/* Logout icon */}
                 <FontAwesomeIcon
                   icon={faSignOutAlt}
                   className="login-icon"
@@ -396,7 +359,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Language switcher */}
           <div className="language-switcher">
             <FontAwesomeIcon
               icon={faGlobe}
@@ -410,7 +372,6 @@ export default function Navbar() {
             />
           </div>
 
-          {/* Desktop dark mode toggle */}
           <div className="toggle-container">
             <input 
               type="checkbox" 

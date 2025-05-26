@@ -1,12 +1,11 @@
-// src/components/ScrollProgress.jsx
 import React, { useEffect, useState } from 'react';
-import '../styles/ScrollProgress.css'; // We'll create this CSS file next
+import '../styles/ScrollProgress.css';
 
 const ScrollProgress = () => {
   const [scrollPercentage, setScrollPercentage] = useState(0);
 
   const handleScroll = () => {
-    const scrollTop = window.pageYOffset; // Number of pixels scrolled vertically
+    const scrollTop = window.pageYOffset;
     const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     const scrolled = (scrollTop / docHeight) * 100;
     setScrollPercentage(scrolled);
@@ -15,7 +14,6 @@ const ScrollProgress = () => {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     
-    // Cleanup the event listener on component unmount
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

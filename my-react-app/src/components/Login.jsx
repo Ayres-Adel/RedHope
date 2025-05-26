@@ -1,14 +1,11 @@
-// src/components/Login.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/auth.css';
-import FadeInSection from './FadeInSection.jsx'; // Optional: For fade-in effect
-import ScrollProgress from './ScrollProgress.jsx'; // Optional: For scroll progress
+import FadeInSection from './FadeInSection.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import floating from '../assets/images/balloon.svg';
 
-// Import images
 import redHopeLogo from '../assets/images/RedHope_Logo.png';
 import Navbar from './Navbar.jsx';
 import { API_BASE_URL } from '../config';
@@ -27,12 +24,10 @@ export default function Login() {
   const loginButton = useRef(null);
 
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Language state: reads from localStorage (defaulting to English)
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
 
-  // Poll localStorage for language changes
   useEffect(() => {
     const interval = setInterval(() => {
       const currentLang = localStorage.getItem('language') || 'en';
@@ -51,12 +46,11 @@ export default function Login() {
     });
     setErrors({
       ...errors,
-      [name]: '' // Clear error for the changed field
+      [name]: ''
     });
   };
 
   useEffect(() => {
-    // Update button styles and enable state based on form validity
     const isFormValid = formData.email && formData.password.length >= 6;
     setIsButtonEnabled(isFormValid);
 
@@ -101,7 +95,7 @@ export default function Login() {
       return;
     }
 
-    setErrors({ email: '', password: '', general: '' }); // Reset errors before submitting
+    setErrors({ email: '', password: '', general: '' });
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
@@ -115,44 +109,35 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store token in localStorage
         if (data.token) {
           localStorage.setItem('token', data.token);
           
-          // Also store refresh token if available
           if (data.refreshToken) {
             localStorage.setItem('refreshToken', data.refreshToken);
           }
           
-          // Check if user is admin based on data returned from server
           const isAdmin = data.user?.isAdmin === true || data.user?.role === 'admin' || data.user?.role === 'superadmin';
           
-          // Store role and admin status
           localStorage.setItem('userRole', data.user?.role || 'user');
           localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
           
-          // Store user ID for future API calls
           if (data.user?.id) {
             localStorage.setItem('userId', data.user.id);
           }
           
-          // Redirect based on admin status
           if (isAdmin) {
             navigate('/admin');
             return;
           } else {
-            // Regular user redirect
             navigate('/search');
           }
         } else {
-          // Handle missing token
           setErrors({
             ...errors,
             general: 'Authentication token not received. Please try again.'
           });
         }
       } else {
-        // Handle errors from the server
         const serverErrors = {};
         if (data.errors && Array.isArray(data.errors)) {
           data.errors.forEach(error => {

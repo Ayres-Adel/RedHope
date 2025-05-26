@@ -1,9 +1,8 @@
-// src/components/Sign.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from './Navbar.jsx';
 import '../styles/auth.css';
-import FadeInSection from './FadeInSection.jsx'; // Import FadeInSection
+import FadeInSection from './FadeInSection.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import floating from '../assets/images/balloon.svg';
 import { 
@@ -16,11 +15,10 @@ import {
   faEye, 
   faEyeSlash, 
   faPhone 
-} from '@fortawesome/free-solid-svg-icons'; // Import necessary icons
+} from '@fortawesome/free-solid-svg-icons';
 import { API_BASE_URL } from '../config';
 import { getCurrentLocation, formatLocation } from '../utils/LocationService';
 
-// Import images
 import redHopeLogo from '../assets/images/RedHope_Logo.png';
 
 export default function Sign() {
@@ -49,12 +47,9 @@ export default function Sign() {
   const signButton = useRef(null);
 
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
-
-  // Language state: reads from localStorage (defaulting to English)
+  const [showPassword, setShowPassword] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
 
-  // Poll localStorage for language changes
   useEffect(() => {
     const interval = setInterval(() => {
       const currentLang = localStorage.getItem('language') || 'en';
@@ -73,7 +68,7 @@ export default function Sign() {
     });
     setErrors({
       ...errors,
-      [name]: '' // Clear error for the changed field
+      [name]: ''
     });
   };
 
@@ -133,7 +128,6 @@ export default function Sign() {
       valid = false;
     }
 
-    // Phone number validation: expecting exactly 10 digits
     const phoneRegex = /^(0|\+)?[0-9]{10,15}$/;
     if (!phoneRegex.test(formData.phoneNumber.replace(/\D/g, ''))) {
       newErrors.phoneNumber = language === 'fr'
@@ -167,7 +161,6 @@ export default function Sign() {
     const dataToSend = {
       ...formData,
       isDonor: formData.isDonor === 'yes',
-      // Include the cityId in data sent to the API
       cityId: formData.cityId || null
     };
     
@@ -210,7 +203,6 @@ export default function Sign() {
     }
   };
 
-  // Improved location fetching using enhanced LocationService
   const getLocation = () => {
     setFormData(prev => ({
       ...prev,
@@ -222,7 +214,6 @@ export default function Sign() {
         const { lat, lng } = position;
         const locationString = `${lat},${lng}`;
         
-        // First update form with just coordinates
         setFormData(prev => ({
           ...prev,
           location: locationString
@@ -231,15 +222,13 @@ export default function Sign() {
         formatLocation(position, language)
           .then(locationInfo => {
             if (locationInfo.success) {
-              // Extract cityId from postal code if available
               const cityId = locationInfo.details?.cityId || 
                              locationInfo.details?.postalCode?.substring(0, 2) || null;
               
-              // Update form with both formatted location and cityId
               setFormData(prev => ({
                 ...prev,
                 formattedLocation: locationInfo.formatted,
-                cityId: cityId // Store the cityId in form data
+                cityId: cityId
               }));
               
               setErrors(prev => ({
@@ -286,7 +275,7 @@ export default function Sign() {
         }));
       },
       enableHighAccuracy: true,
-      timeout: 20000, // Increased from 10000 to 20000ms
+      timeout: 20000,
       maximumAge: 0
     });
   };
@@ -297,7 +286,6 @@ export default function Sign() {
       document.body.classList.toggle('dark-theme', toggle.checked);
     });
 
-    // Cleanup event listener
     return () => {
       toggle.removeEventListener('change', () => {
         document.body.classList.toggle('dark-theme', toggle.checked);

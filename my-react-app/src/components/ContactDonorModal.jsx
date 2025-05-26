@@ -3,11 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faTimes } from '@fortawesome/free-solid-svg-icons';
 import guestService from '../utils/guestService';
 import { getCurrentLocation, reverseGeocode } from '../utils/LocationService';
-import { donationRequestService } from '../services/api'; // Import donation request service
+import { donationRequestService } from '../services/api';
 import '../styles/ContactDonorModal.css';
 
 const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
-  // Initialize phoneNumber from sessionStorage or empty string
   const [phoneNumber, setPhoneNumber] = useState(() => {
     return sessionStorage.getItem('guestPhoneNumber') || '';
   });
@@ -15,9 +14,8 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [registrationInfo, setRegistrationInfo] = useState(null);
-  const [requestCreated, setRequestCreated] = useState(false); // Track request creation
+  const [requestCreated, setRequestCreated] = useState(false);
   
-  // Translation system
   const translations = useMemo(() => ({
     en: {
       contactDonor: 'Contact Donor',
@@ -57,12 +55,10 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
     }
   }), []);
 
-  // Get translations for current language
   const t = translations[language] || translations.en;
   
   if (!isOpen) return null;
 
-  // Update the handleSubmit function to include location for cityId extraction
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -70,7 +66,6 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
     setRequestCreated(false);
     
     try {
-      // Format phone number - remove non-digit characters
       const formattedPhone = phoneNumber.replace(/\D/g, '');
       
       if (formattedPhone.length < 10) {
@@ -79,10 +74,8 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
         return;
       }
       
-      // Save validated phone number to sessionStorage for future use
       sessionStorage.setItem('guestPhoneNumber', formattedPhone);
       
-      // Get current location
       let location;
       let cityId = null;
       try {
@@ -91,18 +84,16 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
             onSuccess: (position) => resolve(position),
             onError: (error) => reject(error),
             enableHighAccuracy: true,
-            timeout: 20000 // Increased from 10000 to 20000
+            timeout: 20000
           });
         });
         
-        // Get cityId from reverse geocoding
         if (location && location.lat && location.lng) {
           const geoResult = await reverseGeocode(location.lat, location.lng, language);
           if (geoResult.success && geoResult.details && geoResult.details.cityId) {
             cityId = geoResult.details.cityId;
             console.log('Extracted cityId from location:', cityId);
           } else if (geoResult.success && geoResult.components && geoResult.components.postcode) {
-            // Extract from postal code directly if cityId wasn't already set
             const postalCode = geoResult.components.postcode;
             if (postalCode && postalCode.length >= 2) {
               const postalPrefix = postalCode.substring(0, 2);
@@ -118,28 +109,21 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
         location = { lat: 0, lng: 0 };
       }
       
-      // Check if user is logged in
       const token = localStorage.getItem('token');
       
-      // Prepare location data in the format the server expects
       const locationData = {
         type: 'Point',
         coordinates: [location.lng || 0, location.lat || 0]
       };
       
-      // Whether logged in or guest, create a donation request
       try {
-        // Calculate default expiry date (7 days from now)
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + 7);
         
-        // For guests, we need to register them first
         let guestInfo = {};
         if (!token) {
-          // 1. Register guest with location data and cityId
           const guestResponse = await guestService.registerGuest(formattedPhone, locationData, cityId);
           
-          // Store registration info including timestamps
           guestInfo = {
             guestId: guestResponse.guestId || guestResponse._id || guestResponse.id,
             createdAt: guestResponse.createdAt,
@@ -148,29 +132,26 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
           };
           setRegistrationInfo(guestInfo);
           
-          // Prepare donation request data
           const donationRequestData = {
             bloodType: donor.bloodType,
-            donorId: donor._id || donor.id, // Add the selected donor's ID
+            donorId: donor._id || donor.id,
             expiryDate: expiryDate.toISOString(),
             phoneNumber: formattedPhone,
             guestId: guestInfo.guestId,
-            cityId: cityId, // Include the cityId for location context
+            cityId: cityId,
             location: locationData
           };
           
-          // Create guest donation request
           const requestResponse = await donationRequestService.createGuestDonationRequest(donationRequestData);
           console.log('Guest donation request created:', requestResponse.data);
           setRequestCreated(true);
           
         } else {
-          // For logged-in users, use the standard endpoint
           const donationRequestData = {
             bloodType: donor.bloodType,
             donorId: donor._id || donor.id,
             expiryDate: expiryDate.toISOString(),
-            cityId: cityId, // Include the cityId for location context
+            cityId: cityId,
             location: locationData
           };
           
@@ -180,13 +161,10 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
         }
       } catch (requestError) {
         console.error('Error creating donation request:', requestError);
-        // Continue with the flow even if request creation fails
       }
       
-      // Show success message
       setSuccess(true);
       
-      // Store contact history in local storage
       if (!token) {
         try {
           const guestHistory = JSON.parse(localStorage.getItem('guestContactHistory') || '[]');
@@ -205,17 +183,14 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
         }
       }
       
-      // Handle direct contact if contactMethod was specified
       if (donor.contactMethod) {
         handleDirectContact(donor.contactMethod, donor.phoneNumber, formattedPhone);
       }
       
-      // Close modal after 2 seconds if no specific contact method
       if (!donor.contactMethod) {
         setTimeout(() => {
           onClose();
           setSuccess(false);
-          // Don't reset phoneNumber here so it stays in state
           setRegistrationInfo(null);
           setRequestCreated(false);
         }, 2000);
@@ -228,12 +203,10 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
     }
   };
   
-  // Function to directly contact donor after registration
   const handleDirectContact = (method, donorPhone, guestPhone) => {
     if (!donorPhone) return;
     
     try {
-      // Format phone number for international dialing
       let formattedPhone = donorPhone;
       if (formattedPhone.startsWith('0')) {
         formattedPhone = `213${formattedPhone.substring(1)}`;
@@ -242,12 +215,10 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
       }
       formattedPhone = formattedPhone.replace(/^\+/, '');
       
-      // Default message
       const messageText = encodeURIComponent(
         'Hello, I found you on RedHope. I need your help with a blood donation.'
       );
       
-      // Create a small delay so the user sees the success message before opening contact method
       setTimeout(() => {
         switch (method) {
           case 'whatsapp':
@@ -270,7 +241,6 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
             window.open(`sms:${donorPhone}?body=${messageText}`, '_blank');
         }
         
-        // Close the modal after opening the contact method
         setTimeout(() => {
           onClose();
           setSuccess(false);
@@ -285,7 +255,6 @@ const ContactDonorModal = ({ donor, isOpen, onClose, language = 'en' }) => {
     }
   };
   
-  // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);

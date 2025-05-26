@@ -300,7 +300,6 @@ body.dark-theme .map-search-button {
   border: 1px solid #444;
 }
 
-/* Add this for the search icon */
 .search-icon {
   color: #ff4747;
   transition: color 0.3s ease;
@@ -323,7 +322,7 @@ body.dark-theme .search-icon {
 
 body.dark-theme .map-search-input {
   color: #f0f0f0;
-  caret-color: #ff6b6b; /* Cursor color in dark mode */
+  caret-color: #ff6b6b;
 }
 
 .map-search-input::placeholder {
@@ -335,7 +334,6 @@ body.dark-theme .map-search-input::placeholder {
   color: #bbb;
 }
 
-/* Suggestions container */
 .suggestions-container {
   position: absolute;
   top: calc(100% + 8px);
@@ -376,7 +374,6 @@ body.dark-theme .suggestion-item:hover {
   background-color: #444;
 }
 
-/* Add .hovered class for individual suggestion hover */
 .suggestion-item.hovered {
   background-color: #f5f5f5;
   transform: translateX(5px);
@@ -425,7 +422,6 @@ body.dark-theme .suggestion-wilaya {
   color: #aaa;
 }
 
-/* Map location indicator */
 .map-location-indicator {
   position: absolute;
   bottom: 20px;
@@ -461,7 +457,6 @@ body.dark-theme .map-location-indicator {
   padding-bottom: 8px;
 }
 
-/* Add dark mode styles for info window heading */
 body.dark-theme .hospital-info-window h3 {
   color: #f0f0f0;
   border-bottom-color: #444;
@@ -476,7 +471,6 @@ body.dark-theme .hospital-info-window h3 {
   font-size: 14px;
 }
 
-/* Add dark mode styles for info window paragraph text */
 body.dark-theme .hospital-info-window p {
   color: #ddd;
 }
@@ -487,11 +481,10 @@ body.dark-theme .hospital-info-window p {
   margin-top: 15px;
 }
 
-/* Accepting donations label - positioned to appear next to the close button */
 .accepting-donations-label {
   position: absolute;
   top: 25px;
-  left: 12px; /* Position next to the close button */
+  left: 12px;
   font-size: 11px;
   font-weight: 500;
   color: #2ecc71;
@@ -506,7 +499,6 @@ body.dark-theme .accepting-donations-label {
   background-color: rgba(46, 204, 113, 0.2);
 }
 
-/* Animation for loading spinner */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -527,7 +519,6 @@ body.dark-theme .loading-spinner {
   border-top-color: #ff6b6b;
 }
 
-/* Add loading and error states for blood type stats */
 
 .stats-loading {
   animation: fadeIn 0.3s ease;
@@ -538,7 +529,7 @@ body.dark-theme .loading-spinner {
   border-radius: 10px;
   position: relative;
   overflow: hidden;
-  min-height: 69px; /* Match the height of actual blood type cards */
+  min-height: 69px;
 }
 
 body.dark-theme .skeleton {
@@ -621,7 +612,6 @@ body.dark-theme .retry-button:hover {
   background-color: #ff5252;
 }
 
-/* Loading and error states */
 .loading-container {
   text-align: center;
   padding: 50px;
@@ -632,7 +622,6 @@ body.dark-theme .retry-button:hover {
   padding: 50px;
 }
 
-/* Search bar styling */
 .map-search-button {
   background-color: var(--background-color, white);
   color: var(--text-color, black);
@@ -687,7 +676,6 @@ body.dark-theme .retry-button:hover {
   opacity: 0.7;
 }
 
-/* Ensure dark mode compatibility */
 .dark-theme .map-search-button {
   background-color: #333;
   color: #eee;
@@ -705,7 +693,6 @@ body.dark-theme .retry-button:hover {
   background-color: #444;
 }
 
-/* Responsive design */
 @media (max-width: 900px) {
   .map-container {
     flex-direction: column;

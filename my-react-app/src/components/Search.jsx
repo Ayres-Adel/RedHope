@@ -271,7 +271,7 @@ export default function Search() {
           setDonors([]);
           setShowTable(true);
           setIsLoading(false);
-          resolve(); // Resolve the promise
+          resolve();
           return;
         }
 
@@ -692,9 +692,7 @@ export default function Search() {
     <>
       <Navbar />
       <div className="search-component">
-        {/* Lean More section*/}
         <div className="Lean-More" ref={mapContainerRef}>
-          {/* Heading and description */}
           {!buttonClicked && (
             <>
               <h1>{translations[language].findNearby}</h1>
@@ -702,7 +700,6 @@ export default function Search() {
             </>
           )}
           
-          {/* Location status indicators */}
           {!buttonClicked && locationStatus === 'loading' && (
             <div className="location-status-container">
               <div className="location-loading">
@@ -727,7 +724,6 @@ export default function Search() {
             </div>
           )}
 
-          {/* Error message */}
           {error && locationStatus === 'error' && (
             <div className="error-message-container">
               <div className="error-message-content">
@@ -750,7 +746,6 @@ export default function Search() {
             </div>
           )}
 
-          {/* Find donors button */}
           {!buttonClicked ? (
             <div className="button-container">
               <button 
@@ -769,7 +764,6 @@ export default function Search() {
             </div>
           ) : (
             <div className="search-results-container">
-              {/* Filters */}
               <div className="filters">
                 <div className="filter-group">
                   <label htmlFor="bloodType">{translations[language].bloodType}</label>
@@ -794,7 +788,6 @@ export default function Search() {
                 </div>
               </div>
 
-              {/* Loading indicator */}
               {isLoading && (
                 <div className="loading-spinner-container" aria-live="polite">
                   <div className="loading-spinner-animation">
@@ -804,9 +797,7 @@ export default function Search() {
                 </div>
               )}
 
-              {/* Map and donors table */}
               <div className="map-table-container">
-                {/* Map */}
                 <div className="map-container">
                   <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}>
                     <Map
@@ -828,7 +819,7 @@ export default function Search() {
                         gestureHandling: "cooperative",
                         disableDefaultUI: true,
                         fullscreenControl: true,
-                        zoomControl: true, // Add zoom control to the map
+                        zoomControl: true,
                       }}
                       onDragStart={() => setIsControlled(false)}
                       onDrag={() => setIsControlled(false)}
@@ -845,19 +836,15 @@ export default function Search() {
                         mapRef.current = map;
                       }}
                     >
-                      {/* User location marker */}
                       {userLocation.lat !== 0 && userLocation.lng !== 0 && (
                         <AdvancedMarker position={userLocation} title={translations[language].yourLocation}>
                           <div style={userLocationMarkerStyle}></div>
                         </AdvancedMarker>
                       )}
                       
-                      {/* Donor markers */}
                       {donors.map((donor, index) => {
-                        // Skip if no valid coordinates
                         if (!donor.latitude || !donor.longitude) return null;
                         
-                        // Create a unique ID for this donor to ensure stable reference
                         const donorId = donor._id || `index-${index}`;
                         
                         return (
@@ -866,16 +853,12 @@ export default function Search() {
                             position={{ lat: donor.latitude, lng: donor.longitude }}
                             title={donor.username}
                             onClick={(e) => {
-                              // Prevent event bubbling
                               if (e && e.stopPropagation) e.stopPropagation();
                               
-                              // Find the donor by ID from the current donors array to ensure we have latest data
                               const donorToShow = donors.find(d => (d._id || `index-${donors.indexOf(d)}`) === donorId);
                               
-                              // Use the found donor or fallback to the original reference
                               const targetDonor = donorToShow || donor;
                               
-                              // Update state with proper centering
                               setSelectedDonor(targetDonor);
                               setMapCenter({ lat: targetDonor.latitude, lng: targetDonor.longitude });
                               setIsControlled(true);
@@ -886,7 +869,6 @@ export default function Search() {
                         );
                       })}
 
-                      {/* Info window for selected donor */}
                       {selectedDonor && selectedDonor.latitude && selectedDonor.longitude && (
                         <InfoWindow
                           position={{ lat: selectedDonor.latitude, lng: selectedDonor.longitude }}
@@ -907,7 +889,6 @@ export default function Search() {
                     </Map>
                   </APIProvider>
                   
-                  {/* Map legend */}
                   <div className="map-legend" aria-label="Map legend">
                     <div className="legend-item">
                       <div className="legend-marker your-location"></div>
@@ -920,7 +901,6 @@ export default function Search() {
                   </div>
                 </div>
 
-                {/* Donors table */}
                 <div className="table-container">
                   <h3 className="nearby-donors-heading">{translations[language].nearbyDonors}</h3>
                   <div className={`donor-table-wrapper ${showTable ? 'show' : ''}`}>
@@ -992,7 +972,6 @@ export default function Search() {
                     </table>
                   </div>
                   
-                  {/* Pagination controls - desktop version */}
                   {!isLoading && donors.length > 0 && (
                     <div className="pagination-controls desktop-pagination">
                       <button 
@@ -1019,7 +998,6 @@ export default function Search() {
                     </div>
                   )}
                   
-                  {/* Mobile view donor cards */}
                   <div className="donor-cards-container" role="list">
                     {donors.length > 0 ? (
                       donors.map((donor, index) => (
@@ -1044,7 +1022,6 @@ export default function Search() {
                           
                           <div className="donor-card-actions">
                             <div className="card-contact-buttons">
-                              {/* Contact buttons for mobile */}
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleContactDonor('sms', donor); }} 
                                 className="contact-btn sms-btn" 
@@ -1096,7 +1073,6 @@ export default function Search() {
                     )}
                   </div>
                   
-                  {/* Pagination controls - mobile version */}
                   {!isLoading && donors.length > 0 && (
                     <div className="pagination-controls mobile-pagination">
                       <button 
@@ -1129,15 +1105,14 @@ export default function Search() {
         </div>
       </div>
       
-      {/* Add this at the end of your component */}
       {showContactModal && selectedDonorContact && (
         <ContactDonorModal
           donor={selectedDonorContact}
           isOpen={showContactModal}
-          language={language} // Pass the current language
+          language={language}
           onClose={() => {
             setShowContactModal(false);
-            setSelectedDonorContact(null); // Clear the donor data when closing
+            setSelectedDonorContact(null);
           }}
         />
       )}
