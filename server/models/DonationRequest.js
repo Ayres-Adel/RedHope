@@ -4,17 +4,17 @@ const donationRequestSchema = new mongoose.Schema({
   requester: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: function() { return !this.guestRequester; } // Only required if no guest requester
+    required: function() { return !this.guestRequester; } 
   },
   guestRequester: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Guest',
-    required: function() { return !this.requester; } // Only required if no registered requester
+    required: function() { return !this.requester; } 
   },
   donor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: false // Changed from required:true to false to allow guest requests without an initial donor
+    required: false 
   },
   bloodType: {
     type: String,
@@ -24,7 +24,7 @@ const donationRequestSchema = new mongoose.Schema({
   hospital: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Hospital'
-    // Not required, optional
+
   },
   cityId: {
     type: String,
@@ -41,11 +41,11 @@ const donationRequestSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Create text index for searching
+
 donationRequestSchema.index({ 
   'bloodType': 'text',
   'donor': 1,
-  'cityId': 1  // Add index for cityId to improve query performance
+  'cityId': 1 
 });
 
 const DonationRequest = mongoose.model('DonationRequest', donationRequestSchema);

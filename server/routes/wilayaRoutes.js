@@ -2,7 +2,7 @@ const { Router } = require('express');
 const router = Router();
 const mongoose = require('mongoose');
 
-// Add error handling wrapper function
+
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((error) => {
     console.error(`API Error: ${error.message}`);
@@ -14,7 +14,7 @@ const asyncHandler = (fn) => (req, res, next) => {
   });
 };
 
-// Define a simple schema for wilaya if not already defined elsewhere
+
 let Wilaya;
 try {
   Wilaya = mongoose.model('Wilaya');
@@ -29,7 +29,7 @@ try {
         default: 'Point'
       },
       coordinates: {
-        type: [Number], // [longitude, latitude]
+        type: [Number], 
         required: true
       }
     },
@@ -41,13 +41,13 @@ try {
   Wilaya = mongoose.model('Wilaya', wilayaSchema);
 }
 
-// Get all wilayas
+
 router.get('/all', asyncHandler(async (req, res) => {
   const wilayas = await Wilaya.find().sort({ code: 1 });
   res.json(wilayas);
 }));
 
-// Get wilaya by code
+
 router.get('/code/:code', asyncHandler(async (req, res) => {
   const wilaya = await Wilaya.findOne({ code: req.params.code });
   if (!wilaya) {
@@ -56,7 +56,7 @@ router.get('/code/:code', asyncHandler(async (req, res) => {
   res.json(wilaya);
 }));
 
-// Get a specific wilaya by id
+
 router.get('/:id', asyncHandler(async (req, res) => {
   const wilaya = await Wilaya.findById(req.params.id);
   if (!wilaya) {
@@ -65,9 +65,9 @@ router.get('/:id', asyncHandler(async (req, res) => {
   res.json(wilaya);
 }));
 
-// In case we have no wilayas in the database, let's provide a way to create some
+
 router.post('/seed', asyncHandler(async (req, res) => {
-  // Check if wilayas already exist
+
   const count = await Wilaya.countDocuments();
   if (count > 0) {
     return res.status(400).json({ 
@@ -77,7 +77,7 @@ router.post('/seed', asyncHandler(async (req, res) => {
     });
   }
 
-  // Create wilayas from the basic mapping
+
   const wilayasToCreate = [
     { code: "01", name: "Adrar", latitude: 27.87, longitude: -0.28 },
     { code: "02", name: "Chlef", latitude: 36.15, longitude: 1.31 },

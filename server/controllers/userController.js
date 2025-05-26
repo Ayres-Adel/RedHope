@@ -1,21 +1,21 @@
-// controllers/userController.js
+
 const User = require('../models/User');
-const mongoose = require('mongoose'); // Add mongoose import
+const mongoose = require('mongoose'); 
 const bcrypt = require('bcrypt');
 
 module.exports = {
-  // Get user profile
+
   getProfile: async (req, res) => {
     try {
-      // Check if user is admin based on the role in the token
+
       const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
       let user;
       
       if (isAdmin) {
-        // Find admin user
+
         const Admin = mongoose.model('Admin');
         user = await Admin.findById(req.user.userId)
-          .select('-password -__v'); // Exclude sensitive fields
+          .select('-password -__v'); 
           
         if (!user) {
           return res.status(404).json({ error: 'Admin not found' });
@@ -30,9 +30,9 @@ module.exports = {
           isAdmin: true
         });
       } else {
-        // Regular user
+
         user = await User.findById(req.user.userId)
-          .select('-password -__v'); // Exclude sensitive fields
+          .select('-password -__v'); 
       
         if (!user) {
           return res.status(404).json({ error: 'User not found' });
@@ -54,19 +54,19 @@ module.exports = {
     }
   },
 
-  // Change password
+
   changePassword: async (req, res) => {
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
     const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
 
     try {
-        // 1. Check if new passwords match
+
         if (newPassword !== confirmNewPassword) {
             return res.status(400).json({ error: 'New passwords do not match' });
         }
 
         let user;
-        // 2. Fetch user from appropriate model
+
         if (isAdmin) {
             const Admin = mongoose.model('Admin');
             user = await Admin.findById(req.user.userId);
@@ -78,15 +78,14 @@ module.exports = {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // 3. Verify current password
+
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({ error: 'Current password is incorrect' });
         }
 
-        // 4. MANUALLY hash and save (to ensure pre-save hook runs)
-        user.password = newPassword; // Set the new plaintext password
-        await user.save(); // This triggers the pre('save') hook to hash it
+        user.password = newPassword; 
+        await user.save(); 
 
         res.json({ message: 'Password changed successfully' });
 
@@ -96,7 +95,7 @@ module.exports = {
     }
   },
 
-  // Delete account
+
   deleteAccount: async (req, res) => {
     const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
     
@@ -105,7 +104,7 @@ module.exports = {
       
       if (isAdmin) {
         const Admin = mongoose.model('Admin');
-        // Only superadmin can delete admin accounts, or admins can delete themselves
+
         if (req.user.role !== 'superadmin' && req.params.userId !== req.user.userId) {
           return res.status(403).json({ error: 'Not authorized to delete other admin accounts' });
         }
@@ -144,12 +143,12 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Make sure these controller functions exist or add them
+
 exports.createUser = async (req, res) => {
   try {
     const { username, email, password, role, bloodType, isDonor, isActive } = req.body;
     
-    // Basic validation
+
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -157,7 +156,7 @@ exports.createUser = async (req, res) => {
       });
     }
     
-    // Check if user already exists
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -166,7 +165,7 @@ exports.createUser = async (req, res) => {
       });
     }
     
-    // Create the user
+
     const user = new User({
       username,
       email,

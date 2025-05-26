@@ -18,7 +18,7 @@ const hospitalSchema = new mongoose.Schema({
       default: 'Point'
     },
     coordinates: {
-      type: [Number], // [longitude, latitude]
+      type: [Number], 
       required: true
     }
   },
@@ -42,14 +42,14 @@ const hospitalSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Create a geospatial index for location-based queries
+
 hospitalSchema.index({ location: '2dsphere' });
 
-// Add a pre-save hook to set wilayaCode if only wilaya name is provided
+
 hospitalSchema.pre('save', async function(next) {
   if (this.wilaya && !this.wilayaCode) {
     try {
-      // Try to find corresponding wilaya code
+
       const Wilaya = mongoose.model('Wilaya');
       const wilaya = await Wilaya.findOne({ 
         name: { $regex: new RegExp(this.wilaya, 'i') }

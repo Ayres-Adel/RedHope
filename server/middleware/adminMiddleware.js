@@ -1,6 +1,6 @@
 const User = require('../models/User');
 
-// Middleware to check if user is an admin
+
 const isAdmin = async (req, res, next) => {
   try {
     if (!req.user || !req.user.userId) {
@@ -19,7 +19,7 @@ const isAdmin = async (req, res, next) => {
       });
     }
     
-    // Add admin info to request for further use
+
     req.admin = {
       role: user.role,
       permissions: user.adminPermissions
@@ -37,32 +37,32 @@ const isAdmin = async (req, res, next) => {
 
 module.exports = (req, res, next) => {
   try {
-    // Check if user exists in request (set by authMiddleware)
+
     if (!req.user) {
-      // Don't block
+
       return next();
     }
 
-    // Check if user has admin or superadmin role
+
     const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
     
-    // Add admin status to request object
+
     req.isAdmin = isAdmin;
     
     next();
   } catch (err) {
     console.error('Error in admin middleware:', err);
-    // Don't block on errors in middleware
+
     next();
   }
 };
 
-// Middleware to check specific admin permissions
+
 const hasPermission = (permission) => {
   return async (req, res, next) => {
     try {
       if (!req.admin) {
-        // Run admin middleware first if not already run
+
         return isAdmin(req, res, () => checkPermission());
       } else {
         return checkPermission();

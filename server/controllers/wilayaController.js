@@ -1,17 +1,13 @@
 const Wilaya = require('../models/Wilaya');
 const asyncHandler = require('../middleware/asyncHandler');
 
-// @desc    Get all wilayas
-// @route   GET /api/wilayas
-// @access  Public
+
 exports.getAllWilayas = asyncHandler(async (req, res) => {
   const wilayas = await Wilaya.find().sort({ code: 1 });
   res.json(wilayas);
 });
 
-// @desc    Get wilaya by code
-// @route   GET /api/wilayas/:code
-// @access  Public
+
 exports.getWilayaByCode = asyncHandler(async (req, res) => {
   const { code } = req.params;
   
@@ -24,9 +20,7 @@ exports.getWilayaByCode = asyncHandler(async (req, res) => {
   res.json(wilaya);
 });
 
-// @desc    Get wilaya by ID
-// @route   GET /api/wilayas/id/:id
-// @access  Public
+
 exports.getWilayaById = asyncHandler(async (req, res) => {
   const wilaya = await Wilaya.findById(req.params.id);
   
@@ -37,11 +31,9 @@ exports.getWilayaById = asyncHandler(async (req, res) => {
   res.json(wilaya);
 });
 
-// @desc    Seed wilayas from database for initial setup
-// @route   POST /api/wilayas/seed
-// @access  Private/Admin
+
 exports.seedWilayas = asyncHandler(async (req, res) => {
-  // Check if wilayas already exist
+
   const count = await Wilaya.countDocuments();
   if (count > 0) {
     return res.status(400).json({ 
@@ -51,7 +43,7 @@ exports.seedWilayas = asyncHandler(async (req, res) => {
     });
   }
 
-  // Create wilayas from the basic mapping
+
   const wilayasToCreate = [
     { code: "01", name: "Adrar", latitude: 27.87, longitude: -0.28 },
     { code: "02", name: "Chlef", latitude: 36.15, longitude: 1.31 },

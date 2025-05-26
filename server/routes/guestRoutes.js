@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Guest = require('../models/Guest');
 
-// Create a new guest
+
 router.post('/register', async (req, res) => {
   try {
     const { phoneNumber, location, cityId } = req.body;
@@ -11,21 +11,21 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Phone number is required' });
     }
     
-    // Check if guest already exists
+
     let guest = await Guest.findOne({ phoneNumber });
     
     if (guest) {
-      // Update last active time and location if guest exists
+
       guest.lastActive = Date.now();
       if (location && location.coordinates) {
         guest.location = location;
         
-        // Use provided cityId or try to update from coordinates
+
         if (cityId) {
           guest.cityId = cityId;
           guest.lastCityUpdate = new Date();
         } else {
-          // Try to update cityId from new coordinates
+    
           try {
             const wilaya = await guest.updateCityFromCoordinates();
             if (wilaya) {
@@ -48,20 +48,20 @@ router.post('/register', async (req, res) => {
       });
     }
     
-    // Create new guest with cityId explicitly from request if provided
+
     guest = new Guest({
       phoneNumber,
       location: location || {
         type: 'Point',
-        coordinates: [0, 0] // Default coordinates
+        coordinates: [0, 0] 
       },
-      cityId: cityId || null, // Prioritize cityId from client
+      cityId: cityId || null, 
       lastCityUpdate: cityId ? new Date() : null
     });
     
     await guest.save();
     
-    // Only try to determine cityId from coordinates if not provided by client
+
     if (!cityId && location && location.coordinates && 
         location.coordinates[0] !== 0 && location.coordinates[1] !== 0) {
       try {
@@ -74,7 +74,7 @@ router.post('/register', async (req, res) => {
       }
     }
     
-    // Store guest ID in session
+
     req.session = req.session || {};
     req.session.guestId = guest._id;
     
@@ -97,7 +97,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Get guest by phone number
+
 router.get('/phone/:phoneNumber', async (req, res) => {
   try {
     const guest = await Guest.findOne({ phoneNumber: req.params.phoneNumber });
@@ -114,7 +114,7 @@ router.get('/phone/:phoneNumber', async (req, res) => {
       guest: {
         ...guest.toObject(),
         registeredOn: guest.createdAt,
-        accountCreationDate: guest.createdAt, // Added explicit account creation date
+        accountCreationDate: guest.createdAt, 
         lastActive: guest.lastActive,
         cityId: guest.cityId
       }
@@ -129,7 +129,7 @@ router.get('/phone/:phoneNumber', async (req, res) => {
   }
 });
 
-// Update guest location
+
 router.post('/update-location', async (req, res) => {
   try {
     const { guestId, phoneNumber, location } = req.body;
@@ -148,7 +148,7 @@ router.post('/update-location', async (req, res) => {
       });
     }
     
-    // Find the guest by ID or phone number
+
     let guest;
     if (guestId) {
       guest = await Guest.findById(guestId);
@@ -163,11 +163,11 @@ router.post('/update-location', async (req, res) => {
       });
     }
     
-    // Update location and last active time
+
     guest.location = location;
     guest.lastActive = Date.now();
     
-    // Try to update cityId from new coordinates
+
     let wilayaName = null;
     try {
       const wilaya = await guest.updateCityFromCoordinates();
@@ -198,7 +198,7 @@ router.post('/update-location', async (req, res) => {
   }
 });
 
-// Get guest by ID
+
 router.get('/:guestId', async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.guestId);

@@ -1,11 +1,10 @@
-// routes/userRoutes.js
 const { Router } = require('express');
 const router = Router();
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
-const User = require('../models/User'); // Add User model import
+const User = require('../models/User'); 
 
-// Mock data as fallback only
+
 const MOCK_USERS = [
   { _id: '1', username: 'admin', email: 'admin@example.com', role: 'admin', bloodType: 'O+', status: 'Active', location: 'Algiers', isDonor: false },
   { _id: '2', username: 'johndoe', email: 'john@example.com', role: 'donor', bloodType: 'A+', status: 'Active', location: 'Oran', isDonor: true },
@@ -14,16 +13,16 @@ const MOCK_USERS = [
   { _id: '5', username: 'sarahwilliams', email: 'sarah@example.com', role: 'user', bloodType: 'O-', status: 'Active', location: 'Blida', isDonor: true }
 ];
 
-// Add debugging middleware
+
 router.use((req, res, next) => {
   next();
 });
 
-// Get all users from actual MongoDB Atlas database
+
 router.get('/all', async (req, res) => {
   try {
-    // Remove console.log and proceed directly with the function
-    // Try to get real users from the database
+
+
     const users = await User.find({});
     
     if (users && users.length > 0) {
@@ -40,7 +39,7 @@ router.get('/all', async (req, res) => {
       });
     }
   } catch (error) {
-    // Fall back to mock data on error
+
     return res.status(200).json({
       success: true,
       users: MOCK_USERS,
@@ -49,7 +48,7 @@ router.get('/all', async (req, res) => {
   }
 });
 
-// Optimize profile route for better performance and error handling
+
 router.get('/profile', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -65,21 +64,21 @@ router.get('/profile', async (req, res) => {
     const secret = process.env.JWT_SECRET || 'your-secret-key';
     
     try {
-      // Decode token
+
       const decoded = jwt.verify(token, secret);
       const userId = decoded.id;
       const userRole = decoded.role;
       
-      // Find user data based on role
+
       let userData;
       
       if (userRole === 'admin' || userRole === 'superadmin') {
-        // Check admin collection first for admin users
+
         const Admin = require('../models/Admin');
         userData = await Admin.findById(userId);
       }
       
-      // If not found or not admin, check regular User model
+
       if (!userData) {
         userData = await User.findById(userId);
       }
@@ -91,7 +90,7 @@ router.get('/profile', async (req, res) => {
         });
       }
       
-      // Format user data for consistent response
+
       const formattedUser = {
         _id: userData._id,
         username: userData.username || userData.name || 'User',
@@ -99,7 +98,7 @@ router.get('/profile', async (req, res) => {
         role: userData.role || userRole || 'user',
         bloodType: userData.bloodType || 'Not specified',
         location: userData.location || userData.address || 'Not specified',
-        phoneNumber: userData.phoneNumber || 'Not specified', // Changed key from 'phone' to 'phoneNumber'
+        phoneNumber: userData.phoneNumber || 'Not specified', 
         isActive: userData.isActive !== false,
         isDonor: userData.isDonor || false
       };
@@ -110,7 +109,7 @@ router.get('/profile', async (req, res) => {
       });
       
     } catch (tokenError) {
-      // Handle token errors specifically
+
       if (tokenError.name === 'TokenExpiredError') {
         return res.status(401).json({
           success: false,
@@ -134,17 +133,17 @@ router.get('/profile', async (req, res) => {
   }
 });
 
-// Add a stats API endpoint to reduce multiple calls
+
 router.get('/stats/dashboard', async (req, res) => {
   try {
-    // Get all users
+
     const users = await User.find({});
     
-    // Get all donations
+
     const Donation = require('../models/Donation');
     const donations = await Donation.find({});
     
-    // Calculate stats
+
     const stats = {
       totalUsers: users.length,
       totalDonors: users.filter(user => user.isDonor).length,
@@ -166,7 +165,7 @@ router.get('/stats/dashboard', async (req, res) => {
   }
 });
 
-// Create user in actual database
+
 router.post('/create', async (req, res) => {
   try {
     const { 
@@ -177,11 +176,11 @@ router.post('/create', async (req, res) => {
       bloodType, 
       location, 
       isDonor,
-      phoneNumber,  // Extract phoneNumber
-      dateOfBirth   // Extract dateOfBirth
+      phoneNumber,  
+      dateOfBirth  
     } = req.body;
     
-    // Validate input
+
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -189,7 +188,7 @@ router.post('/create', async (req, res) => {
       });
     }
     
-    // Check if user already exists
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -198,21 +197,21 @@ router.post('/create', async (req, res) => {
       });
     }
     
-    // Create new user document with all required fields
+
     const newUser = new User({
       username,
       email,
-      password, // This should be hashed in the User model pre-save hook
+      password,
       role: role || 'user',
       bloodType: bloodType || 'Unknown',
       location: location || 'Unknown',
       isDonor: isDonor || false,
       isActive: true,
-      phoneNumber: phoneNumber || '0000000000', // Add phoneNumber with default
-      dateOfBirth: dateOfBirth || new Date('1990-01-01') // Add dateOfBirth with default
+      phoneNumber: phoneNumber || '0000000000', 
+      dateOfBirth: dateOfBirth || new Date('1990-01-01') 
     });
     
-    // Save to database
+ 
     await newUser.save();
     
     return res.status(201).json({
@@ -238,10 +237,10 @@ router.post('/create', async (req, res) => {
   }
 });
 
-// Add a dedicated route for changing password
+
 router.put('/change-password', async (req, res) => {
   try {
-    // Get token from authorization header
+
     const token = req.headers.authorization?.split(' ')[1];
     
     if (!token) {
@@ -251,7 +250,7 @@ router.put('/change-password', async (req, res) => {
       });
     }
     
-    // Decode token to get userId
+
     const jwt = require('jsonwebtoken');
     const secret = process.env.JWT_SECRET || 'your-secret-key';
     
@@ -259,7 +258,7 @@ router.put('/change-password', async (req, res) => {
       const decoded = jwt.verify(token, secret);
       const userId = decoded.id;
       
-      // Validate password change request
+
       const { currentPassword, newPassword, confirmNewPassword } = req.body;
       
       if (!currentPassword || !newPassword || !confirmNewPassword) {
@@ -276,7 +275,7 @@ router.put('/change-password', async (req, res) => {
         });
       }
       
-      // Find user
+
       const user = await User.findById(userId);
       
       if (!user) {
@@ -286,7 +285,7 @@ router.put('/change-password', async (req, res) => {
         });
       }
       
-      // Verify current password
+
       const bcrypt = require('bcrypt');
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       
@@ -297,8 +296,8 @@ router.put('/change-password', async (req, res) => {
         });
       }
       
-      // Update password
-      user.password = newPassword; // The pre-save hook in the User model will hash this
+
+      user.password = newPassword; 
       await user.save();
       
       return res.status(200).json({
@@ -307,7 +306,7 @@ router.put('/change-password', async (req, res) => {
       });
       
     } catch (tokenError) {
-      // Handle token errors
+
       if (tokenError.name === 'TokenExpiredError') {
         return res.status(401).json({
           success: false,
@@ -331,13 +330,13 @@ router.put('/change-password', async (req, res) => {
   }
 });
 
-// Update user in database
+
 router.put('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const updateData = req.body;
     
-    // Remove fields that shouldn't be updated directly
+
     const { password, ...safeUpdateData } = updateData;
     
     const updatedUser = await User.findByIdAndUpdate(
@@ -368,7 +367,7 @@ router.put('/:userId', async (req, res) => {
   }
 });
 
-// Delete user from database
+
 router.delete('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
@@ -396,10 +395,10 @@ router.delete('/:userId', async (req, res) => {
   }
 });
 
-// Test route with database connection status
+
 router.get('/test', async (req, res) => {
   try {
-    // Check database connection by counting users
+
     const count = await User.countDocuments();
     
     res.status(200).json({
@@ -420,10 +419,10 @@ router.get('/test', async (req, res) => {
   }
 });
 
-// Get paginated users with search and filters
+
 router.get('/paginated', async (req, res) => {
   try {
-    // 1. Extract query params with defaults
+
     const {
       page = '1',
       limit = '10',
@@ -432,22 +431,22 @@ router.get('/paginated', async (req, res) => {
       sortOrder = '-1',
       role = '',
       bloodType = '',
-      isDonor  // optional string "true" | "false"
+      isDonor  
     } = req.query;
 
-    // 2. Normalize types
+
     const pageNum     = Math.max(1, parseInt(page, 10) || 1);
     const limitNum    = Math.max(1, parseInt(limit, 10) || 10);
     const skip        = (pageNum - 1) * limitNum;
     const sortOrderNum= parseInt(sortOrder, 10) === 1 ? 1 : -1;
 
-    // 3. Build Mongo filter
+
     const filter = {};
 
-    // 3a. Text search across multiple fields - with trimming
+
     const trimmedSearch = search.trim();
     if (trimmedSearch) {
-      // Escape special regex characters to prevent injection
+
       const safeSearch = trimmedSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const re = new RegExp(safeSearch, 'i');
       filter.$or = [
@@ -458,17 +457,17 @@ router.get('/paginated', async (req, res) => {
       ];
     }
 
-    // 3b. Role filter
+
     if (role) {
       filter.role = role;
     }
 
-    // 3c. Blood-type filter
+
     if (bloodType) {
       filter.bloodType = bloodType;
     }
 
-    // 3d. Boolean isDonor filter (only if valid)
+
     let isDonorBool;
     if (isDonor === 'true')  isDonorBool = true;
     if (isDonor === 'false') isDonorBool = false;
@@ -476,14 +475,14 @@ router.get('/paginated', async (req, res) => {
       filter.isDonor = isDonorBool;
     }
 
-    // 4. Get counts for pagination
+
     const totalMatching = await User.countDocuments(filter);
     const totalPages = Math.ceil(totalMatching / limitNum);
 
-    // 5. Fetch with stable sorting to avoid duplicates
+
     const sortSpec = {
       [sortBy]: sortOrderNum,
-      _id:      sortOrderNum // Secondary sort for stability
+      _id:      sortOrderNum 
     };
 
     const users = await User.find(filter)
@@ -491,9 +490,9 @@ router.get('/paginated', async (req, res) => {
       .sort(sortSpec)
       .skip(skip)
       .limit(limitNum)
-      .lean(); // Convert to plain JS objects for better performance
+      .lean(); 
 
-    // 6. Prepare response
+
     const response = {
       success: true,
       users,
@@ -505,7 +504,7 @@ router.get('/paginated', async (req, res) => {
       }
     };
 
-    // Add debug info in development mode
+
     if (process.env.NODE_ENV === 'development') {
       const totalInDb      = await User.countDocuments({});
       const totalDonors    = await User.countDocuments({ isDonor: true });

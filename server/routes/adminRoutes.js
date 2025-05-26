@@ -2,26 +2,26 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-// Import middleware correctly
+
 const authMiddleware = require('../middleware/authMiddleware');
 const requireAuth = authMiddleware.requireAuth || authMiddleware;
 
-// Fallback middleware in case requireAuth is undefined
+
 const fallbackAuth = (req, res, next) => {
   next();
 };
 
-// Admin profile endpoint - with middleware check
+
 router.get('/profile', requireAuth || fallbackAuth, (req, res) => {
   try {
-    // Get Admin model
+
     const Admin = mongoose.models.Admin || require('../models/Admin');
     
     if (!Admin) {
       return res.status(500).json({ error: 'Admin model not registered' });
     }
     
-    // Get admin by ID
+
     Admin.findById(req.user.userId || req.user.id)
       .select('-password')
       .then(admin => {
@@ -29,7 +29,7 @@ router.get('/profile', requireAuth || fallbackAuth, (req, res) => {
           return res.status(404).json({ error: 'Admin not found' });
         }
         
-        // Return admin data - removed firstName, lastName
+
         res.json({
           id: admin._id,
           username: admin.username,
@@ -48,12 +48,12 @@ router.get('/profile', requireAuth || fallbackAuth, (req, res) => {
   }
 });
 
-// Admin dashboard stats - with middleware check
+
 router.get('/stats', requireAuth || fallbackAuth, (req, res) => {
   try {
     const User = mongoose.models.User;
     
-    // Get basic stats using Promise chain
+
     User.countDocuments()
       .then(totalUsers => {
         User.countDocuments({ isDonor: true })
@@ -79,7 +79,7 @@ router.get('/stats', requireAuth || fallbackAuth, (req, res) => {
   }
 });
 
-// Add user stats endpoint - with middleware check
+
 router.get('/user/stats', requireAuth || fallbackAuth, (req, res) => {
   try {
     res.json({
@@ -94,7 +94,7 @@ router.get('/user/stats', requireAuth || fallbackAuth, (req, res) => {
   }
 });
 
-// Add donations stats endpoint - with middleware check
+
 router.get('/donations/stats', requireAuth || fallbackAuth, (req, res) => {
   try {
     res.json({
@@ -109,7 +109,7 @@ router.get('/donations/stats', requireAuth || fallbackAuth, (req, res) => {
   }
 });
 
-// Add blood supply endpoint - with middleware check
+
 router.get('/blood-supply', requireAuth || fallbackAuth, (req, res) => {
   try {
     res.json({
@@ -128,20 +128,20 @@ router.get('/blood-supply', requireAuth || fallbackAuth, (req, res) => {
   }
 });
 
-// Get all admin accounts with pagination, filtering and sorting
+
 router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
   try {
-    // Extract query parameters with defaults
+
     const { 
       page = 1, 
-      limit = 10, // Default limit
+      limit = 10, 
       search = '', 
       sortBy = 'createdAt', 
-      sortOrder = -1, // Default descending order
+      sortOrder = -1, 
       role = '' 
     } = req.query;
     
-    // Get the Admin model properly
+
     const Admin = mongoose.model('Admin');
     
     if (!Admin) {
@@ -152,10 +152,10 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       });
     }
     
-    // Build query filters
+
     const filter = {};
     
-    // Search by username, email, or name if search term provided
+
     if (search) {
       filter.$or = [
         { username: { $regex: search, $options: 'i' } },
@@ -165,32 +165,32 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       ];
     }
     
-    // Filter by role if specified
+
     if (role) {
       filter.role = role;
     }
     
-    // Convert page and limit to numbers
+
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
     
-    // Validate sortOrder
+
     const sortOrderNum = parseInt(sortOrder, 10);
     const finalSortOrder = (sortOrderNum === 1 || sortOrderNum === -1) ? sortOrderNum : -1;
 
-    // Count total matching documents for pagination
+
     const totalAdmins = await Admin.countDocuments(filter);
     const totalPages = Math.ceil(totalAdmins / limitNum);
     
-    // Execute query with pagination and sorting
+
     const admins = await Admin.find(filter)
       .select('-password')
       .sort({ [sortBy]: finalSortOrder })
       .skip(skip)
       .limit(limitNum);
     
-    // Format admin accounts for response
+
     const formattedAdmins = admins.map(admin => ({
       id: admin._id,
       username: admin.username || `${admin.firstName || ''} ${admin.lastName || ''}`.trim() || 'Unknown Admin',
@@ -206,7 +206,7 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       isActive: admin.isActive !== false
     }));
     
-    // Return success response with pagination data
+
     res.status(200).json({
       success: true,
       admins: formattedAdmins,
@@ -228,12 +228,12 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
   }
 });
 
-// Get a single admin by ID
+
 router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Get Admin model
+
     const Admin = mongoose.model('Admin');
     
     if (!Admin) {
@@ -243,7 +243,7 @@ router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
       });
     }
     
-    // Find the admin by ID
+
     const admin = await Admin.findById(id).select('-password');
     
     if (!admin) {
@@ -253,7 +253,7 @@ router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
       });
     }
     
-    // Format and return the admin data - removed firstName, lastName
+
     res.status(200).json({
       success: true,
       admin: {
@@ -278,13 +278,13 @@ router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
   }
 });
 
-// Create a new admin account
+
 router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
   try {
-    // Extract admin data from request body - removed firstName, lastName
+
     const { username, email, password, role, permissions } = req.body;
     
-    // Validate required fields
+
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -292,10 +292,10 @@ router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       });
     }
     
-    // Get Admin model
+
     const Admin = mongoose.model('Admin');
     
-    // Check if email already exists
+
     const existingAdmin = await Admin.findOne({ email });
     
     if (existingAdmin) {
@@ -305,11 +305,11 @@ router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       });
     }
     
-    // Create new admin - removed firstName, lastName
+
     const newAdmin = new Admin({
       username,
       email,
-      password, // Will be hashed by pre-save hook in model
+      password, 
       role: role || 'admin',
       permissions: permissions || {
         manageUsers: true,
@@ -319,10 +319,10 @@ router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       }
     });
     
-    // Save to database
+
     await newAdmin.save();
     
-    // Return success without password
+
     res.status(201).json({
       success: true,
       message: 'Admin account created successfully',
@@ -344,17 +344,17 @@ router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
   }
 });
 
-// Update an admin account
+
 router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    // Removed firstName, lastName from destructuring
+
     const { username, email, role, isActive, permissions } = req.body;
     
-    // Get Admin model
+
     const Admin = mongoose.model('Admin');
     
-    // Find admin to update
+
     const admin = await Admin.findById(id);
     
     if (!admin) {
@@ -364,7 +364,7 @@ router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
       });
     }
     
-    // Check if email is being changed and already exists
+
     if (email && email !== admin.email) {
       const existingAdmin = await Admin.findOne({ email, _id: { $ne: id } });
       
@@ -376,14 +376,14 @@ router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
       }
     }
     
-    // Update fields if provided - removed firstName, lastName
+
     if (username) admin.username = username;
     if (email) admin.email = email;
     if (role) admin.role = role;
     if (isActive !== undefined) admin.isActive = isActive;
     if (permissions) admin.permissions = { ...admin.permissions, ...permissions };
     
-    // Save changes
+
     await admin.save();
     
     res.status(200).json({
@@ -409,15 +409,15 @@ router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
   }
 });
 
-// Delete an admin account
+
 router.delete('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Get Admin model
+
     const Admin = mongoose.model('Admin');
     
-    // Find and delete admin
+
     const admin = await Admin.findByIdAndDelete(id);
     
     if (!admin) {
@@ -443,7 +443,7 @@ router.delete('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => 
   }
 });
 
-// Update admin permissions specifically
+
 router.patch('/accounts/:id/permissions', requireAuth || fallbackAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -456,10 +456,10 @@ router.patch('/accounts/:id/permissions', requireAuth || fallbackAuth, async (re
       });
     }
     
-    // Get Admin model
+
     const Admin = mongoose.model('Admin');
     
-    // Find the admin
+
     const admin = await Admin.findById(id);
     
     if (!admin) {
@@ -469,7 +469,7 @@ router.patch('/accounts/:id/permissions', requireAuth || fallbackAuth, async (re
       });
     }
     
-    // Update permissions
+
     admin.permissions = { ...admin.permissions, ...permissions };
     await admin.save();
     
@@ -489,28 +489,28 @@ router.patch('/accounts/:id/permissions', requireAuth || fallbackAuth, async (re
   }
 });
 
-// Debug endpoint to check Admin model registration
+
 router.get('/check-model', (req, res) => {
   try {
     const mongoose = require('mongoose');
     const modelNames = Object.keys(mongoose.models);
     
-    // Check if Admin model is registered
+
     const adminModel = mongoose.models.Admin;
     const isAdminRegistered = !!adminModel;
     
-    // Get registered models count
+
     const adminCount = isAdminRegistered ? 
       'Counting admins...' : 
       'Cannot count, Admin model not registered';
       
-    // Try to count admins if model exists
+
     let countPromise = Promise.resolve(0);
     if (isAdminRegistered) {
       countPromise = adminModel.countDocuments();
     }
     
-    // Return the count when ready
+
     countPromise.then(count => {
       res.json({
         success: true,

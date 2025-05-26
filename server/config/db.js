@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    // Default to local MongoDB if MONGO_URI is not provided
+
     const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/redhope';
     
-    // Remove deprecated options
+
     await mongoose.connect(mongoURI, {
-      serverSelectionTimeoutMS: 5000 // Timeout after 5s
+      serverSelectionTimeoutMS: 5000 
     });
     
     console.log('✅ Connected to MongoDB');

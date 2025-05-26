@@ -6,7 +6,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { requireAuth, checkUser } = require('./middleware/authMiddleware');
 
-// Import all route files
+
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const statsRoutes = require('./routes/statsRoutes');
@@ -14,46 +14,46 @@ const hospitalRoutes = require('./routes/hospitalRoutes');
 const wilayaRoutes = require('./routes/wilayaRoutes');
 const donationRequestRoutes = require('./routes/donationRequestRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-// Add map routes
+
 const mapRoutes = require('./routes/mapRoutes');
-// Import guest routes
+
 const guestRoutes = require('./routes/guestRoutes');
 
 const app = express();
 
-// Load environment variables early to ensure they're available
+
 dotenv.config();
 
-// Debug database connection string (masked for security)
+
 const dbUriParts = (process.env.MONGO_URI || '').split(':');
 
-// Apply middleware
+
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging middleware
+
 app.use((req, res, next) => {
-  // Keep minimal logging for server requests but without details
+
   next();
 });
 
-// Register routes - ensure proper prefixing
+
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes); 
 app.use('/api/hospital', hospitalRoutes);
 app.use('/api/wilaya', wilayaRoutes);
 app.use('/api/donation-request', donationRequestRoutes);
-// Use the admin routes
+
 app.use('/api/admin', adminRoutes);
 app.use('/api/stats', statsRoutes);
-// Add map routes
+
 app.use('/api/map', mapRoutes);
-// Use guest routes
+
 app.use('/api/guest', guestRoutes);
 
-// Simple test route that doesn't require database
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
@@ -63,7 +63,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Improved error handling middleware
+
 app.use((req, res, next) => {
   res.status(404).json({
     success: false,
@@ -77,12 +77,12 @@ app.use((req, res, next) => {
   });
 });
 
-// Comprehensive error handler
+
 app.use((err, req, res, next) => {
-  // Log error for debugging
+
   console.error('Server error:', err);
   
-  // Handle different types of errors
+
   if (err.name === 'ValidationError') {
     return res.status(400).json({
       success: false,
@@ -102,7 +102,7 @@ app.use((err, req, res, next) => {
     });
   }
   
-  // Handle timeout errors
+
   if (err.name === 'MongooseError' && err.message.includes('timed out')) {
     return res.status(503).json({
       success: false,
@@ -112,16 +112,16 @@ app.use((err, req, res, next) => {
     });
   }
   
-  // Generic error response
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal server error',
-    // Only show stack trace in development
+
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
 
-// Ensure Admin model is loaded
+
 try {
   const adminSchema = new mongoose.Schema({
     username: {
@@ -135,7 +135,7 @@ try {
       unique: true,
       lowercase: true
     },
-    // firstName and lastName fields removed
+
     password: {
       type: String,
       required: [true, 'Please enter a password'],
@@ -162,7 +162,7 @@ try {
     }
   }, { timestamps: true });
   
-  // Add pre-save hook for password hashing
+
   adminSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     
@@ -171,7 +171,7 @@ try {
     next();
   });
   
-  // Only create model if it doesn't already exist
+
   if (!mongoose.models.Admin) {
     mongoose.model('Admin', adminSchema);
     console.log('Admin model registered');
@@ -182,7 +182,7 @@ try {
 
 const connectDB = require('./config/db');
 
-// Initialize connection and start server
+
 connectDB().then(connected => {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
@@ -194,4 +194,4 @@ connectDB().then(connected => {
   });
 });
 
-module.exports = app; // Export for testing
+module.exports = app; 

@@ -81,20 +81,20 @@ UserSchema.statics.login = async function (email, password) {
 
 
 UserSchema.statics.checkExisting = async function ({ email, phoneNumber, password }) {
-  // Check if email exists
+
   const emailExists = await this.findOne({ email });
   if (emailExists) {
     throw Error('Email already exists');
   }
 
-  // Check if phone number exists
+
   const phoneExists = await this.findOne({ phoneNumber });
   if (phoneExists) {
     throw Error('Phone number already exists');
   }
 
-  // Check if password already exists (hashed comparison)
-  const existingUsers = await this.find({}); // Get all users (you can filter to specific conditions if needed)
+
+  const existingUsers = await this.find({}); 
   for (let user of existingUsers) {
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (isPasswordMatch) {
@@ -102,23 +102,23 @@ UserSchema.statics.checkExisting = async function ({ email, phoneNumber, passwor
     }
   }
 
-  // No errors, return null or true
+
   return null;
 };
 
 UserSchema.methods.updateCityFromCoordinates = async function() {
   try {
-    // Skip if no valid coordinates
+
     if (!this.location || !this.location.coordinates || 
         this.location.coordinates.length !== 2 ||
         (this.location.coordinates[0] === 0 && this.location.coordinates[1] === 0)) {
       return null;
     }
     
-    // Get longitude and latitude
+
     const [longitude, latitude] = this.location.coordinates;
     
-    // Find the nearest city using geospatial query
+
     const City = mongoose.model('City');
     const nearestCity = await City.findOne({
       'location': {
@@ -127,13 +127,13 @@ UserSchema.methods.updateCityFromCoordinates = async function() {
             type: 'Point',
             coordinates: [longitude, latitude]
           },
-          $maxDistance: 50000 // 50km radius
+          $maxDistance: 50000 
         }
       }
     });
     
     if (nearestCity) {
-      // Update city reference
+
       this.city = nearestCity._id;
       this.cityId = nearestCity.code.toString();
       this.lastCityUpdate = new Date();
@@ -149,10 +149,10 @@ UserSchema.methods.updateCityFromCoordinates = async function() {
   }
 };
 
-// Add a static method to bulk update cities for users with coordinates but no city
+
 UserSchema.statics.bulkUpdateCitiesFromCoordinates = async function(limit = 100) {
   try {
-    // Find users with coordinates but no city
+
     const users = await this.find({
       city: null,
       'location.coordinates.0': { $ne: 0 },

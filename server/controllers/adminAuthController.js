@@ -1,10 +1,10 @@
 const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
 
-// Max age for JWT token - 3 days
+
 const maxAge = 3 * 24 * 60 * 60;
 
-// Create JWT token for admin
+
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: maxAge
