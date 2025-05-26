@@ -2,7 +2,6 @@ const DonationRequest = require('../models/DonationRequest');
 const User = require('../models/User');
 const Guest = require('../models/Guest');
 
-
 const withTimeout = (promise, ms = 5000) => {
   const timeout = new Promise((_, reject) =>
     setTimeout(() => reject(new Error(`Operation timed out after ${ms}ms`)), ms)
@@ -11,12 +10,10 @@ const withTimeout = (promise, ms = 5000) => {
 };
 
 module.exports = {
-
   createDonationRequest: async (req, res) => {
     try {
       const { bloodType, hospitalId, expiryDate, donorId, cityId } = req.body;
       
-
       let wilayaName = null;
       if (cityId) {
         try {
@@ -27,10 +24,8 @@ module.exports = {
           }
         } catch (wilayaErr) {
           console.error('Error fetching wilaya:', wilayaErr);
-
         }
       }
-
 
       const requestData = {
         requester: req.user.userId,
@@ -38,10 +33,9 @@ module.exports = {
         status: 'Active',
         expiryDate: new Date(expiryDate),
         cityId: cityId || null,
-        wilayaName 
+        wilayaName
       };
       
-
       if (!requestData.cityId) {
         try {
           const user = await withTimeout(User.findById(req.user.userId), 3000);
@@ -50,18 +44,14 @@ module.exports = {
           }
         } catch (userErr) {
           console.error('Error getting user cityId:', userErr);
-
         }
       }
       
-
       if (hospitalId) {
         requestData.hospital = hospitalId;
       }
       
-
       if (donorId) {
-
         try {
           const donor = await withTimeout(User.findById(donorId), 3000);
           if (!donor) {
@@ -83,15 +73,12 @@ module.exports = {
       
       const donationRequest = await withTimeout(DonationRequest.create(requestData), 5000);
       
-
       let potentialDonors = [];
       
       try {
         if (donorId) {
-
           potentialDonors = [{ _id: donorId }];
         } else {
-
           const compatibleBloodTypes = getCompatibleBloodTypes(bloodType);
           
           potentialDonors = await withTimeout(User.find({
@@ -101,12 +88,9 @@ module.exports = {
         }
       } catch (donorFindErr) {
         console.error('Error finding potential donors:', donorFindErr);
-
       }
       
-
       if (global.Notification && potentialDonors.length > 0) {
-
         (async () => {
           try {
             const notificationPromises = potentialDonors.map(donor => 
@@ -119,7 +103,7 @@ module.exports = {
                   itemType: 'DonationRequest',
                   itemId: donationRequest._id
                 },
-                priority: donorId ? 'Urgent' : 'High' 
+                priority: donorId ? 'Urgent' : 'High'
               })
             );
             
@@ -127,7 +111,6 @@ module.exports = {
             console.log(`Sent ${notificationPromises.length} notifications for donation request ${donationRequest._id}`);
           } catch (notifyErr) {
             console.error('Error sending notifications:', notifyErr);
-
           }
         })();
       }
@@ -145,8 +128,6 @@ module.exports = {
       });
     }
   },
-  
-
   createGuestDonationRequest: async (req, res) => {
     try {
       const {
@@ -159,7 +140,6 @@ module.exports = {
         cityId  
       } = req.body;
       
-
       if (!guestId && !phoneNumber) {
         return res.status(400).json({ 
           success: false, 
@@ -167,7 +147,6 @@ module.exports = {
         });
       }
       
-
       if (!bloodType) {
         return res.status(400).json({
           success: false,
@@ -175,7 +154,6 @@ module.exports = {
         });
       }
       
-
       let guest;
       if (guestId) {
         guest = await Guest.findById(guestId);
@@ -186,10 +164,8 @@ module.exports = {
           });
         }
       } else {
-
         guest = await Guest.findOne({ phoneNumber });
         
-
         if (!guest) {
           guest = new Guest({
             phoneNumber,
@@ -201,12 +177,10 @@ module.exports = {
           await guest.save();
         }
         
-
         guest.lastActive = Date.now();
         await guest.save();
       }
       
-
       let donorToAssign = donorId;
       if (!donorToAssign) {
         const compatibleDonors = await User.find({
@@ -217,12 +191,10 @@ module.exports = {
         if (compatibleDonors.length > 0) {
           donorToAssign = compatibleDonors[0]._id;
         } else {
-
           donorToAssign = null;
         }
       }
       
-
       const donationRequestData = {
         guestRequester: guest._id,
         bloodType,
@@ -231,23 +203,18 @@ module.exports = {
         cityId: cityId || guest.cityId || null 
       };
       
-
       if (hospitalId) {
         donationRequestData.hospital = hospitalId;
       }
       
-
       if (donorToAssign) {
         donationRequestData.donor = donorToAssign;
       }
       
-
       const donationRequest = await DonationRequest.create(donationRequestData);
       
-
       if (donorToAssign) {
         try {
-
           const compatibleBloodTypes = getCompatibleBloodTypes(bloodType);
           
           const potentialDonors = await User.find({
@@ -255,7 +222,6 @@ module.exports = {
             bloodType: { $in: compatibleBloodTypes }
           }).limit(20);
           
-
           if (global.Notification) {
             const notificationPromises = potentialDonors.map(donor => 
               global.Notification.create({
@@ -275,7 +241,6 @@ module.exports = {
           }
         } catch (notificationError) {
           console.error('Error sending notifications:', notificationError);
-
         }
       }
       
@@ -297,27 +262,22 @@ module.exports = {
       });
     }
   },
-  
-
   getDonationRequests: async (req, res) => {
     try {
       const { bloodType, status } = req.query;
       
       const filter = {};
       
-
       if (bloodType) {
         filter.bloodType = bloodType;
       }
       
-
       if (status) {
         filter.status = status;
       } else {
         filter.status = 'Active'; 
       }
       
-
       filter.expiryDate = { $gt: new Date() };
       
       const donationRequests = await DonationRequest.find(filter)
@@ -332,8 +292,6 @@ module.exports = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-  
-
   getDonationRequestById: async (req, res) => {
     try {
       const { requestId } = req.params;
@@ -353,8 +311,6 @@ module.exports = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-  
-
   updateDonationRequestStatus: async (req, res) => {
     try {
       const { requestId } = req.params;
@@ -371,7 +327,6 @@ module.exports = {
         return res.status(404).json({ error: 'Donation request not found' });
       }
       
-
       if (donationRequest.requester && donationRequest.requester.toString() !== req.user.userId) {
         return res.status(403).json({ error: 'Not authorized' });
       }
@@ -385,14 +340,11 @@ module.exports = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-  
-
   updateDonationRequest: async (req, res) => {
     try {
       const { id } = req.params;
       const { bloodType, hospitalId, expiryDate, donorId, cityId } = req.body;
       
-
       const donationRequest = await DonationRequest.findById(id);
       
       if (!donationRequest) {
@@ -402,7 +354,6 @@ module.exports = {
         });
       }
       
-
       if (donationRequest.requester && donationRequest.requester.toString() !== req.user.userId) {
         return res.status(403).json({ 
           success: false, 
@@ -410,7 +361,6 @@ module.exports = {
         });
       }
       
-
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -418,15 +368,12 @@ module.exports = {
         });
       }
       
-
       if (bloodType) donationRequest.bloodType = bloodType;
       if (hospitalId) donationRequest.hospital = hospitalId;
       if (expiryDate) donationRequest.expiryDate = new Date(expiryDate);
       if (cityId) donationRequest.cityId = cityId;
       
-
       if (donorId) {
-
         const donor = await User.findById(donorId);
         if (!donor) {
           return res.status(404).json({
@@ -437,7 +384,6 @@ module.exports = {
         donationRequest.donor = donorId;
       }
       
-
       await donationRequest.save();
       
       res.status(200).json({
@@ -454,8 +400,6 @@ module.exports = {
       });
     }
   },
-  
-
   getUserDonationRequests: async (req, res) => {
     try {
       const donationRequests = await DonationRequest.find({ requester: req.user.userId })
@@ -468,8 +412,6 @@ module.exports = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-  
-
   getUserDonorRequests: async (req, res) => {
     try {
       const donorId = req.user.id;
@@ -494,11 +436,8 @@ module.exports = {
       });
     }
   },
-  
-
   getAllUserRequests: async (req, res) => {
     try {
-
       const userId = req.user && req.user.id;
       
       if (!userId) {
@@ -508,7 +447,6 @@ module.exports = {
         });
       }
       
-
       const requests = await DonationRequest.find({
         $or: [
           { requester: userId },
@@ -531,13 +469,10 @@ module.exports = {
       });
     }
   },
-  
-
   cancelDonationRequest: async (req, res) => {
     try {
       const { requestId } = req.params;
       const userId = req.user?.id || req.user?._id;
-
 
       const donationRequest = await DonationRequest.findById(requestId);
       
@@ -548,7 +483,6 @@ module.exports = {
         });
       }
       
-
       if (donationRequest.requester && donationRequest.requester.toString() !== userId.toString()) {
         return res.status(403).json({
           success: false,
@@ -556,7 +490,6 @@ module.exports = {
         });
       }
       
-
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -564,7 +497,6 @@ module.exports = {
         });
       }
       
-
       donationRequest.status = 'Cancelled';
       await donationRequest.save();
       
@@ -582,14 +514,11 @@ module.exports = {
       });
     }
   },
-  
-
   updateDonationRequest: async (req, res) => {
     try {
       const { requestId } = req.params;
       const updateData = req.body;
       const userId = req.user?.id || req.user?._id;
-
 
       const donationRequest = await DonationRequest.findById(requestId);
       
@@ -600,7 +529,6 @@ module.exports = {
         });
       }
       
-
       if (donationRequest.requester && donationRequest.requester.toString() !== userId.toString()) {
         return res.status(403).json({
           success: false,
@@ -608,7 +536,6 @@ module.exports = {
         });
       }
       
-
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -616,10 +543,8 @@ module.exports = {
         });
       }
       
-
       const allowedFields = ['bloodType', 'hospital', 'expiryDate', 'donor', 'cityId'];
       
-
       for (const field of allowedFields) {
         if (updateData[field] !== undefined) {
           donationRequest[field] = updateData[field];
@@ -642,13 +567,10 @@ module.exports = {
       });
     }
   },
-  
-
   completeDonationRequest: async (req, res) => {
     try {
       const { requestId } = req.params;
       const userId = req.user?.id || req.user?._id;
-
 
       const donationRequest = await DonationRequest.findById(requestId);
       
@@ -659,7 +581,6 @@ module.exports = {
         });
       }
       
-
       const isRequester = donationRequest.requester && 
         donationRequest.requester.toString() === userId.toString();
       const isDonor = donationRequest.donor && 
@@ -672,7 +593,6 @@ module.exports = {
         });
       }
       
-
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -680,7 +600,6 @@ module.exports = {
         });
       }
       
-
       donationRequest.status = 'Fulfilled';
       donationRequest.completedAt = new Date();
       await donationRequest.save();
@@ -699,13 +618,10 @@ module.exports = {
       });
     }
   },
-  
-
   fulfillDonationRequest: async (req, res) => {
     try {
       const { requestId } = req.params;
       const userId = req.user?.id || req.user?._id;
-
 
       const donationRequest = await DonationRequest.findById(requestId);
       
@@ -716,7 +632,6 @@ module.exports = {
         });
       }
       
-
       const user = await User.findById(userId);
       if (!user || !user.isDonor) {
         return res.status(403).json({
@@ -725,7 +640,6 @@ module.exports = {
         });
       }
       
-
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -733,7 +647,6 @@ module.exports = {
         });
       }
       
-
       donationRequest.donor = userId;
       donationRequest.status = 'Fulfilled';
       donationRequest.fulfilledAt = new Date();
@@ -753,13 +666,10 @@ module.exports = {
       });
     }
   },
-  
-
   deleteDonationRequest: async (req, res) => {
     try {
       const donationRequestId = req.params.requestId; 
       
-
       const deletedRequest = await DonationRequest.findByIdAndDelete(donationRequestId);
       
       if (!deletedRequest) {
@@ -781,7 +691,6 @@ module.exports = {
     }
   }
 };
-
 
 function getCompatibleBloodTypes(bloodType) {
   const compatibilityMap = {

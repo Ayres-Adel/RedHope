@@ -1,4 +1,3 @@
-/* NavBarStyle.css - Mobile First Approach */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -8,10 +7,9 @@
   }
 }
 
-/* Base styles apply to mobile first */
 .nav-links {
   position: static;
-  display: none; /* Hidden by default on mobile */
+  display: none;
   gap: 20px;
   margin: 0 auto;
 }
@@ -28,24 +26,23 @@
 
 body {
   animation: fadeIn 1s ease-in-out;
-  overflow-x: hidden; /* Prevent horizontal scrollbar */
+  overflow-x: hidden;
 }
 
 header {
   margin-top: 15px;
 }
 
-/* Hamburger menu styles - Added from Search.css */
 .hamburger {
-  display: none; /* Hidden by default */
+  display: none;
   flex-direction: column;
   gap: 5px;
   position: absolute;
-  left: 20px; /* Position on the left */
-  top: 32px; /* Adjusted to align better with navbar */
+  left: 20px;
+  top: 32px;
   margin-left: 25px;
   padding: 10px;
-  z-index: 1002; /* Ensure it's above other elements */
+  z-index: 1002;
 }
 
 .nav-icons  .language-switcher, 
@@ -56,7 +53,7 @@ header {
 .hamburger div {
   width: 25px;
   height: 3px;
-  background-color: #333; /* Default color that works with both themes */
+  background-color: #333;
   transition: all 0.3s ease;
 }
 
@@ -64,9 +61,8 @@ header {
   color: black;
 }
 
-/* Navbar layout - mobile first */
 nav {
-  width: 100vw; /* Changed from 100vw to prevent overflow */
+  width: 100vw;
   position: fixed;
   top: 0;
   left: 0;
@@ -84,16 +80,15 @@ nav {
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: none; /* Remove animation which was causing size changes */
+  animation: none;
   transition: background-color 0.3s ease, background-image 0.3s ease, box-shadow 0.3s ease;
-  z-index: 2000; /* Increased z-index to ensure proper stacking */
+  z-index: 2000;
   height: 80px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  box-sizing: border-box; /* Include padding in width calculation */
-  contain: none; /* Removed potentially problematic contain property */
+  box-sizing: border-box;
+  contain: none;
 }
 
-/* Dark theme navbar styles */
 .dark-theme nav {
   background-color: rgba(15, 15, 15, 0.4);
   background-image: linear-gradient(155deg, 
@@ -105,7 +100,6 @@ nav {
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* Logo styling - smaller for mobile */
 .nav-logo img, .RedHope img {
   width: 65px;
   height: 65px;
@@ -151,7 +145,6 @@ nav {
   color: rgb(77, 50, 50);
 }
 
-/* Dark theme styles for icons */
 .dark-theme .login-icon,
 .dark-theme .language-icon {
   color: #e0e0e0;
@@ -218,22 +211,19 @@ hr {
   margin: -10px 2.3rem;
 }
 
-/* Auth buttons for mobile - Stacked on very small screens */
 .auth {
   display: flex;
   gap: 12px;
   position: relative;
   left: 0;
   flex-direction: column;
-  margin-right: 7px; /* Added space for proper alignment */
+  margin-right: 7px;
 }
 
-/* Icon alignment fix */
 .notLoggedIn-icon {
-  margin-top: 16px; /* Adjusted for proper vertical alignment */
+  margin-top: 16px;
 }
 
-/* Nav Icons Container - Mobile positioning */
 .nav-icons {
   display: flex;
   align-items: center;
@@ -245,9 +235,8 @@ hr {
   z-index: 1001;
 }
 
-/* Icon styling */
 .login-icon, .language-icon {
-  font-size: 24px; /* Standardized icon size */
+  font-size: 24px;
   color: #5f5f61;
   transition: all 0.3s ease;
 }
@@ -257,7 +246,6 @@ hr {
   transform: scale(1.2) rotate(5deg);
 }
 
-/* HSA styling */
 .HSA {
   font-weight: var(--Weights_02);
   font-size: 16px;
@@ -313,7 +301,6 @@ hr {
   transform: scale(1.2) rotate(5deg);
 }
 
-/* Toggle styles */
 .toggle-container {
   position: relative;
   display: flex;
@@ -411,7 +398,6 @@ input[type="checkbox"]:focus-visible + label.display {
   outline-offset: 3px;
 }
 
-/* Language Switcher */
 .language-switcher {
   position: relative;
   top: auto;
@@ -423,7 +409,6 @@ input[type="checkbox"]:focus-visible + label.display {
   transform: scale(1.2) rotate(5deg);
 }
 
-/* Mobile menu styling */
 .nav-links.active {
   display: flex;
   flex-direction: column;
@@ -536,7 +521,6 @@ input[type="checkbox"]:focus-visible + label.display {
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* Mobile utility section when active */
 .mobile-utility-section {
   display: none;
   flex-direction: row;
@@ -587,52 +571,50 @@ input[type="checkbox"]:focus-visible + label.display {
   height: 24px;
 }
 
-/* SMALL SCREENS - Mobile (0px to 400px) */
 @media (min-width: 0px) {
-  
   .nav-logo img, .RedHope img {
-    width: 60px; /* Smaller for very small screens */
+    width: 60px;
     height: 60px;
   }
 
   .Sign-up, .Login {
-    padding: 6px 12px; /* Smaller padding for very small screens */
-    font-size: 12px; /* Smaller font for very small screens */
+    padding: 6px 12px;
+    font-size: 12px;
   }
 
   .nav-links.active {
-    width: 220px; /* Smaller menu for very small screens */
+    width: 220px;
   }
 
   .nav-links.active .HSA {
     width: 90%;
-    padding: 10px 15px; /* Smaller padding for very small screens */
-    font-size: 14px; /* Smaller font for very small screens */
+    padding: 10px 15px;
+    font-size: 14px;
     margin: 5px 0;
-    border-radius: 8px; /* Smaller border radius for very small screens */
+    border-radius: 8px;
   }
 
   .nav-links.active .HSA:hover {
-    padding: 10px 15px; /* Smaller padding for very small screens */
-    font-size: 14px; /* Smaller font for very small screens */
+    padding: 10px 15px;
+    font-size: 14px;
   }
 
   .nav-links.active .HSA.active {
-    padding: 10px 15px; /* Smaller padding for very small screens */
-    font-size: 14px; /* Smaller font for very small screens */
+    padding: 10px 15px;
+    font-size: 14px;
   }
 
   .nav-links.active .HSA::after {
-    width: 80%; /* Smaller width for very small screens */
-    height: 2px; /* Smaller height for very small screens */
+    width: 80%;
+    height: 2px;
   }
 
   .nav-links.active .HSA:hover::after {
-    height: 2px; /* Smaller height for very small screens */
+    height: 2px;
   }
 
   .nav-links.active .HSA.active::after {
-    height: 2px; /* Smaller height for very small screens */
+    height: 2px;
   }
 
   .auth {
@@ -647,20 +629,18 @@ input[type="checkbox"]:focus-visible + label.display {
   }
 
   .mobile-utility-section {
-    display: flex; /* Show utility section on very small screens */
+    display: flex;
   }
 
   .hamburger {
-    left: 0px !important; /* Closer to edge on very small screens */
-    top: 23px !important; /* Adjusted for smaller screens */
-    margin-left: 0 !important; /* Adjusted for smaller screens */
-    padding: 15px !important; /* Adjusted for smaller screens */
-    display: flex; /* Show hamburger on mobile */
+    left: 0px !important;
+    top: 23px !important;
+    margin-left: 0 !important;
+    padding: 15px !important;
+    display: flex;
   }
-
 } 
 
-/* MEDIUM SCREENS - Mobile to Tablet (401px to 600px) */
 @media (min-width: 401px) {
   .auth {
     flex-direction: row;
@@ -673,14 +653,13 @@ input[type="checkbox"]:focus-visible + label.display {
   }
 
   .mobile-utility-section {
-    display: flex; /* Show utility section on medium screens */
+    display: flex;
   }
 }
 
-/* TABLET (601px to 1200px) */
 @media (min-width: 601px) {
   .nav-logo img, .RedHope img {
-    width: 70px; /* Larger on tablet */
+    width: 70px;
     height: 70px;
   }
   
@@ -693,38 +672,37 @@ input[type="checkbox"]:focus-visible + label.display {
   }
   
   .Sign-up, .Login {
-    padding: 10px 18px; /* Medium size for tablets */
+    padding: 10px 18px;
     font-size: 15px;
   }
   
   .nav-links.active {
-    width: 280px; /* Wider menu for tablets */
+    width: 280px;
   }
 }
 
-/* DESKTOP (1201px+) */
 @media (min-width: 1201px) {
   nav {
-    padding: 0 30px; /* Wider padding for desktop */
-    justify-content: space-between; /* Space between for desktop layout */
-    height: 75px; /* Original height for desktop */
+    padding: 0 30px;
+    justify-content: space-between;
+    height: 75px;
   }
   
   .nav-logo, .RedHope {
-    margin: 0; /* Reset margin for desktop */
+    margin: 0;
   }
   
   .nav-logo img, .RedHope img {
-    width: 75px; /* Original size for desktop */
+    width: 75px;
     height: 75px;
   }
   
   .hamburger {
-    display: none; /* Hide hamburger on desktop */
+    display: none;
   }
   
   .nav-links {
-    display: flex; /* Show nav links on desktop */
+    display: flex;
     gap: 10px;
   }
 
@@ -733,26 +711,26 @@ input[type="checkbox"]:focus-visible + label.display {
   }
   
   .nav-icons {
-    position: static; /* Reset position */
-    gap: 20px; /* Original gap */
+    position: static;
+    gap: 20px;
   }
   
   .nav-icons > .language-switcher,
   .nav-icons > .toggle-container {
-    display: flex !important; /* Show in header on desktop */
+    display: flex !important;
   }
   
   .Sign-up, .Login {
-    padding: 10px 24px; /* Original size for desktop */
+    padding: 10px 24px;
     font-size: 16px;
   }
   
   .Login {
-    padding: 12px 30px; /* Original padding */
+    padding: 12px 30px;
   }
 
   .mobile-utility-section {
-    display: none; /* Show utility section on medium screens */
+    display: none;
   }
 
   .notLoggedIn-icon {

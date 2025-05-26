@@ -24,7 +24,6 @@ export default function MapComponent() {
     lng: 1.330560770492638,
   };
 
-  // Core state
   const [open, setOpen] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
@@ -32,11 +31,9 @@ export default function MapComponent() {
   const [controlledCenter, setControlledCenter] = useState(null);
   const mapRef = useRef(null);
   const [selectedCityName, setSelectedCityName] = useState("National");
-  
-  // Language state
+
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
-  
-  // Translation object
+
   const translations = useMemo(() => ({
     en: {
       pageTitle: "Hospitals & Blood Centers",
@@ -60,10 +57,8 @@ export default function MapComponent() {
     }
   }), []);
 
-  // Use the selected language translations
   const t = translations[language];
-  
-  // Poll for language changes
+
   useEffect(() => {
     const interval = setInterval(() => {
       const currentLang = localStorage.getItem('language') || 'en';
@@ -74,7 +69,6 @@ export default function MapComponent() {
     return () => clearInterval(interval);
   }, [language]);
 
-  // Use custom hooks for data fetching
   const { hospitals, isLoading, error } = useHospitals();
   const { 
     bloodTypeStats, 
@@ -83,13 +77,11 @@ export default function MapComponent() {
     statsError,
     fetchBloodTypeStats 
   } = useBloodStatistics();
-  
-  // Dark mode detection
+
   const [isDarkMode, setIsDarkMode] = useState(
     document.body.classList.contains("dark-theme")
   );
-  
-  // Listen for theme changes
+
   useEffect(() => {
     const handleThemeChange = () => {
       setIsDarkMode(document.body.classList.contains("dark-theme"));
@@ -99,24 +91,20 @@ export default function MapComponent() {
     return () => window.removeEventListener("themeChange", handleThemeChange);
   }, []);
 
-  // Search functionality
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const searchInputRef = useRef(null);
 
-  // Handle location changes from CitySelector
   const handleLocationChange = useCallback((newLocation, cityName, cityId) => {
     setSelectedCityName(cityName || "All Cities");
-    
-    // If All Cities is selected, only update stats
+
     if (cityName === "All Cities" || !cityId) {
       fetchBloodTypeStats(null);
       return;
     }
-    
-    // If coordinates are available, update the map
+
     if (newLocation) {
       const newCenter = {
         lat: Number(newLocation.lat),
@@ -135,7 +123,6 @@ export default function MapComponent() {
     }
   }, [fetchBloodTypeStats]);
 
-  // Search handler
   const handleSearch = useCallback((value) => {
     setSearchTerm(value);
     if (value.length > 0) {
@@ -154,11 +141,9 @@ export default function MapComponent() {
     }
   }, [hospitals]);
 
-  // Handle suggestion click
   const handleSuggestionClick = useCallback((hospital) => {
     setIsControlled(true);
-    
-    // Normalize position format
+
     let coordinates;
     if (hospital.position && hospital.position.lat && hospital.position.lng) {
       coordinates = {
@@ -177,14 +162,12 @@ export default function MapComponent() {
     
     setMapCenter(coordinates);
     setControlledCenter(coordinates);
-    
-    // Pan the map
+
     if (mapRef.current) {
       mapRef.current.panTo(coordinates);
       mapRef.current.setZoom(15);
     }
-    
-    // Set selected marker with normalized coordinates
+
     setSelectedMarker({
       ...hospital,
       latitude: coordinates.lat,
@@ -196,21 +179,18 @@ export default function MapComponent() {
     handleCloseSearch();
   }, []);
 
-  // Close search
   const handleCloseSearch = useCallback(() => {
     setShowSearch(false);
     setShowSuggestions(false);
     setSearchTerm("");
   }, []);
 
-  // Render markers efficiently with useMemo
   const hospitalMarkers = useMemo(() => {
     if (!hospitals || hospitals.length === 0) {
       return null;
     }
     
     return hospitals.map((hospital, index) => {
-      // Skip hospitals without valid position data
       if (!hospital.position || !hospital.position.lat || !hospital.position.lng) {
         return null;
       }
@@ -240,10 +220,9 @@ export default function MapComponent() {
           />
         </AdvancedMarker>
       );
-    }).filter(Boolean); // Filter out null values
+    }).filter(Boolean);
   }, [hospitals]);
 
-  // Loading state
   if (isLoading) {
     return (
       <>
@@ -256,7 +235,6 @@ export default function MapComponent() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <>
@@ -302,8 +280,8 @@ export default function MapComponent() {
                       {elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }]},
                       {elementType: "labels.text.fill", stylers: [{ color: "#746855" }]},
                     ] : undefined,
-                    disableDefaultUI: true,    // Disable all default UI
-                    fullscreenControl: true, // Disable fullscreen control
+                    disableDefaultUI: true,
+                    fullscreenControl: true, 
                   }}
                   defaultCenter={mapCenter}
                   center={isControlled ? controlledCenter : undefined}

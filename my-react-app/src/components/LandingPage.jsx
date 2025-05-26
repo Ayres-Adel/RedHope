@@ -1,4 +1,3 @@
-// src/components/LandingPage.jsx
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,7 +22,6 @@ import FadeInSection from "./FadeInSection.jsx";
 import Percentages from "../assets/images/Percentages-removebg-preview.png";
 import "../styles/LandingPageStyle.css";
 
-// Add constant for content types to match AdminPage
 const CONTENT_TYPES = {
   HOMEPAGE_BANNER: 'homepage_banner',
   ABOUT_US: 'about_us',
@@ -57,7 +55,6 @@ export default function LandingPage() {
     localStorage.getItem("language") || "en"
   );
   
-  // Add state for content data
   const [contentData, setContentData] = useState(
     JSON.parse(localStorage.getItem('redhope_content_data')) || INITIAL_CONTENT_DATA
   );
@@ -81,7 +78,6 @@ export default function LandingPage() {
     return () => toggle.removeEventListener("change", handleThemeChange);
   }, []);
 
-  // Add effect to check for content updates
   useEffect(() => {
     const handleStorageChange = () => {
       const updatedContent = localStorage.getItem('redhope_content_data');
@@ -89,15 +85,12 @@ export default function LandingPage() {
         try {
           setContentData(JSON.parse(updatedContent));
         } catch (err) {
-          console.error('Error parsing content data:', err);
         }
       }
     };
 
-    // Listen for storage events (in case admin updates content in another tab)
     window.addEventListener('storage', handleStorageChange);
     
-    // Check for content updates periodically
     const interval = setInterval(handleStorageChange, 5000);
     
     return () => {
@@ -221,20 +214,20 @@ export default function LandingPage() {
           <div className="grid_Container_04">
             {[
               {
-                titleEn: "Blood Donation Drives",
-                titleFr: "Campagnes de don de sang",
-                descEn: "We organize regular blood donation drives to help ensure a steady supply of blood for those in need.",
-                descFr: "Nous organisons régulièrement des campagnes de don de sang pour garantir un approvisionnement constant en sang pour ceux dans le besoin.",
+                titleEn: "Proximity-Based Donor Matching",
+                titleFr: "Appariement des donneurs basé sur la proximité",
+                descEn: "We provide advanced matching algorithms to connect patients with suitable blood donors based on compatibility and proximity.",
+                descFr: "Nous proposons des algorithmes avancés pour connecter les patients aux donneurs compatibles, en fonction de leur groupe sanguin et de leur proximité.",
               },
               {
-                titleEn: "Donor Matching",
-                titleFr: "Appariement des donneurs",
-                descEn: "We provide advanced matching algorithms to connect patients with suitable blood donors based on compatibility.",
-                descFr: "Nous proposons des algorithmes avancés pour connecter les patients aux donneurs compatibles, selon leur groupe sanguin et leurs disponibilités.",
+                titleEn: "Hospitals Mapping",
+                titleFr: "Cartographie des hôpitaux",
+                descEn: "We provide an interactive map of hospitals to help donors and recipients easily find nearby healthcare facilities.",
+                descFr: "Nous fournissons une carte interactive des hôpitaux pour aider les donneurs et les receveurs à trouver facilement les établissements de santé à proximité.",
               },
               {
                 titleEn: "Emergency Services",
-                titleFr: "Services d’urgence",
+                titleFr: "Services d'urgence",
                 descEn: "Our platform is available 24/7 for emergencies, ensuring that blood is always accessible when needed.",
                 descFr: "Notre plateforme est disponible 24h/24 et 7j/7 en cas d'urgence, assurant ainsi l'accès au sang quand vous en avez besoin.",
               },

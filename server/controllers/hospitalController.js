@@ -95,7 +95,6 @@ module.exports = {
 
   seedHospitals: async (req, res) => {
     try {
-
       const count = await Hospital.countDocuments();
       
       if (count > 0) {
@@ -106,12 +105,10 @@ module.exports = {
         });
       }
       
-
       const fs = require('fs');
       const path = require('path');
       const hospitalsPath = path.join(__dirname, '../../my-react-app/src/assets/Hospitals.json');
       
-
       const hospitalsData = JSON.parse(fs.readFileSync(hospitalsPath, 'utf8'));
       
       if (!hospitalsData.hospitals || !Array.isArray(hospitalsData.hospitals)) {
@@ -121,27 +118,16 @@ module.exports = {
         });
       }
       
-
       const formattedHospitals = hospitalsData.hospitals.map(hospital => ({
         name: hospital.name,
         structure: hospital.structure,
         location: {
           type: 'Point',
-          coordinates: [hospital.longitude, hospital.latitude] 
-        },
+          coordinates: [hospital.longitude, hospital.latitude]        },
         telephone: hospital.telephone,
         fax: hospital.fax,
         wilaya: hospital.wilaya
       }));
-      
-
-      await Hospital.insertMany(formattedHospitals);
-      
-      res.json({ 
-        success: true, 
-        message: `Successfully seeded database with ${formattedHospitals.length} hospitals`,
-        seeded: true
-      });
       
     } catch (err) {
       console.error('Error seeding hospitals:', err);

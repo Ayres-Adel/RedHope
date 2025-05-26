@@ -1,29 +1,13 @@
-/**
- * LocationService.js - Utility functions for handling geolocation
- */
-
-// In-memory cache for geocoding results to reduce API calls
 const geocodeCache = {};
 
-// Centralized API key management
 export const GEOCODE_API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY || '4bcabb4ac4e54f1692c1e4d811bb29e5';
 
-/**
- * Get current user location with coordinates
- * @param {Object} options - Configuration options
- * @param {Function} options.onSuccess - Success callback with coordinates
- * @param {Function} options.onError - Error callback with error message
- * @param {Boolean} options.enableHighAccuracy - Whether to enable high accuracy
- * @param {Number} options.timeout - Timeout in milliseconds
- * @param {Number} options.maximumAge - Maximum cached position age
- * @returns {Promise} Promise that resolves with coordinates or rejects with error
- */
 export const getCurrentLocation = (options = {}) => {
   const {
     onSuccess,
     onError,
     enableHighAccuracy = true,
-    timeout = 20000, // Increase from 10000 to 20000 (20s)
+    timeout = 20000,
     maximumAge = 0
   } = options;
 
@@ -76,9 +60,7 @@ export const getCurrentLocation = (options = {}) => {
   });
 };
 
-// Optimize wilaya mapping with more concise format and improved organization
 const wilayaMapping = (() => {
-  // Base mapping with primary names
   const baseMap = {
     'adrar': '01', 'chlef': '02', 'laghouat': '03', 'oum el bouaghi': '04',
     'batna': '05', 'bejaia': '06', 'biskra': '07', 'bechar': '08',
@@ -92,7 +74,6 @@ const wilayaMapping = (() => {
     'tindouf': '37', 'tissemsilt': '38', 'el oued': '39', 'khenchela': '40',
     'souk ahras': '41', 'tipaza': '42', 'mila': '43', 'ain defla': '44',
     'naama': '45', 'ain temouchent': '46', 'ghardaia': '47', 'relizane': '48',
-    // New wilayas added in 2019
     'el mghair': '49', 'el meniaa': '50', 'ouled djellal': '51', 
     'bordj badji mokhtar': '52', 'beni abbes': '53', 'timimoun': '54',
     'touggourt': '55', 'djanet': '56', 'in salah': '57', 'in guezzam': '58'
@@ -106,60 +87,40 @@ const wilayaMapping = (() => {
     'ghardaïa': '47', 'el m\'ghair': '49', 'el mgheir': '49', 'el menea': '50',
     'el menia': '50', 'bordj baji mokhtar': '52', 'béni abbès': '53',
     'toggourt': '55', 'tugurt': '55', 'ain salah': '57', 'in guezam': '58',
-    'algiers': '16' // English name for Alger
+    'algiers': '16'
   };
   
   return { ...baseMap, ...alternativeMap };
 })();
 
-/**
- * Optimized function to find cityId by state name
- * @param {string} stateName - State name to look up
- * @returns {string|null} - CityId if found, null otherwise
- */
 const findCityIdByState = (stateName) => {
   if (!stateName) return null;
   
-  // Normalize name (lowercase, no accents, trimmed)
   const normalizedName = stateName.toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .trim();
   
-  // Direct lookup (most efficient)
   if (wilayaMapping[normalizedName]) {
     return wilayaMapping[normalizedName];
   }
   
-  // Partial match as fallback with early returns for efficiency
   for (const [key, value] of Object.entries(wilayaMapping)) {
-    // First check if the normalized name contains the key (more likely match)
     if (normalizedName.includes(key)) {
       return value;
     }
-    // Then check if the key contains the normalized name (less likely but possible)
-    if (key.includes(normalizedName) && normalizedName.length > 3) { // Avoid matching very short strings
+    if (key.includes(normalizedName) && normalizedName.length > 3) {
       return value;
     }
   }
   
-  // No match found
   return null;
 };
 
-/**
- * Convert cityId (wilaya code) to wilaya name
- * @param {string} cityId - The wilaya code to convert
- * @param {Object} options - Optional settings
- * @param {boolean} options.normalized - Whether to return normalized name (default: false)
- * @returns {string|null} - Wilaya name or null if not found
- */
 export const cityIdToWilaya = (cityId, options = { normalized: false }) => {
   if (!cityId) return null;
   
-  // Ensure cityId is a string and padded to 2 digits if needed
   const formattedCityId = String(cityId).padStart(2, '0');
   
-  // Map of wilaya codes to normalized names
   const wilayaCodeToName = {
     "01": "Adrar",
     "02": "Chlef",
@@ -221,28 +182,17 @@ export const cityIdToWilaya = (cityId, options = { normalized: false }) => {
     "58": "In Guezzam"
   };
   
-  // Return the wilaya name or null if not found
   return wilayaCodeToName[formattedCityId] || null;
 };
 
-/**
- * Reverse geocode coordinates to get readable location name
- * @param {Number} latitude - Latitude coordinate
- * @param {Number} longitude - Longitude coordinate
- * @param {String} language - Preferred language for results
- * @returns {Promise} Promise that resolves with standardized location response
- */
 export const reverseGeocode = async (latitude, longitude, language = 'en') => {
   try {
-    // Generate cache key based on coordinates and language
     const cacheKey = `${latitude.toFixed(6)},${longitude.toFixed(6)}_${language}`;
     
-    // Return cached result if available
     if (geocodeCache[cacheKey]) {
       return geocodeCache[cacheKey];
     }
     
-    // Validate API key
     if (!GEOCODE_API_KEY || GEOCODE_API_KEY.length < 10) {
       console.error('Invalid or missing OpenCage API key');
       return {
@@ -253,7 +203,6 @@ export const reverseGeocode = async (latitude, longitude, language = 'en') => {
       };
     }
     
-    // Ensure coordinates are valid numbers
     if (isNaN(latitude) || isNaN(longitude) || !isFinite(latitude) || !isFinite(longitude)) {
       return {
         success: false,
@@ -267,7 +216,6 @@ export const reverseGeocode = async (latitude, longitude, language = 'en') => {
     
     const response = await fetch(reverseGeoUrl);
     
-    // Handle HTTP errors
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`OpenCage API error (${response.status}):`, errorText);
@@ -282,7 +230,6 @@ export const reverseGeocode = async (latitude, longitude, language = 'en') => {
     
     const data = await response.json();
     
-    // Process the results to standard format
     const result = {
       success: true,
       error: false,
@@ -295,18 +242,14 @@ export const reverseGeocode = async (latitude, longitude, language = 'en') => {
       }
     };
     
-    // Extract location details
     if (data.results && data.results.length > 0) {
       const components = data.results[0].components;
       
-      // PRIMARY METHOD: Extract cityId from postal code (if available)
       const postalCode = components.postcode || '';
       let cityId = null;
       let methodUsed = 'none';
       
-      // First attempt: Use postal code if available and valid
       if (postalCode && postalCode.length >= 2) {
-        // Extra validation to ensure postal code is numeric (for Algeria)
         const postalPrefix = postalCode.substring(0, 2);
         if (/^\d{2}$/.test(postalPrefix)) {
           cityId = postalPrefix;
@@ -314,7 +257,6 @@ export const reverseGeocode = async (latitude, longitude, language = 'en') => {
         } 
       }
       
-      // FALLBACK METHOD: Only use if postal code method failed
       if (!cityId && components.state) {
         const stateBasedCityId = findCityIdByState(components.state);
         if (stateBasedCityId) {
@@ -331,17 +273,15 @@ export const reverseGeocode = async (latitude, longitude, language = 'en') => {
         postalCode,
         cityId,
         state: components.state || null,
-        cityIdMethod: methodUsed // Track which method was used to get the cityId
+        cityIdMethod: methodUsed
       };
     }
     
-    // Cache the result
     geocodeCache[cacheKey] = result;
     
     return result;
   } catch (error) {
     console.error('Geocoding error:', error);
-    // Return standardized error structure
     return { 
       success: false,
       error: true, 
@@ -352,93 +292,85 @@ export const reverseGeocode = async (latitude, longitude, language = 'en') => {
   }
 };
 
-/**
- * Format coordinates into a human-readable address
- * @param {String|Object} location - Coordinates string "lat,lng" or {lat, lng} object
- * @param {String} language - Preferred language for results
- * @returns {Promise} Promise with formatted address
- */
-export const formatLocation = async (location, language = 'en') => {
+export const formatLocation = async (position, language = 'en') => {
   try {
-    let lat, lng;
+    const lat = position.lat || position.latitude;
+    const lng = position.lng || position.longitude;
     
-    if (typeof location === 'string') {
-      const parts = location.split(',');
-      if (parts.length === 2) {
-        lat = parseFloat(parts[0].trim());
-        lng = parseFloat(parts[1].trim());
-      }
-    } else if (location && typeof location === 'object') {
-      lat = location.lat;
-      lng = location.lng;
-    }
-    
-    if (isNaN(lat) || isNaN(lng)) {
-      return { 
-        success: false, 
-        formatted: 'Invalid location format', 
-        coordinates: null 
+    if (!lat || !lng) {
+      return {
+        success: false,
+        formatted: `Invalid coordinates`,
+        message: 'Missing latitude or longitude'
       };
     }
     
-    const geoResult = await reverseGeocode(lat, lng, language);
+    const result = await reverseGeocode(lat, lng, language);
     
-    // Create custom formatted address with only road, city, and state
-    let customFormatted = `${lat},${lng}`;
+    if (!result.success) {
+      return {
+        success: false,
+        formatted: `${lat},${lng}`,
+        message: result.message || 'Geocoding failed'
+      };
+    }
     
-    if (geoResult.success && geoResult.components) {
-      const components = geoResult.components;
-      const addressParts = [];
-      
-      // Add road if available
-      if (components.road) {
-        addressParts.push(components.road);
+    let cityId = null;
+    
+    if (result.details && result.details.cityId) {
+      cityId = result.details.cityId;
+    }
+    else if (result.components && result.components.postcode) {
+      const postalCode = result.components.postcode;
+      if (postalCode && postalCode.length >= 2) {
+        cityId = postalCode.substring(0, 2);
       }
-      
-      // Add city if available (try multiple city-like fields)
-      if (components.city) {
-        addressParts.push(components.city);
-      } else if (components.town) {
-        addressParts.push(components.town);
-      } else if (components.village) {
-        addressParts.push(components.village);
-      }
-      
-      // Add state if available
-      if (components.state) {
-        addressParts.push(components.state);
-      }
-      
-      // If we have address parts, join them to create formatted address
-      if (addressParts.length > 0) {
-        customFormatted = addressParts.join(', ');
+    }
+    else if (result.components) {
+      const wilayaName = result.components.state || result.components.city;
+      if (wilayaName) {
+        const wilayaMapping = {
+          'Adrar': '01', 'Chlef': '02', 'Laghouat': '03', 'Oum El Bouaghi': '04',
+          'Batna': '05', 'Béjaïa': '06', 'Biskra': '07', 'Béchar': '08',
+          'Blida': '09', 'Bouira': '10',
+        };
+        
+        const normalizedName = wilayaName.toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .trim();
+          
+        for (const [key, value] of Object.entries(wilayaMapping)) {
+          const normalizedKey = key.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .trim();
+            
+          if (normalizedName.includes(normalizedKey) || normalizedKey.includes(normalizedName)) {
+            cityId = value;
+            break;
+          }
+        }
       }
     }
     
     return {
-      success: geoResult.success,
-      formatted: customFormatted,
-      details: geoResult.details || {},
-      coordinates: { lat, lng },
-      // Include original formatted address as a fallback
-      originalFormatted: geoResult.formatted
+      success: true,
+      formatted: result.formatted || `${lat},${lng}`,
+      details: {
+        ...result.details,
+        cityId: cityId
+      },
+      components: result.components
     };
   } catch (error) {
     console.error('Error formatting location:', error);
-    return { 
-      success: false, 
-      formatted: 'Error formatting location', 
-      error: true,
-      message: error.message
+    return {
+      success: false,
+      formatted: position.lat ? `${position.lat},${position.lng}` : String(position),
+      message: error.message || 'Unknown error formatting location'
     };
   }
 };
 
-/**
- * Save coordinates to storage
- * @param {Object} coordinates - Coordinates to save
- * @param {Boolean} isLoggedIn - Whether user is logged in
- */
 export const saveCoordinates = (coordinates, isLoggedIn = false) => {
   if (isLoggedIn) {
     localStorage.setItem('userMapCoordinates', JSON.stringify(coordinates));
@@ -447,11 +379,6 @@ export const saveCoordinates = (coordinates, isLoggedIn = false) => {
   }
 };
 
-/**
- * Get saved coordinates from storage
- * @param {Boolean} isLoggedIn - Whether user is logged in
- * @returns {Object|null} Saved coordinates or null
- */
 export const getSavedCoordinates = (isLoggedIn = false) => {
   try {
     let savedCoords = null;
@@ -479,9 +406,6 @@ export const getSavedCoordinates = (isLoggedIn = false) => {
   return null;
 };
 
-/**
- * Clear all cached geocode data
- */
 export const clearGeocodeCache = () => {
   Object.keys(geocodeCache).forEach(key => delete geocodeCache[key]);
 };

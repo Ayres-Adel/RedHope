@@ -1,9 +1,7 @@
 const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
 
-
 const maxAge = 3 * 24 * 60 * 60;
-
 
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -31,7 +29,6 @@ module.exports.login_post = async (req, res) => {
       permissions: admin.permissions
     });
   } catch (err) {
-    console.error('Admin login error:', err);
     res.status(400).json({ error: err.message });
   }
 };
@@ -46,7 +43,6 @@ module.exports.get_admin_profile = async (req, res) => {
     
     res.json(admin);
   } catch (err) {
-    console.error('Error fetching admin profile:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };

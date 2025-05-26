@@ -9,7 +9,6 @@ const InfiniteScroll = () => {
         document.body.classList.toggle('dark-theme', toggle.checked);
       });
   
-      // Cleanup event listener
       return () => {
         toggle.removeEventListener('change', () => {
           document.body.classList.toggle('dark-theme', toggle.checked);
@@ -34,43 +33,43 @@ const InfiniteScroll = () => {
       <div className='tag-list'>
         <div className='inner'>
           <div className='tag'>
-            <i className="fas fa-tint"></i> {/* Blood drop icon */}
+            <i className="fas fa-tint"></i>
            RedHope
           </div>
           <div className='tag'>
-            <i className="fas fa-heart"></i> {/* Heart icon */}
+            <i className="fas fa-heart"></i>
             {language === 'fr' ? 'SauvezDesVies' : 'SaveLives'}
           </div>
           <div className='tag'>
-            <i className="fas fa-hand-holding-heart"></i> {/* Hand holding heart icon */}
+            <i className="fas fa-hand-holding-heart"></i>
              {language === 'fr' ? 'SoyezUnHéros' : 'BeAHero'}
           </div>
           <div className='tag'>
-            <i className="fas fa-syringe"></i> {/* Syringe icon */}
+            <i className="fas fa-syringe"></i>
             {language === 'fr' ? 'FaitesUnDonAujourd’hui' : 'DonateToday'}
           </div>
           <div className='tag'>
-            <i className="fas fa-hands-helping"></i> {/* Helping hands icon */}
+            <i className="fas fa-hands-helping"></i>
             {language === 'fr' ? 'PartagezL’Amour' : 'SpreadLove'}
           </div>
           <div className='tag'>
-            <i className="fas fa-tint"></i> {/* Blood drop icon */}
+            <i className="fas fa-tint"></i>
            RedHope
           </div>
           <div className='tag'>
-            <i className="fas fa-heart"></i> {/* Heart icon */}
+            <i className="fas fa-heart"></i>
             {language === 'fr' ? 'SauvezDesVies' : 'SaveLives'}
           </div>
           <div className='tag'>
-            <i className="fas fa-hand-holding-heart"></i> {/* Hand holding heart icon */}
+            <i className="fas fa-hand-holding-heart"></i>
             {language === 'fr' ? 'SoyezUnHéros' : 'BeAHero'}
           </div>
           <div className='tag'>
-            <i className="fas fa-syringe"></i> {/* Syringe icon */}
+            <i className="fas fa-syringe"></i>
             {language === 'fr' ? 'FaitesUnDonAujourd’hui' : 'DonateToday'}
           </div>
           <div className='tag'>
-            <i className="fas fa-hands-helping"></i> {/* Helping hands icon */}
+            <i className="fas fa-hands-helping"></i>
             {language === 'fr' ? 'PartagezL’Amour' : 'SpreadLove'}
           </div>
         </div>

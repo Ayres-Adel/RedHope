@@ -2,15 +2,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #ffffff; /* White background */
-    width: 100%; /* Full width */
-    overflow: hidden; /* Prevent horizontal overflow */
+    background-color: #ffffff;
+    width: 100%;
+    overflow: hidden;
     margin-bottom: 50px;
 }
 
 .tag-list {
-    width: 100%; /* Full width of the container */
-    max-width: 80rem; /* Increased maximum width for larger screens */
+    width: 100%;
+    max-width: 80rem;
     font-family: "Montserrat";
     position: relative;
     overflow: hidden;
@@ -19,36 +19,36 @@
 .inner {
     width: fit-content;
     display: flex;
-    gap: 2rem; /* Increased gap between tags */
-    animation: loop 10s linear infinite; /* Slower animation for better readability */
+    gap: 2rem;
+    animation: loop 10s linear infinite;
 }
 
 .tag {
     display: flex;
     align-items: center;
-    gap: 0.8rem; /* Increased gap between icon, hashtag, and text */
-    color: #ffffff; /* White text color for contrast */
-    font-size: 1.5rem; /* Larger base font size */
-    background-color: #dc2626; /* Red background for tags */
-    padding: 1rem 1.5rem; /* Increased padding for tags */
-    border-radius: 1rem; /* More rounded corners */
-    border: 1px solid #b91c1c; /* Darker red border for definition */
-    white-space: nowrap; /* Prevent text from wrapping */
+    gap: 0.8rem;
+    color: #ffffff;
+    font-size: 1.5rem;
+    background-color: #dc2626;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid #b91c1c;
+    white-space: nowrap;
 }
 
 .tag i {
-    font-size: 1.5rem; /* Larger icon size */
-    color: #ffffff; /* White color for icons */
+    font-size: 1.5rem;
+    color: #ffffff;
 }
 
 .tag span {
-    font-size: 1.8rem; /* Larger hashtag symbol */
-    color: #fca5a5; /* Light red color for hashtag */
+    font-size: 1.8rem;
+    color: #fca5a5;
 }
 
 .fade {
     position: absolute;
-    background: linear-gradient(90deg, #ffffff, transparent 30%, #ffffff); /* White fade effect */
+    background: linear-gradient(90deg, #ffffff, transparent 30%, #ffffff);
     inset: 0;
     pointer-events: none;
 }
@@ -68,7 +68,7 @@
 }
 
 .dark-theme .tag i {
-    color: #dc2626; /* Red color for icons */
+    color: #dc2626;
 }
 
 @keyframes loop {
@@ -80,26 +80,25 @@
     }
 }
 
-/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
     .infinite-scroll-container {
-        margin-bottom: 30px; /* Reduced margin for smaller screens */
+        margin-bottom: 30px;
     }
 
     .tag {
-        font-size: 1.2rem; /* Slightly smaller font size for tablets */
-        padding: 0.8rem 1.2rem; /* Slightly smaller padding */
+        font-size: 1.2rem;
+        padding: 0.8rem 1.2rem;
     }
 
     .tag i {
-        font-size: 1.2rem; /* Slightly smaller icon size */
+        font-size: 1.2rem;
     }
 
     .tag span {
-        font-size: 1.5rem; /* Slightly smaller hashtag size */
+        font-size: 1.5rem;
     }
 
     .inner {
-        gap: 1.5rem; /* Slightly smaller gap between tags */
+        gap: 1.5rem;
     }
 }

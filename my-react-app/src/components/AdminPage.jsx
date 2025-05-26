@@ -8,10 +8,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import adminService from '../services/adminService';
 import userService from '../services/userService';
-import hospitalService from '../services/hospitalService'; // Add this import
-import ActionButton from './ui/ActionButton';
-import StatusBadge from './ui/StatusBadge';
-// Import the components
+import hospitalService from '../services/hospitalService';
 import DashboardMetrics from './admin/DashboardMetrics';
 import BloodSupplySection from './admin/BloodSupplySection';
 import RecentActivitySection from './admin/RecentActivitySection';
@@ -21,25 +18,15 @@ import SystemSettings from './admin/SystemSettings';
 import UserManagement from './admin/UserManagement';
 import AdminManagement from './admin/AdminManagement';
 import AdminModals from './admin/AdminModals';
-import HospitalManagement from './admin/HospitalManagement'; // Add this import to fix the error
+import HospitalManagement from './admin/HospitalManagement';
 
-// --- Constants ---
 const ITEMS_PER_PAGE = 10;
 const DEBOUNCE_DELAY = 500;
-const EXPORT_LOADING_KEY = 'export'; // Add new loading key for exports
 
 const ROLES = {
   USER: 'user',
   ADMIN: 'admin',
   SUPERADMIN: 'superadmin',
-};
-
-const STATUS = {
-  ACTIVE: 'Active',
-  INACTIVE: 'Inactive',
-  PENDING: 'Pending',
-  COMPLETED: 'Completed',
-  CANCELLED: 'Cancelled',
 };
 
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -53,7 +40,7 @@ const BLOOD_SUPPLY_STATUS = {
 const MODAL_TYPE = {
   USER: 'user',
   ADMIN: 'admin',
-  HOSPITAL: 'hospital', // Add this type
+  HOSPITAL: 'hospital',
 };
 
 const INITIAL_USER_FORM_DATA = {
@@ -61,12 +48,12 @@ const INITIAL_USER_FORM_DATA = {
   email: '',
   role: ROLES.USER,
   bloodType: '',
-  isDonor: true, // Changed from false to true - users are donors by default
+  isDonor: true,
   isActive: true,
   password: '',
-  phoneNumber: '0500000000', // Default phone number (10 digits)
-  dateOfBirth: new Date('1990-01-01').toISOString().split('T')[0], // Default date of birth (YYYY-MM-DD)
-  location: '0.000000, 0.000000', // Coordinated location format (latitude, longitude)
+  phoneNumber: '0500000000',
+  dateOfBirth: new Date('1990-01-01').toISOString().split('T')[0],
+  location: '0.000000, 0.000000',
 };
 
 const INITIAL_ADMIN_FORM_DATA = {
@@ -87,14 +74,13 @@ const INITIAL_HOSPITAL_FORM_DATA = {
   structure: '',
   location: {
     type: 'Point',
-    coordinates: [0, 0] // [longitude, latitude]
+    coordinates: [0, 0]
   },
   telephone: '',
   fax: '',
   wilaya: '',
 };
 
-// --- Helper Components (Internal) ---
 const EmptyStateMessage = ({ type, message, icon = faExclamationTriangle }) => (
   <div className="no-data-message error">
     <FontAwesomeIcon icon={icon} size="2x" />
@@ -128,7 +114,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   );
 };
 
-// --- Main Component ---
 const AdminPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -136,7 +121,6 @@ const AdminPage = () => {
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
   const [isDarkMode, setIsDarkMode] = useState(() => document.body.classList.contains('dark-theme'));
 
-  // Add polling for language changes
   useEffect(() => {
     const interval = setInterval(() => {
       const currentLang = localStorage.getItem('language') || 'en';
@@ -147,7 +131,6 @@ const AdminPage = () => {
     return () => clearInterval(interval);
   }, [language]);
 
-  // Data States
   const [users, setUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [hospitals, setHospitals] = useState([]);
@@ -162,7 +145,6 @@ const AdminPage = () => {
     bloodSupplyUnavailable: false,
   });
 
-  // UI States
   const [loadingStates, setLoadingStates] = useState({
     global: true,
     dashboard: false,
@@ -170,7 +152,7 @@ const AdminPage = () => {
     hospitals: false,
     admins: false,
     action: false,
-    export: false, // New export-specific loading state
+    export: false,
   });
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -179,17 +161,15 @@ const AdminPage = () => {
     hospitals: { page: 1, totalPages: 1, totalItems: 0 },
   });
 
-  // Modal State
   const [modalState, setModalState] = useState({
     isOpen: false,
-    type: null, // 'user', 'admin', or 'hospital'
-    data: null, // user, admin, or hospital object for editing
+    type: null,
+    data: null,
   });
   const [userFormData, setUserFormData] = useState(INITIAL_USER_FORM_DATA);
   const [adminFormData, setAdminFormData] = useState(INITIAL_ADMIN_FORM_DATA);
-  const [hospitalFormData, setHospitalFormData] = useState(INITIAL_HOSPITAL_FORM_DATA); // Add this state
+  const [hospitalFormData, setHospitalFormData] = useState(INITIAL_HOSPITAL_FORM_DATA);
 
-  // --- Translations ---
   const translations = useMemo(() => ({
     en: {
       dashboard: 'Dashboard',
@@ -277,7 +257,6 @@ const AdminPage = () => {
       edit: 'Edit',
       delete: 'Delete',
 
-      // Modal translations
       editUser: 'Edit User',
       editAdmin: 'Edit Admin',
       editHospital: 'Edit Hospital',
@@ -305,7 +284,6 @@ const AdminPage = () => {
       algeriaCoordinates: 'For Algeria, coordinates are typically latitude ~36 and longitude ~3',
       donors: 'donors',
 
-      // New translations for donation requests
       donationRequests: 'Donation Requests',
       donationRequestManagement: 'Donation Request Management',
       activeRequests: 'Active Requests',
@@ -412,7 +390,6 @@ const AdminPage = () => {
       edit: 'Modifier',
       delete: 'Supprimer',
 
-      // Modal translations
       editUser: 'Modifier l\'utilisateur',
       editAdmin: 'Modifier l\'administrateur',
       editHospital: 'Modifier l\'hôpital',
@@ -440,7 +417,6 @@ const AdminPage = () => {
       algeriaCoordinates: 'Pour l\'Algérie, les coordonnées sont généralement latitude ~36 et longitude ~3',
       donors: 'donneurs',
 
-      // New translations for donation requests
       donationRequests: 'Demandes de Don',
       donationRequestManagement: 'Gestion des Demandes de Don',
       activeRequests: 'Demandes Actives',
@@ -461,11 +437,10 @@ const AdminPage = () => {
       expireRequest: 'Expirer la Demande',
       cancelRequest: 'Annuler la Demande',
     }
-  }), [language]); // Only depends on language
+  }), [language]);
 
   const t = useMemo(() => translations[language], [translations, language]);
 
-  // --- Helper Functions ---
   const setLoading = useCallback((key, value) => {
     setLoadingStates(prev => ({ ...prev, [key]: value }));
   }, []);
@@ -474,8 +449,7 @@ const AdminPage = () => {
     const errorMessage = `Failed to ${operation}: ${error?.response?.data?.message || error?.message || 'Unknown error'}`;
     console.error(errorMessage, error);
     setError(errorMessage);
-    // Increase error message display time
-    const timer = setTimeout(() => setError(null), 10000); // Increased from 5000 to 10000ms
+    const timer = setTimeout(() => setError(null), 10000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -484,29 +458,26 @@ const AdminPage = () => {
     return { headers: { Authorization: `Bearer ${token}` } };
   }, []);
 
-  // --- API Fetching Functions ---
   const fetchBloodSupply = useCallback(async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/stats/blood-types`, getAuthHeaders());
       if (response.data?.success) {
         const bloodData = response.data.data?.bloodTypes || {};
         const supply = {};
-        const bloodCounts = {}; // Store the actual counts
+        const bloodCounts = {};
         
         Object.entries(bloodData).forEach(([type, count]) => {
-          // Determine status based on count
           if (count >= 20) supply[type] = BLOOD_SUPPLY_STATUS.STABLE;
           else if (count >= 10) supply[type] = BLOOD_SUPPLY_STATUS.LOW;
           else supply[type] = BLOOD_SUPPLY_STATUS.CRITICAL;
           
-          // Store the count
           bloodCounts[type] = count;
         });
         
         setStats(prev => ({ 
           ...prev, 
           bloodSupply: supply, 
-          bloodCounts: bloodCounts, // Add counts to stats
+          bloodCounts: bloodCounts,
           bloodSupplyUnavailable: false 
         }));
       } else {
@@ -517,7 +488,7 @@ const AdminPage = () => {
       setStats(prev => ({ 
         ...prev, 
         bloodSupply: {}, 
-        bloodCounts: {}, // Clear counts on error
+        bloodCounts: {},
         bloodSupplyUnavailable: true 
       }));
     }
@@ -560,11 +531,9 @@ const AdminPage = () => {
       }
 
       try {
-        // Make a paginated request to get all hospitals with count information
         const hospitalsResponse = await hospitalService.getAllHospitals(1, 1, '');
         
         if (hospitalsResponse.data?.success || hospitalsResponse.data?.hospitals) {
-          // Extract the total count from pagination metadata instead of array length
           const totalHospitalsCount = hospitalsResponse.data.pagination?.totalItems || 0;
           
           setStats(prev => ({
@@ -600,14 +569,12 @@ const AdminPage = () => {
     setLoading('dashboard', true);
     setError(null);
     
-    // Skip the API call to /api/stats/dashboard and use fetchStatsFromDatabase directly
     try {
       await fetchStatsFromDatabase();
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
     }
     
-    // Fetch blood supply separately to isolate potential failures
     try {
       await fetchBloodSupply();
     } catch (bloodErr) {
@@ -643,7 +610,6 @@ const AdminPage = () => {
 
         setAllUsers(normalizedUsers);
         
-        // Update page info based on server response
         setPageInfo(prev => ({
           ...prev,
           users: {
@@ -670,7 +636,6 @@ const AdminPage = () => {
     setLoading('hospitals', true);
     setError(null);
     try {
-      // Log the request
       console.log('Fetching hospitals with params:', { page, limit, searchQuery });
       
       const response = await hospitalService.getAllHospitals(page, limit, searchQuery);
@@ -679,7 +644,6 @@ const AdminPage = () => {
       if (response.data && (response.data.success || response.data.hospitals)) {
         const hospitalData = response.data.hospitals || [];
         
-        // Ensure hospitalData is an array before setting state
         if (Array.isArray(hospitalData)) {
           setHospitals(hospitalData);
           
@@ -693,7 +657,6 @@ const AdminPage = () => {
           }));
         } else {
           console.error('Hospital data is not an array:', hospitalData);
-          // If hospitalData is not an array, initialize with empty array
           setHospitals([]);
           setPageInfo(prev => ({ 
             ...prev, 
@@ -752,31 +715,27 @@ const AdminPage = () => {
     }
   }, [handleApiError, setLoading]);
 
-  // --- CRUD Operations ---
   const createUser = useCallback(async (userData) => {
     setLoading('action', true);
     setError(null);
     try {
-      // Log what we're sending to the API
       console.log('Sending user data to API:', userData);
       
-      // Ensure required fields are present
       if (!userData.username || !userData.email || !userData.password) {
         setError('Username, email, and password are required fields.');
         return false;
       }
       
-      // Send the request
       const response = await userService.createUser({
         username: userData.username,
         email: userData.email,
         password: userData.password,
         role: userData.role || ROLES.USER,
         bloodType: userData.bloodType || '',
-        isDonor: userData.isDonor || true, // Default to true
+        isDonor: userData.isDonor || true,
         isActive: userData.isActive !== false,
-        phoneNumber: userData.phoneNumber || '0500000000', // Default phone number (10 digits)
-        dateOfBirth: userData.dateOfBirth || new Date('1990-01-01').toISOString().split('T')[0], // Default date of birth (YYYY-MM-DD)
+        phoneNumber: userData.phoneNumber || '0500000000',
+        dateOfBirth: userData.dateOfBirth || new Date('1990-01-01').toISOString().split('T')[0],
         location: userData.location || 'N/A',
       });
       
@@ -839,16 +798,13 @@ const AdminPage = () => {
     setLoading('action', true);
     setError(null);
     try {
-      // Log what we're sending to the API
       console.log('Sending admin data to API:', data);
       
-      // Ensure required fields are present
       if (!data.username || !data.email || !data.password) {
         setError('Username, email, and password are required fields.');
         return false;
       }
       
-      // Send the request with explicitly defined fields
       const response = await adminService.createAdmin({
         username: data.username,
         email: data.email,
@@ -916,31 +872,26 @@ const AdminPage = () => {
     setLoading('action', true);
     setError(null);
     try {
-      // Log what we're sending to the API
       console.log('Sending hospital data to API:', hospitalData);
       
-      // Ensure required fields are present
       if (!hospitalData.name || !hospitalData.structure || !hospitalData.wilaya) {
         setError('Name, structure, and wilaya are required fields.');
         return false;
       }
       
-      // Extract and validate coordinates
       const latitude = parseFloat(hospitalData.latitude);
       const longitude = parseFloat(hospitalData.longitude);
       
-      // Create the hospital data object with proper GeoJSON format
       const formattedData = {
         name: hospitalData.name,
         structure: hospitalData.structure,
         wilaya: hospitalData.wilaya,
         telephone: hospitalData.telephone || '',
         fax: hospitalData.fax || '',
-        // Only include location if both coordinates are valid numbers
         ...((!isNaN(latitude) && !isNaN(longitude)) ? {
           location: {
             type: 'Point',
-            coordinates: [longitude, latitude] // GeoJSON format is [longitude, latitude]
+            coordinates: [longitude, latitude]
           }
         } : {})
       };
@@ -968,28 +919,24 @@ const AdminPage = () => {
     setLoading('action', true);
     setError(null);
     try {
-      // Ensure required fields are present
       if (!hospitalData.name || !hospitalData.structure || !hospitalData.wilaya) {
         setError('Name, structure, and wilaya are required fields.');
         return false;
       }
       
-      // Extract and validate coordinates
       const latitude = parseFloat(hospitalData.latitude);
       const longitude = parseFloat(hospitalData.longitude);
       
-      // Create the hospital data object with proper GeoJSON format
       const formattedData = {
         name: hospitalData.name,
         structure: hospitalData.structure,
         wilaya: hospitalData.wilaya,
         telephone: hospitalData.telephone || '',
         fax: hospitalData.fax || '',
-        // Only include location if both coordinates are valid numbers
         ...((!isNaN(latitude) && !isNaN(longitude)) ? {
           location: {
             type: 'Point',
-            coordinates: [longitude, latitude] // GeoJSON format is [longitude, latitude]
+            coordinates: [longitude, latitude]
           }
         } : {})
       };
@@ -1023,7 +970,6 @@ const AdminPage = () => {
         
         if (response.data?.success) {
           alert('Hospital deleted successfully!');
-          // Re-fetch the list to update UI
           await fetchHospitals(pageInfo.hospitals.page, ITEMS_PER_PAGE, searchTerm);
           return true;
         } else {
@@ -1039,7 +985,6 @@ const AdminPage = () => {
     return false;
   }, [fetchHospitals, handleApiError, pageInfo.hospitals.page, searchTerm, setLoading]);
 
-  // --- Effects ---
   useEffect(() => {
     const checkAdminStatus = async () => {
       setLoading('global', true);
@@ -1098,7 +1043,7 @@ const AdminPage = () => {
         case 'users':
           fetchAllUsers(1, ITEMS_PER_PAGE, '');
           break;
-        case 'hospitals': // Changed from 'donations'
+        case 'hospitals':
           fetchHospitals(1, ITEMS_PER_PAGE, '');
           break;
         case 'adminManagement':
@@ -1115,13 +1060,11 @@ const AdminPage = () => {
     setSearchTerm(value);
     
     if (activeTab === 'users') {
-      // Add debounce for search
       const handler = setTimeout(() => {
         fetchAllUsers(1, ITEMS_PER_PAGE, value);
       }, DEBOUNCE_DELAY);
       return () => clearTimeout(handler);
-    } else if (activeTab === 'hospitals') { // Changed from 'donations'
-      // Add debounce for search
+    } else if (activeTab === 'hospitals') {
       const handler = setTimeout(() => {
         fetchHospitals(1, ITEMS_PER_PAGE, value);
       }, DEBOUNCE_DELAY);
@@ -1132,12 +1075,11 @@ const AdminPage = () => {
   const handlePageChange = useCallback((type, newPage) => {
     if (type === 'users') {
       fetchAllUsers(newPage, ITEMS_PER_PAGE, searchTerm);
-    } else if (type === 'hospitals') { // Changed from 'donations'
+    } else if (type === 'hospitals') {
       fetchHospitals(newPage, ITEMS_PER_PAGE, searchTerm);
     }
   }, [fetchAllUsers, fetchHospitals, searchTerm]);
 
-  // --- Event Handlers ---
   const openModal = useCallback((type, data = null) => {
     setError(null);
     setModalState({ isOpen: true, type, data });
@@ -1147,8 +1089,8 @@ const AdminPage = () => {
         email: data.email,
         role: data.role,
         bloodType: data.bloodType || '',
-        isDonor: true, // Always set to true, regardless of existing value
-        isActive: true, // Always set to true, regardless of existing value
+        isDonor: true,
+        isActive: true,
         password: data.password || '',
       } : INITIAL_USER_FORM_DATA);
     } else if (type === MODAL_TYPE.ADMIN) {
@@ -1160,7 +1102,6 @@ const AdminPage = () => {
         permissions: { ...INITIAL_ADMIN_FORM_DATA.permissions, ...data.permissions },
       } : INITIAL_ADMIN_FORM_DATA);
     } else if (type === MODAL_TYPE.HOSPITAL) {
-      // Format hospital data for edit or create new
       if (data) {
         console.log('Opening edit modal with hospital data:', data);
         const locationCoords = data.location?.coordinates || [0, 0];
@@ -1186,7 +1127,7 @@ const AdminPage = () => {
     setModalState({ isOpen: false, type: null, data: null });
     setUserFormData(INITIAL_USER_FORM_DATA);
     setAdminFormData(INITIAL_ADMIN_FORM_DATA);
-    setHospitalFormData(INITIAL_HOSPITAL_FORM_DATA); // Reset hospital form
+    setHospitalFormData(INITIAL_HOSPITAL_FORM_DATA);
   }, []);
 
   const handleUserFormChange = useCallback((e) => {
@@ -1217,7 +1158,6 @@ const AdminPage = () => {
     const { name, value } = e.target;
     
     if (name === 'latitude' || name === 'longitude') {
-      // Handle coordinate changes separately
       setHospitalFormData(prev => ({
         ...prev,
         location: {
@@ -1228,7 +1168,6 @@ const AdminPage = () => {
         }
       }));
     } else {
-      // Handle all other fields
       setHospitalFormData(prev => ({
         ...prev,
         [name]: value
@@ -1239,7 +1178,6 @@ const AdminPage = () => {
   const handleUserSubmit = useCallback(async (e, formData) => {
     e.preventDefault();
     
-    // Validate required fields
     if (!formData.username || !formData.email || (!modalState.data && !formData.password)) {
       setError('Username, email, and password are required fields.');
       return;
@@ -1247,12 +1185,10 @@ const AdminPage = () => {
     
     let success = false;
     if (modalState.data) {
-      // When updating, only include password if it's provided
       const dataToUpdate = {...formData};
       if (!dataToUpdate.password) delete dataToUpdate.password;
       success = await updateUser(modalState.data._id, dataToUpdate);
     } else {
-      // Log the data being sent to createUser
       console.log('Form data submitted to createUser:', formData);
       success = await createUser(formData);
     }
@@ -1264,7 +1200,6 @@ const AdminPage = () => {
   const handleAdminSubmit = useCallback(async (e, formData) => {
     e.preventDefault();
     
-    // Validate required fields
     if (!formData.username || !formData.email || (!modalState.data && !formData.password)) {
       setError('Username, email, and password are required fields.');
       return;
@@ -1272,12 +1207,10 @@ const AdminPage = () => {
     
     let success = false;
     if (modalState.data && modalState.data.id) {
-      // When updating, only include password if it's provided
       const dataToUpdate = {...formData};
       if (!dataToUpdate.password) delete dataToUpdate.password;
       success = await updateAdmin(modalState.data.id, dataToUpdate);
     } else {
-      // Log the data being sent to createAdmin
       console.log('Form data submitted to createAdmin:', formData);
       success = await createAdmin(formData);
     }
@@ -1290,7 +1223,6 @@ const AdminPage = () => {
     e.preventDefault();
     console.log('Hospital form submitted with data:', formData);
     
-    // Validate required fields
     if (!formData.name || !formData.structure || !formData.wilaya) {
       setError('Name, structure, and wilaya are required fields.');
       return;
@@ -1310,44 +1242,34 @@ const AdminPage = () => {
   }, [modalState.data, updateHospital, createHospital, closeModal, setError]);
 
   const exportToCSV = useCallback(async (type) => {
-    setLoading('export', true); // Use specific export loading state
+    setLoading('export', true);
     setError(null);
     try {
       let csvContent = '';
       let filename = '';
       let dataToExport = [];
       
-      // Convert array of objects to CSV format
       const convertToCSV = (objArray) => {
-        // Extract column headers from the first object
         const headers = Object.keys(objArray[0] || {}).filter(key => 
-          // Skip complex objects or arrays
           typeof objArray[0][key] !== 'object' && 
           typeof objArray[0][key] !== 'function' &&
           key !== 'password'); 
 
-        // Create header row
         const headerRow = headers.join(',');
         
-        // Create data rows
         const rows = objArray.map(item => {
           return headers.map(header => {
-            // Handle special cases like nulls, quotes in text
             const cell = item[header] === null || item[header] === undefined ? '' : String(item[header]);
-            // Escape quotes and wrap in quotes to handle commas in data
             return `"${cell.replace(/"/g, '""')}"`;
           }).join(',');
         });
         
-        // Combine headers and rows
         return [headerRow, ...rows].join('\n');
       };
       
-      // Fetch complete data sets based on export type
       if (type === 'users') {
         console.log('Fetching all users for export...');
         try {
-          // Fetch all users without pagination
           const response = await userService.getAllUsers(1, 999999, '');
           if (response.data?.success || response.data?.users) {
             const allUserData = response.data.users || [];
@@ -1365,7 +1287,6 @@ const AdminPage = () => {
         } catch (err) {
           console.error('Failed to fetch all users for export:', err);
           setError('Failed to fetch all users for export. Using current page data instead.');
-          // Fall back to current page data
           dataToExport = allUsers.map(user => ({
             id: user._id,
             username: user.username,
@@ -1381,7 +1302,6 @@ const AdminPage = () => {
       } else if (type === 'hospitals') {
         console.log('Fetching all hospitals for export...');
         try {
-          // Fetch all hospitals without pagination
           const response = await hospitalService.getAllHospitals(1, 999999, '');
           if (response.data?.success || response.data?.hospitals) {
             const allHospitalData = response.data.hospitals || [];
@@ -1399,7 +1319,6 @@ const AdminPage = () => {
         } catch (err) {
           console.error('Failed to fetch all hospitals for export:', err);
           setError('Failed to fetch all hospitals for export. Using current page data instead.');
-          // Fall back to current page data
           dataToExport = hospitals.map(hospital => ({
             id: hospital._id,
             name: hospital.name,
@@ -1415,7 +1334,6 @@ const AdminPage = () => {
       } else if (type === 'admins') {
         console.log('Fetching all admin accounts for export...');
         try {
-          // Fetch all admins without pagination
           const response = await adminService.getAllAdmins(1, 999999, '');
           if (response.data?.success || response.data?.admins) {
             const allAdminData = response.data.admins || [];
@@ -1435,7 +1353,6 @@ const AdminPage = () => {
         } catch (err) {
           console.error('Failed to fetch all admin accounts for export:', err);
           setError('Failed to fetch all admin accounts for export. Using current page data instead.');
-          // Fall back to current page data
           dataToExport = adminAccounts.map(admin => ({
             id: admin.id,
             username: admin.username,
@@ -1454,7 +1371,6 @@ const AdminPage = () => {
         throw new Error('Invalid export type');
       }
       
-      // Only continue if we have data to export
       if (dataToExport.length === 0) {
         setError(`No ${type} data to export`);
         return;
@@ -1462,10 +1378,8 @@ const AdminPage = () => {
       
       console.log(`Exporting ${dataToExport.length} ${type} records to CSV`);
       
-      // Convert data to CSV
       csvContent = convertToCSV(dataToExport);
       
-      // Create a Blob and download link
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -1485,7 +1399,6 @@ const AdminPage = () => {
     }
   }, [adminAccounts, allUsers, hospitals, setError, setLoading]);
 
-  // --- Render Functions ---
   const renderDashboard = useCallback(() => {
     return (
       <div className="admin-dashboard">
@@ -1511,7 +1424,7 @@ const AdminPage = () => {
         users={allUsers}
         loading={loadingStates.users}
         actionLoading={loadingStates.action}
-        exportLoading={loadingStates.export} // Add this
+        exportLoading={loadingStates.export}
         searchTerm={searchTerm}
         pageInfo={pageInfo.users}
         translations={t}
@@ -1559,7 +1472,7 @@ const AdminPage = () => {
         onSearchChange={handleSearchChange}
         onOpenModal={openModal}
         onDeleteAdmin={deleteAdmin}
-        onExportCSV={exportToCSV}  // Add this prop to pass export function
+        onExportCSV={exportToCSV}
         modalType={MODAL_TYPE.ADMIN}
         roles={ROLES}
         EmptyStateMessage={EmptyStateMessage}
@@ -1568,7 +1481,6 @@ const AdminPage = () => {
     );
   }, [t, adminAccounts, loadingStates.admins, searchTerm, handleSearchChange, openModal, deleteAdmin, exportToCSV]);
 
-  // Replace the existing render functions with component calls
   const renderContent = useCallback(() => {
     return <ContentManagement translations={t} />;
   }, [t]);
@@ -1598,7 +1510,7 @@ const AdminPage = () => {
     switch (activeTab) {
       case 'dashboard': return renderDashboard();
       case 'users': return renderUsers();
-      case 'hospitals': return renderHospitals(); // Changed from 'donations'
+      case 'hospitals': return renderHospitals();
       case 'adminManagement': return renderAdminManagement();
       case 'content': return renderContent();
       case 'settings': return renderSettings();

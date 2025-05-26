@@ -1,12 +1,10 @@
 import api from './api';
 
 export const adminService = {
-  // Dashboard
   getDashboardStats: async () => {
     return api.get('/api/admin/dashboard');
   },
-  
-  // User management
+
   getAllUsers: async (page = 1, limit = 20, search = '', sort = 'createdAt', order = 'desc') => {
     return api.get('/api/admin/users', {
       params: { page, limit, search, sort, order }
@@ -20,19 +18,18 @@ export const adminService = {
   exportUserData: async (format = 'csv') => {
     return api.get('/api/admin/export/users', {
       params: { format },
-      responseType: 'blob' // Important for file downloads
+      responseType: 'blob'
     });
   },
-  
-  // Admin management
+
   getAllAdmins: async (page = 1, limit = 10, search = '', sort = 'createdAt', order = 'desc') => {
     return api.get('/api/admin/accounts', {
       params: { 
         page, 
         limit, 
         search, 
-        sortBy: sort, // Use sortBy
-        sortOrder: order === 'desc' ? -1 : 1 // Use sortOrder with -1 or 1
+        sortBy: sort,
+        sortOrder: order === 'desc' ? -1 : 1 
       }
     });
   },
@@ -42,7 +39,6 @@ export const adminService = {
   },
 
   createAdmin: async (adminData) => {
-    // Make sure we're using the correct endpoint
     return api.post('/api/admin/accounts', adminData);
   },
   
@@ -57,8 +53,6 @@ export const adminService = {
   updateAdminPermissions: async (adminId, permissions) => {
     return api.patch(`/api/admin/accounts/${adminId}/permissions`, { permissions });
   }
-  
-  // Additional admin services can be added here
 };
 
 export default adminService;

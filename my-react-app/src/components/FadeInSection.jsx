@@ -1,6 +1,5 @@
-// src/components/FadeInSection.jsx
 import React, { useRef, useEffect, useState } from 'react';
-import '../styles/FadeInSection.css'; // We'll create this CSS file next
+import '../styles/FadeInSection.css';
 
 const FadeInSection = ({ children, className = '' }) => {
   const domRef = useRef();
@@ -8,16 +7,16 @@ const FadeInSection = ({ children, className = '' }) => {
 
   useEffect(() => {
     const observerOptions = {
-      root: null, // Defaults to the viewport
+      root: null,
       rootMargin: '0px',
-      threshold: 0.1, // 10% of the element is visible
+      threshold: 0.1,
     };
 
     const observerCallback = (entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           setVisible(true);
-          observer.unobserve(entry.target); // Stop observing after it's visible
+          observer.unobserve(entry.target);
         }
       });
     };
@@ -27,7 +26,6 @@ const FadeInSection = ({ children, className = '' }) => {
       observer.observe(domRef.current);
     }
 
-    // Cleanup on unmount
     return () => {
       if (domRef.current) {
         observer.unobserve(domRef.current);

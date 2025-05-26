@@ -33,7 +33,6 @@
     background: rgb(233, 41, 41);
   }
   
-
 :root {
     --Primary_blue: hsl(0, 0%, 3%);
     --light-coral: #F08080;
@@ -51,13 +50,12 @@
     --Weights_01: 400;
     --Weights_02: 700;
 
-    --dark-background: #121212; /* Dark background */
-    --dark-card: #1e1e1e; /* Card background */
-    --dark-border: #333333; /* Border color */
-    --dark-text: #ffffff; /* Light text color */
-    --dark-placeholder: #888888; /* Placeholder color */
-    --dark-accent: rgb(255, 71, 71); /* Accent color */
-
+    --dark-background: #121212;
+    --dark-card: #1e1e1e;
+    --dark-border: #333333;
+    --dark-text: #ffffff;
+    --dark-placeholder: #888888;
+    --dark-accent: rgb(255, 71, 71);
 }
 
 * {
@@ -90,9 +88,9 @@ a, button {
 
   input, textarea {
     cursor: url("./RedTextSelectHope.cur"), text;
-  }  
+  }
 
 
-  
+
 
 

@@ -6,16 +6,15 @@ import {
   faClock, faTimes, faPhone, faIdCard,
   faUserCircle, faShieldAlt, faCheckCircle,
   faTimesCircle, faClock as faClockSolid,
-  faTrash // Add trash icon for delete button
+  faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
 import { getCityNameSync } from '../../utils/cityUtils';
-import '../../styles/DonationComponents.css'; // Import the new CSS file
+import '../../styles/DonationComponents.css';
 
 const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdateStatus, onDelete }) => {
   const modalRef = useRef(null);
   
-  // Handle click outside to close modal
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -32,19 +31,16 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscapeKey);
     
-    // Disable body scrolling when modal is open
     document.body.style.overflow = 'hidden';
     
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
-      
-      // Re-enable scrolling when modal is closed
+
       document.body.style.overflow = 'auto';
     };
   }, [onClose]);
-  
-  // Helper function to format date
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -61,7 +57,6 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
     }
   };
 
-  // Get appropriate status icon and class
   const getStatusInfo = (status) => {
     const statusLower = status?.toLowerCase() || '';
     
@@ -98,13 +93,11 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
     }
   };
 
-  // Helper function to get city name from cityId
   const getCityName = (cityId) => {
     if (!cityId) return null;
     return getCityNameSync(cityId) || `City ${cityId}`;
   };
-  
-  // Get status info
+
   const statusInfo = getStatusInfo(donationRequest.status);
 
   return (
@@ -121,7 +114,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
         </div>
         
         <div className="donation-detail-content">
-          {/* Status badge */}
+
           <div className="donation-detail-status">
             <span className={`status-badge ${statusInfo.class}`}>
               <FontAwesomeIcon icon={statusInfo.icon} />
@@ -136,7 +129,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
             )}
           </div>
 
-          {/* Request ID */}
+
           <div className="donation-detail-item">
             <FontAwesomeIcon icon={faIdCard} className="detail-icon" />
             <div className="detail-content">
@@ -145,7 +138,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
             </div>
           </div>
           
-          {/* Blood Type */}
+
           <div className="donation-detail-item highlight">
             <FontAwesomeIcon icon={faTint} className="detail-icon" />
             <div className="detail-content">
@@ -154,7 +147,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
             </div>
           </div>
           
-          {/* Created Date */}
+
           <div className="donation-detail-item">
             <FontAwesomeIcon icon={faCalendarAlt} className="detail-icon" />
             <div className="detail-content">
@@ -163,7 +156,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
             </div>
           </div>
           
-          {/* Expiry Date */}
+
           {donationRequest.expiryDate && (
             <div className="donation-detail-item">
               <FontAwesomeIcon icon={faClock} className="detail-icon" />
@@ -178,8 +171,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
               </div>
             </div>
           )}
-          
-          {/* Hospital */}
+
           {donationRequest.hospital && (
             <div className="donation-detail-item">
               <FontAwesomeIcon icon={faHospital} className="detail-icon" />
@@ -203,8 +195,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
               </div>
             </div>
           )}
-          
-          {/* Location */}
+
           {(donationRequest.cityId || donationRequest.wilaya) && (
             <div className="donation-detail-item">
               <FontAwesomeIcon icon={faMapMarkerAlt} className="detail-icon" />
@@ -218,8 +209,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
               </div>
             </div>
           )}
-          
-          {/* Requester (User) */}
+
           {donationRequest.requester && (
             <div className="donation-detail-item">
               <FontAwesomeIcon icon={faUserCircle} className="detail-icon" />
@@ -244,8 +234,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
               </div>
             </div>
           )}
-          
-          {/* Guest Requester */}
+
           {donationRequest.guestRequester && (
             <div className="donation-detail-item guest-item">
               <FontAwesomeIcon icon={faUser} className="detail-icon" />
@@ -276,8 +265,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
               </div>
             </div>
           )}
-          
-          {/* Donor */}
+
           {(donationRequest.donor || donationRequest.donorId || donationRequest.donorName) && (
             <div className="donation-detail-item donor-item">
               <FontAwesomeIcon icon={faUserCircle} className="detail-icon" />
@@ -300,8 +288,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
               </div>
             </div>
           )}
-          
-          {/* Notes (if available) */}
+
           {donationRequest.notes && (
             <div className="donation-detail-item notes-item">
               <FontAwesomeIcon icon={faNotesMedical} className="detail-icon" />
@@ -314,7 +301,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
         </div>
         
         <div className="donation-detail-footer">
-          {/* Status update buttons */}
+
           {onUpdateStatus && donationRequest.status === 'active' && (
             <div className="status-update-buttons">
               <button 
@@ -336,7 +323,7 @@ const DonationRequestDetail = ({ donationRequest, onClose, translations, onUpdat
           )}
           
           <div className="modal-action-buttons">
-            {/* Delete button added here */}
+
             {onDelete && (
               <button 
                 className="delete-request-btn"
@@ -367,7 +354,7 @@ DonationRequestDetail.propTypes = {
   onClose: PropTypes.func.isRequired,
   translations: PropTypes.object.isRequired,
   onUpdateStatus: PropTypes.func,
-  onDelete: PropTypes.func // Add onDelete prop
+  onDelete: PropTypes.func
 };
 
 export default DonationRequestDetail;

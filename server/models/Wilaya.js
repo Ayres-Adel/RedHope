@@ -39,7 +39,6 @@ const wilayaSchema = new mongoose.Schema({
   blood_centers: [bloodCenterSchema]
 }, { timestamps: true });
 
-// Create geospatial index for location-based queries
 wilayaSchema.index({ latitude: 1, longitude: 1 });
 
 const Wilaya = mongoose.model('Wilaya', wilayaSchema);

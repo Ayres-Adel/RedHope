@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/FlipCard.css';
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaEnvelope, FaGlobe } from 'react-icons/fa'; // React Icons
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaEnvelope, FaGlobe } from 'react-icons/fa';
 import RedHopeLogo from '../assets/images/RedHope_Logo.png';
 
 const FlipCard = () => {
@@ -14,7 +14,6 @@ const FlipCard = () => {
     setIsFlipped(false);
   };
 
-  // Language state: reads from localStorage
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
   useEffect(() => {
     const interval = setInterval(() => {
@@ -32,7 +31,6 @@ const FlipCard = () => {
       document.body.classList.toggle('dark-theme', toggle.checked);
     });
 
-    // Cleanup event listener
     return () => {
       toggle.removeEventListener('change', () => {
         document.body.classList.toggle('dark-theme', toggle.checked);

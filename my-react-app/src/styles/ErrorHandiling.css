@@ -6,8 +6,8 @@
 }
 
 .ErrorHandling > img {
-    max-width: 100%; /* Ensure the image is responsive */
-    height: auto; /* Maintain aspect ratio */
+    max-width: 100%;
+    height: auto;
 }
 
 .ErrorHandling > p {
@@ -30,9 +30,6 @@
     background-color: hsl(19, 59%, 71%); 
 }
 
-/* Media Queries for Responsiveness */
-
-/* For tablets and smaller desktops */
 @media (max-width: 768px) {
     .ErrorHandling {
         margin-top: 30px;
@@ -48,7 +45,6 @@
     }
 }
 
-/* For mobile phones */
 @media (max-width: 480px) {
     .ErrorHandling {
         margin-top: 20px;

@@ -135,7 +135,6 @@ try {
       unique: true,
       lowercase: true
     },
-
     password: {
       type: String,
       required: [true, 'Please enter a password'],

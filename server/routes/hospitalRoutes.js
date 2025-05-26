@@ -1,23 +1,19 @@
 const { Router } = require('express');
-
 const authMiddleware = require('../middleware/authMiddleware');
 const requireAuth = authMiddleware.requireAuth || authMiddleware;
 const hospitalController = require('../controllers/hospitalController');
-const Hospital = require('../models/Hospital'); 
+const Hospital = require('../models/Hospital');
 
 const router = Router();
 
-
 router.get('/', async (req, res) => {
   try {
-
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || '';
     const sort = req.query.sort || 'name';
     const order = req.query.order === 'desc' ? -1 : 1;
     
-
     const query = {};
     if (search) {
       query.$or = [
@@ -26,10 +22,9 @@ router.get('/', async (req, res) => {
         { structure: { $regex: search, $options: 'i' } }
       ];
     }
-
+    
     const totalItems = await Hospital.countDocuments(query);
     
-
     let sortOptions = {};
     sortOptions[sort] = order;
     
@@ -39,7 +34,6 @@ router.get('/', async (req, res) => {
       .limit(limit)
       .lean();
     
-
     res.json({
       success: true,
       hospitals: hospitals,
@@ -51,7 +45,6 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Error fetching hospitals from database:', err);
     res.status(500).json({ 
       success: false, 
       message: 'Server error',
@@ -60,18 +53,14 @@ router.get('/', async (req, res) => {
   }
 });
 
-
 router.get('/wilaya/:wilaya', hospitalController.getHospitalsByWilaya);
 
-
 router.get('/nearby', hospitalController.getHospitalsNearby);
-
 
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-
     const hospital = await Hospital.findById(id).lean();
     
     if (!hospital) {
@@ -83,18 +72,14 @@ router.get('/:id', async (req, res) => {
     
     res.json({ success: true, hospital });
   } catch (err) {
-    console.error(`Error fetching hospital ${req.params.id}:`, err);
     res.status(500).json({ success: false, error: 'Server error' });
   }
 });
 
-
 router.post('/', requireAuth, async (req, res) => {
   try {
-
     const newHospital = new Hospital(req.body);
     
-
     const savedHospital = await newHospital.save();
     
     res.status(201).json({ 
@@ -103,7 +88,6 @@ router.post('/', requireAuth, async (req, res) => {
       hospital: savedHospital 
     });
   } catch (err) {
-    console.error('Error creating hospital:', err);
     res.status(500).json({ 
       success: false, 
       message: 'Error creating hospital', 
@@ -112,12 +96,10 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-
 router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     
-
     const updatedHospital = await Hospital.findByIdAndUpdate(
       id,
       { $set: req.body },
@@ -137,7 +119,6 @@ router.put('/:id', requireAuth, async (req, res) => {
       hospital: updatedHospital
     });
   } catch (err) {
-    console.error(`Error updating hospital ${req.params.id}:`, err);
     res.status(500).json({ 
       success: false, 
       message: 'Error updating hospital', 
@@ -146,12 +127,10 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     
-
     const deletedHospital = await Hospital.findByIdAndDelete(id);
     
     if (!deletedHospital) {
@@ -167,7 +146,6 @@ router.delete('/:id', requireAuth, async (req, res) => {
       hospital: deletedHospital
     });
   } catch (err) {
-    console.error(`Error deleting hospital ${req.params.id}:`, err);
     res.status(500).json({ 
       success: false, 
       message: 'Error deleting hospital', 
@@ -176,10 +154,8 @@ router.delete('/:id', requireAuth, async (req, res) => {
   }
 });
 
-
 router.get('/export', requireAuth, async (req, res) => {
   try {
-
     const csvContent = "id,name,structure,wilaya,telephone,fax\n" +
       "hospital_1,Hospital 1,Structure 1,Algiers,+21355500001,+21366600001\n" +
       "hospital_2,Hospital 2,Structure 2,Oran,+21355500002,+21366600002";
@@ -188,27 +164,22 @@ router.get('/export', requireAuth, async (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename=hospitals.csv');
     res.status(200).send(csvContent);
   } catch (err) {
-    console.error('Error exporting hospital data:', err);
     res.status(500).json({ success: false, error: 'Server error' });
   }
 });
-
 
 router.post('/seed', async (req, res) => {
   await hospitalController.seedHospitals(req, res);
 });
 
-
 router.post('/some-endpoint', (req, res) => {
   try {
-
     res.status(200).json({
       success: true,
       message: 'Endpoint under construction',
       data: null
     });
   } catch (err) {
-    console.error('Error in /some-endpoint:', err);
     res.status(500).json({
       success: false,
       message: err.message || 'An error occurred processing your request'
@@ -216,13 +187,10 @@ router.post('/some-endpoint', (req, res) => {
   }
 });
 
-
 router.post('/some-route', async (req, res) => {
   try {
-
     const data = req.body;
     
-
     if (!data) {
       return res.status(400).json({
         success: false,
@@ -230,14 +198,12 @@ router.post('/some-route', async (req, res) => {
       });
     }
     
-
     res.status(200).json({
       success: true,
       message: 'Operation completed successfully',
       data: {}
     });
   } catch (error) {
-    console.error('Error in hospital route:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',

@@ -10,7 +10,6 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
   const [error, setError] = useState(null);
   const initialSelectionMade = useRef(false);
   
-  // Translations
   const translations = useMemo(() => ({
     en: {
       allCities: "All Cities",
@@ -26,10 +25,8 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
     }
   }), []);
 
-  // Use the selected language translations
   const t = translations[language] || translations.en;
 
-  // Fetch cities data
   useEffect(() => {
     let isMounted = true;
     
@@ -38,7 +35,6 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
         setIsLoading(true);
         const response = await fetch(`${API_BASE_URL}/api/wilaya/all`);
         
-        // Handle 404 error specifically (try to seed data)
         if (!response.ok) {
           if (response.status === 404 && isMounted) {
             const seedResponse = await fetch(`${API_BASE_URL}/api/wilaya/seed`, {
@@ -60,14 +56,12 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
           throw new Error(`Failed to load cities: ${response.status}`);
         }
         
-        // Process successful response
         const data = await response.json();
         if (!isMounted) return;
         
         handleCitiesData(data);
       } catch (error) {
         if (isMounted) {
-          console.error('Error fetching cities:', error);
           setError(error.message);
         }
       } finally {
@@ -79,27 +73,47 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
     
     fetchCities();
     
-    // Cleanup function to prevent state updates if component unmounts
     return () => {
       isMounted = false;
     };
   }, []);
   
-  // Process cities data from API response
+  const formatCityCode = (code) => {
+    if (!code) return '';
+    return String(code).padStart(2, '0');
+  };
+  
   const handleCitiesData = (data) => {
     let citiesData = [];
     
-    if (!data.data && data.success && Array.isArray(data)) {
+    if (Array.isArray(data)) {
       citiesData = data;
     } else if (data.data && Array.isArray(data.data)) {
       citiesData = data.data;
+    } else if (data.success && Array.isArray(data.cities)) {
+      citiesData = data.cities;
+    } else if (data.wilayas && Array.isArray(data.wilayas)) {
+      citiesData = data.wilayas;
+    } else if (data.success && data.data && Array.isArray(data.data.wilayas)) {
+      citiesData = data.data.wilayas;
     } else {
-      console.warn('Unexpected API response format:', data);
-      setError('Unexpected API response format');
-      return;
+      const arrayProps = Object.keys(data).filter(key => Array.isArray(data[key]));
+      if (arrayProps.length > 0) {
+        citiesData = data[arrayProps[0]];
+      } else {
+        setError('Unexpected API response format');
+        return;
+      }
     }
     
-    // Sort cities by their numeric code
+    if (citiesData.length > 0) {
+      const firstCity = citiesData[0];
+      if (!firstCity.name || (!firstCity.code && !firstCity.wilayaCode)) {
+        setError('Invalid city data format');
+        return;
+      }
+    }
+    
     const sortedCities = citiesData.sort((a, b) => {
       const codeA = parseInt(a.code || a.wilayaCode || 0);
       const codeB = parseInt(b.code || b.wilayaCode || 0);
@@ -109,14 +123,11 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
     setCities(sortedCities);
   };
   
-  // Make initial selection when cities are loaded
   useEffect(() => {
     if (!isLoading && cities.length > 0 && !initialSelectionMade.current) {
       initialSelectionMade.current = true;
       
-      // Only trigger for "All Cities" selection
       if (selectedCity === 'all') {
-        // Delay to avoid race conditions
         const timer = setTimeout(() => {
           onLocationChange(
             {
@@ -126,14 +137,13 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
             t.allCities, 
             null
           );
-        }, 300); // Increased from 100ms to 300ms
+        }, 300);
         
         return () => clearTimeout(timer);
       }
     }
   }, [isLoading, cities, selectedCity, onLocationChange, t]);
   
-  // Handle city selection change
   const handleCityChange = useCallback((e) => {
     const cityId = e.target.value;
     setSelectedCity(cityId);
@@ -143,19 +153,15 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
       return;
     }
     
-    if (!cityId) return; // Handle empty selection
+    if (!cityId) return;
     
-    // Find the selected city data
     const city = cities.find(c => c._id === cityId || c.id === cityId);
     if (!city) {
-      console.warn('Could not find city data for ID:', cityId);
       return;
     }
     
-    // Get the city code
-    const cityCode = city.code || city.wilayaCode;
+    const cityCode = formatCityCode(city.code || city.wilayaCode);
     
-    // Handle location coordinates based on data format
     if (city.location && city.location.coordinates) {
       onLocationChange({
         lat: city.location.coordinates[1],
@@ -166,8 +172,6 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
         lat: parseFloat(city.latitude),
         lng: parseFloat(city.longitude)
       }, city.name, cityCode);
-    } else {
-      console.warn('Selected city has no valid coordinates:', city);
     }
   }, [cities, onLocationChange, t]);
   
@@ -192,7 +196,7 @@ const CitySelector = memo(({ onLocationChange, isDarkMode, includeAllCities = fa
         
         {cities.map(city => (
           <option key={city._id || city.id} value={city._id || city.id}>
-            {city.code ? `${city.code} - ${city.name}` : city.name}
+            {city.code ? `${formatCityCode(city.code)} - ${city.name}` : city.name}
           </option>
         ))}
       </select>

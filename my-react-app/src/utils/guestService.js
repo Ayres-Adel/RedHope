@@ -2,16 +2,13 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config.js';
 
 const guestService = {
-  // Register a guest with phone number and location
   registerGuest: async (phoneNumber, location, cityId = null) => {
     try {
-      // Validate inputs
       if (!phoneNumber) {
         throw new Error('Phone number is required');
       }
       
       if (!location || !location.coordinates) {
-        // Create a default location if none provided
         location = {
           type: 'Point',
           coordinates: [0, 0]
@@ -21,11 +18,10 @@ const guestService = {
       const response = await axios.post(`${API_BASE_URL}/api/guest/register`, {
         phoneNumber,
         location,
-        cityId, // Include cityId if available
-        timestamp: new Date().toISOString() // Include client timestamp
+        cityId,
+        timestamp: new Date().toISOString()
       });
       
-      // Store timestamp locally
       try {
         localStorage.setItem('guestRegistrationTime', response.data.createdAt || new Date().toISOString());
         localStorage.setItem('guestPhoneNumber', phoneNumber);
@@ -37,7 +33,6 @@ const guestService = {
     } catch (error) {
       console.error('Error registering guest:', error);
       if (error.response && error.response.status === 409) {
-        // 409 Conflict - Phone number already exists, treat as success
         return {
           success: true,
           message: 'Guest already registered',
@@ -48,7 +43,6 @@ const guestService = {
     }
   },
 
-  // Get guest by phone number
   getGuestByPhone: async (phoneNumber) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/guest/phone/${phoneNumber}`);
@@ -59,7 +53,6 @@ const guestService = {
     }
   },
   
-  // Get guest registration time from local storage
   getLastRegistrationTime: () => {
     try {
       return localStorage.getItem('guestRegistrationTime');
@@ -68,7 +61,6 @@ const guestService = {
     }
   },
   
-  // Check if a guest is already registered
   isGuestRegistered: () => {
     return !!localStorage.getItem('guestRegistrationTime') && 
            !!localStorage.getItem('guestPhoneNumber');

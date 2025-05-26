@@ -13,7 +13,6 @@ import Toast from './Toast';
 import { FiEye, FiEyeOff, FiUser, FiMail, FiPhone, FiMapPin, FiDroplet, FiLock, FiTrash2, FiSettings, FiHome, FiShield, FiHeart, FiCalendar, FiClock, FiCheckCircle, FiAlertCircle, FiX } from 'react-icons/fi';
 import { getCurrentLocation, reverseGeocode } from '../utils/LocationService';
 
-// Import our new components
 import DonationRequestsTable from './donation/DonationRequestsTable';
 import DonationRequestCard from './donation/DonationRequestCard';
 import DonationRequestDetail from './donation/DonationRequestDetail';
@@ -60,7 +59,6 @@ const UserPage = () => {
   const [showDonationDetail, setShowDonationDetail] = useState(false);
   const [donationsError, setDonationsError] = useState('');
 
-  // Translations
   const translations = {
     en: {
       accountSettings: 'Account Settings',
@@ -228,7 +226,6 @@ const UserPage = () => {
 
   const t = translations[language];
 
-  // Fetch user data when component mounts - update to also set the editForm state
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -250,7 +247,6 @@ const UserPage = () => {
             
             if (typeof formattedLocation === 'string' && formattedLocation.includes(',')) {
               try {
-                // Use formatLocation instead of direct reverseGeocode calls
                 const locationInfo = await formatLocation(formattedLocation, language);
                 
                 if (locationInfo.success) {
@@ -273,7 +269,6 @@ const UserPage = () => {
             
             setUserInfo(userInfoData);
             
-            // Set edit form with the same values
             setEditForm({
               username: userData.username || userData.name || '',
               email: userData.email || '',
@@ -451,35 +446,29 @@ const UserPage = () => {
     };
   }, []);
 
-  // Add a function to handle clicking outside the modal
   const handleModalOverlayClick = (e) => {
-    // Only close if clicking directly on the overlay, not on the modal content
     if (e.target.className === 'modal-overlay') {
       setShowDeleteModal(false);
       setDeleteConfirmation('');
     }
   };
 
-  // Function to handle entering edit mode
   const handleEnterEditMode = () => {
     setEditMode(true);
   };
   
-  // Function to handle canceling edit mode
   const handleCancelEdit = () => {
     setEditMode(false);
-    // Reset form to current user info - include isDonor status
     setEditForm({
       username: userInfo.name,
       email: userInfo.email,
       phoneNumber: userInfo.phone,
       bloodType: userInfo.bloodType,
       location: userInfo.location,
-      isDonor: userInfo.isDonor // Add this to preserve donor status
+      isDonor: userInfo.isDonor
     });
   };
   
-  // Function to handle input changes in the edit form
   const handleEditFormChange = (e) => {
     const { name, value } = e.target;
     setEditForm(prev => ({
@@ -488,7 +477,6 @@ const UserPage = () => {
     }));
   };
   
-  // Function to handle saving user information
   const handleSaveUserInfo = async (e) => {
     e.preventDefault();
     setUpdating(true);
@@ -500,13 +488,11 @@ const UserPage = () => {
         return;
       }
       
-      // If we have new location coordinates, try to get the cityId
       if (editForm.location && editForm.location !== userInfo.location && editForm.location.includes(',')) {
         try {
           const locationInfo = await formatLocation(editForm.location, language);
           
           if (locationInfo.success && locationInfo.details?.cityId) {
-            // Add cityId to the data being sent to the API
             editForm.cityId = locationInfo.details.cityId;
           }
         } catch (geoError) {
@@ -514,7 +500,6 @@ const UserPage = () => {
         }
       }
       
-      // Send data to API including cityId if available
       await axios.put(
         `${API_BASE_URL}/api/user/${userInfo.id}`,
         editForm,
@@ -526,12 +511,10 @@ const UserPage = () => {
         }
       );
       
-      // Handle location formatting if location was updated using LocationService
       let formattedLocation = editForm.location;
       
       if (formattedLocation && formattedLocation !== userInfo.location && formattedLocation.includes(',')) {
         try {
-          // Use formatLocation function which handles parsing and reverse geocoding in one step
           const locationInfo = await formatLocation(formattedLocation, language);
           
           if (locationInfo.success) {
@@ -539,11 +522,9 @@ const UserPage = () => {
           }
         } catch (geoError) {
           addMessage('Location coordinates saved, but address could not be formatted', 'warning');
-          // If there's an error, keep the original coordinates
         }
       }
       
-      // Update the user info state with the new values including properly formatted location
       setUserInfo({
         ...userInfo,
         name: editForm.username,
@@ -557,23 +538,19 @@ const UserPage = () => {
       addMessage(t.profileUpdated, 'success');
       setEditMode(false);
       
-      // The refresh of user data is kept as a backup but is now less critical
-      // since we're already formatting and updating the location above
       const { data } = await axios.get(`${API_BASE_URL}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
       if (data.user || data) {
         const userData = data.user || data;
-        // Update only what's needed, keeping the rest intact
         setUserInfo(prev => ({
           ...prev,
           name: userData.username || userData.name || prev.name,
           email: userData.email || prev.email,
           phone: userData.phoneNumber || prev.phone,
           bloodType: userData.bloodType || prev.bloodType,
-          isDonor: Boolean(userData.isDonor) // Make sure isDonor is updated
-          // Location will be updated with the formatted value during the next useEffect run
+          isDonor: Boolean(userData.isDonor)
         }));
       }
       
@@ -590,7 +567,6 @@ const UserPage = () => {
     }
   };
 
-  // Function to toggle donor status
   const handleToggleDonorStatus = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -612,13 +588,11 @@ const UserPage = () => {
         }
       );
       
-      // Update the user info state with the new donor status
       setUserInfo(prev => ({
         ...prev,
         isDonor: newDonorStatus
       }));
       
-      // Update the edit form state as well
       setEditForm(prev => ({
         ...prev,
         isDonor: newDonorStatus
@@ -638,7 +612,6 @@ const UserPage = () => {
     }
   };
 
-  // Replace the local fetchUserLocation function with imported getCurrentLocation
   const handleGetLocation = () => {
     setUpdating(true);
     
@@ -647,31 +620,41 @@ const UserPage = () => {
         const { lat, lng } = position;
         const locationString = `${lat},${lng}`;
         
-        // Update form with just coordinates first
         setEditForm(prev => ({
           ...prev,
           location: locationString
         }));
         
-        // Use the improved formatLocation function instead of separate reverse geocoding
         formatLocation(position, language)
           .then(locationInfo => {
             if (locationInfo.success) {
-              // Extract cityId from location details
               const cityId = locationInfo.details?.cityId || null;
               
-              // Update form with cityId if available
               if (cityId) {
                 setEditForm(prev => ({
                   ...prev,
-                  cityId: cityId // Add cityId to form data
+                  location: locationString, 
+                  cityId: cityId
                 }));
+                addMessage(`Location updated with city ID: ${cityId}`, 'success');
+                addMessage(`Location updated: ${locationInfo.formatted}`, 'success');
+              } else {
+                const postalCode = locationInfo.details?.postalCode || 
+                                  locationInfo.components?.postcode;
+                                  
+                if (postalCode && postalCode.length >= 2) {
+                  const extractedCityId = postalCode.substring(0, 2);
+                  setEditForm(prev => ({
+                    ...prev,
+                    location: locationString,
+                    cityId: extractedCityId
+                  }));
+                  addMessage(`Location updated with city ID from postal code: ${extractedCityId}`, 'success');
+                } else {
+                  addMessage(`Location updated: ${locationInfo.formatted}`, 'success');
+                }
               }
-              
-              // Show the formatted address in a success message
-              addMessage(`Location updated: ${locationInfo.formatted}`, 'success');
             } else {
-              console.warn('Could not get formatted location:', locationInfo.message);
               addMessage('Location coordinates saved, but address details could not be retrieved', 'warning');
             }
             setUpdating(false);
@@ -693,7 +676,6 @@ const UserPage = () => {
     });
   };
 
-  // Update the fetchUserDonations function to get all related requests
   const fetchUserDonations = async () => {
     setLoadingDonations(true);
     setDonationsError('');
@@ -704,7 +686,6 @@ const UserPage = () => {
         return;
       }
 
-      // Use the all-user endpoint to get both requests made by the user and requests where user is a donor
       const response = await axios.get(
         `${API_BASE_URL}/api/donation-request/all-user`,
         {
@@ -713,42 +694,37 @@ const UserPage = () => {
       );
 
       if (response.data && Array.isArray(response.data)) {
-        // API returns an array of donation requests
         setDonations(response.data);
-        setFilteredDonationRequests(response.data); // Initialize filtered results
+        setFilteredDonationRequests(response.data);
       } else if (response.data && Array.isArray(response.data.data)) {
-        // API returns an object with a data property containing the array
         setDonations(response.data.data);
-        setFilteredDonationRequests(response.data.data); // Initialize filtered results
+        setFilteredDonationRequests(response.data.data);
       } else {
         console.error('Unexpected API response format:', response.data);
         setDonationsError('Unexpected data format received from server');
         setDonations([]);
-        setFilteredDonationRequests([]); // Clear filtered results on error
+        setFilteredDonationRequests([]);
       }
     } catch (error) {
       console.error('Error fetching donation requests:', error);
       setDonationsError(error.response?.data?.message || 'Failed to load donation requests');
       setDonations([]);
-      setFilteredDonationRequests([]); // Clear filtered results on error
+      setFilteredDonationRequests([]);
     } finally {
       setLoadingDonations(false);
     }
   };
 
-  // Fetch donation requests when the user navigates to the donations section
   useEffect(() => {
     if (activeSection === 'donations') {
       fetchUserDonations();
     }
   }, [activeSection]);
 
-  // Handle search results
   const handleSearchResults = (results) => {
     setFilteredDonationRequests(results);
   };
 
-  // Function to handle canceling a donation request
   const handleCancelDonation = async (donationId) => {
     try {
       setActionLoading(true);
@@ -758,7 +734,6 @@ const UserPage = () => {
         return;
       }
 
-      // Call the API to cancel the donation request
       const response = await axios.put(
         `${API_BASE_URL}/api/donation-request/${donationId}/cancel`,
         {},
@@ -768,7 +743,6 @@ const UserPage = () => {
       );
 
       if (response.data && response.data.success) {
-        // Update the local state with the canceled donation
         setDonations(prevDonations => 
           prevDonations.map(donation => 
             donation._id === donationId 
@@ -788,7 +762,6 @@ const UserPage = () => {
     }
   };
 
-  // Add function to handle confirming a donation request
   const handleConfirmDonation = async (donationId) => {
     try {
       setActionLoading(true);
@@ -798,7 +771,6 @@ const UserPage = () => {
         return;
       }
 
-      // Call the API to confirm the donation request
       const response = await axios.put(
         `${API_BASE_URL}/api/donation-request/${donationId}/fulfill`,
         {},
@@ -808,7 +780,6 @@ const UserPage = () => {
       );
 
       if (response.data && response.data.success) {
-        // Update the local state with the confirmed donation
         setDonations(prevDonations => 
           prevDonations.map(donation => 
             donation._id === donationId 
@@ -828,7 +799,6 @@ const UserPage = () => {
     }
   };
 
-  // Add function to handle completing a donation request
   const handleCompleteDonation = async (donationId) => {
     try {
       setActionLoading(true);
@@ -838,7 +808,6 @@ const UserPage = () => {
         return;
       }
 
-      // Call the API to mark donation request as completed
       const response = await axios.put(
         `${API_BASE_URL}/api/donation-request/${donationId}/complete`,
         {},
@@ -848,7 +817,6 @@ const UserPage = () => {
       );
 
       if (response.data && response.data.success) {
-        // Update the local state with the completed donation
         setDonations(prevDonations => 
           prevDonations.map(donation => 
             donation._id === donationId 
@@ -868,9 +836,7 @@ const UserPage = () => {
     }
   };
 
-  // Add function to handle deleting a donation request
   const handleDeleteDonation = async (donationId) => {
-    // Show confirmation prompt before deleting
     if (!window.confirm(t.confirmDeleteRequest)) {
       return;
     }
@@ -883,7 +849,6 @@ const UserPage = () => {
         return;
       }
 
-      // Call the API to delete the donation request
       const response = await axios.delete(
         `${API_BASE_URL}/api/donation-request/${donationId}`,
         {
@@ -892,7 +857,6 @@ const UserPage = () => {
       );
 
       if (response.data && response.data.success) {
-        // Remove the donation from the local state
         setDonations(prevDonations => 
           prevDonations.filter(donation => donation._id !== donationId)
         );
@@ -909,21 +873,16 @@ const UserPage = () => {
     }
   };
 
-  // Add these functions before the return statement:
-
-  // Function to handle viewing donation details
   const handleViewDonationDetails = (donation) => {
     setSelectedDonation(donation);
     setShowDonationDetail(true);
   };
 
-  // Function to handle closing donation details
   const handleCloseDonationDetails = () => {
     setShowDonationDetail(false);
     setSelectedDonation(null);
   };
 
-  // In the render section, replace the donation container with our new components
   return (
     <>
       <Navbar />
@@ -1029,7 +988,6 @@ const UserPage = () => {
                               </span>
                               <span className="info-value">{userInfo.location}</span>
                             </div>
-                            {/* Add donor status info item with toggle button */}
                             <div className="info-item donor-status-item">
                               <span className="info-label">
                                 <FiHeart className="info-icon" />
@@ -1180,7 +1138,6 @@ const UserPage = () => {
                       <div className="error-message">{donationsError}</div>
                     )}
                     
-                    {/* Remove inline styles and use CSS classes */}
                     {loadingDonations ? (
                       <div className="donations-loading">
                         <FontAwesomeIcon icon={faSpinner} spin />
@@ -1198,7 +1155,6 @@ const UserPage = () => {
                           translations={t}
                         >
                           <div className="donations-wrapper">
-                            {/* Remove style conditionals based on viewMode */}
                             <div className="donations-table-wrapper">
                               <DonationRequestsTable
                                 donationRequests={filteredDonationRequests}
@@ -1232,13 +1188,12 @@ const UserPage = () => {
                       </>
                     )}
                     
-                    {/* Details modal */}
                     {showDonationDetail && selectedDonation && (
                       <DonationRequestDetail
                         donationRequest={selectedDonation}
                         onClose={handleCloseDonationDetails}
                         translations={t}
-                        onDelete={handleDeleteDonation} // Add the delete handler
+                        onDelete={handleDeleteDonation}
                       />
                     )}
                   </div>

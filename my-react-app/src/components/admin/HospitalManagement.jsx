@@ -25,35 +25,27 @@ const HospitalManagement = ({
   const [showFilters, setShowFilters] = useState(false);
   const [renderError, setRenderError] = useState(null);
 
-  // Safely check if hospitals is an array
   const hasHospitals = Array.isArray(hospitals) && hospitals.length > 0;
   
-  // Use Effect to catch render errors
   useEffect(() => {
     try {
-      // Check if hospitals is not an array when it's expected to be
       if (hospitals && !Array.isArray(hospitals)) {
-        console.error("Hospitals prop is not an array:", hospitals);
         setRenderError("Invalid hospital data format");
       } else {
         setRenderError(null);
       }
     } catch (err) {
-      console.error("Error in HospitalManagement:", err);
       setRenderError(err.message || "Failed to render hospital management");
     }
   }, [hospitals]);
 
-  // Helper function to format coordinates for display
   const formatCoordinates = (hospital) => {
     if (hospital.location && Array.isArray(hospital.location.coordinates) && hospital.location.coordinates.length === 2) {
-      // GeoJSON format is [longitude, latitude], but we display as [latitude, longitude]
       return `${hospital.location.coordinates[1].toFixed(4)}, ${hospital.location.coordinates[0].toFixed(4)}`;
     }
     return 'N/A';
   };
   
-  // If there's a render error, show an error message
   if (renderError) {
     return (
       <div className="admin-hospitals">
@@ -106,16 +98,14 @@ const HospitalManagement = ({
         ) : (
           <div className="table-wrapper">
             <table className="data-table">
-              <thead>
-                <tr>
+              <thead><tr>
                   <th>{translations.name}</th>
                   <th>{translations.structure}</th>
                   <th>{translations.wilaya}</th>
                   <th>{translations.telephone}</th>
                   <th>{translations.coordinates}</th>
                   <th>{translations.actions}</th>
-                </tr>
-              </thead>
+              </tr></thead>
               <tbody>
                 {hospitals.map(hospital => (
                   <tr key={hospital._id}>
@@ -150,7 +140,6 @@ const HospitalManagement = ({
               </tbody>
             </table>
 
-            {/* Card view for mobile - updated to match user card styling */}
             <div className="data-cards">
               {hospitals.map(hospital => (
                 <div className="data-card" key={hospital._id}>
