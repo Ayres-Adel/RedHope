@@ -2,23 +2,25 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faUsers, faHospital, faNewspaper, faCog,
+  faUsers, faHospital,
   faUserShield, faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 
-/**
- * AdminSidebar component that handles navigation in the admin panel
- */
-const AdminSidebar = ({ activeTab, setActiveTab, translations }) => {
-  // Define menu items with their icons, labels, and IDs
-  const menuItems = useMemo(() => [
-    { id: 'dashboard', icon: faChartLine, label: translations.dashboard },
-    { id: 'users', icon: faUsers, label: translations.userManagement },
-    { id: 'adminManagement', icon: faUserShield, label: translations.adminManagement },
-    { id: 'hospitals', icon: faHospital, label: translations.hospitalManagement },
-    { id: 'content', icon: faNewspaper, label: translations.content },
-    { id: 'settings', icon: faCog, label: translations.settings },
-  ], [translations]);
+
+const AdminSidebar = ({ activeTab, setActiveTab, translations, userRole }) => {
+  const menuItems = useMemo(() => {
+    const baseItems = [
+      { id: 'dashboard', icon: faChartLine, label: translations.dashboard },
+      { id: 'users', icon: faUsers, label: translations.userManagement },
+      { id: 'hospitals', icon: faHospital, label: translations.hospitalManagement },
+    ];
+
+    if (userRole === 'superadmin') {
+      baseItems.splice(2, 0, { id: 'adminManagement', icon: faUserShield, label: translations.adminManagement });
+    }
+
+    return baseItems;
+  }, [translations, userRole]);
 
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
@@ -30,7 +32,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, translations }) => {
         <div className="admin-avatar"><FontAwesomeIcon icon={faUserShield} /></div>
         <div className="admin-info">
           <h3>Admin User</h3>
-          <p>{translations.superAdministrator}</p>
+          <p>{userRole === 'superadmin' ? translations.superAdministrator : 'Administrator'}</p>
         </div>
       </div>
       <ul className="admin-menu">

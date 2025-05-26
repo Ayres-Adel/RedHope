@@ -35,36 +35,43 @@ exports.getUserStats = async (req, res) => {
 
 exports.getDonationStats = async (req, res) => {
   try {
-
-    const Donation = mongoose.model('Donation');
+    const DonationRequest = require('../models/DonationRequest');
     
-
-    const stats = await Donation.aggregate([
+    const stats = await DonationRequest.aggregate([
       {
         $group: {
           _id: null,
           totalDonations: { $sum: 1 },
-          pendingRequests: {
-            $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] }
+          activeDonations: {
+            $sum: { $cond: [{ $eq: ["$status", "Active"] }, 1, 0] }
           },
-          completedDonations: {
-            $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] }
+          fulfilledDonations: {
+            $sum: { $cond: [{ $eq: ["$status", "Fulfilled"] }, 1, 0] }
+          },
+          expiredDonations: {
+            $sum: { $cond: [{ $eq: ["$status", "Expired"] }, 1, 0] }
+          },
+          cancelledDonations: {
+            $sum: { $cond: [{ $eq: ["$status", "Cancelled"] }, 1, 0] }
           }
         }
       }
     ]);
     
-
     return res.status(200).json({
       success: true,
       data: stats.length > 0 ? {
         totalDonations: stats[0].totalDonations,
-        pendingRequests: stats[0].pendingRequests,
-        completedDonations: stats[0].completedDonations
+        activeDonations: stats[0].activeDonations,
+        fulfilledDonations: stats[0].fulfilledDonations,
+        expiredDonations: stats[0].expiredDonations,
+        cancelledDonations: stats[0].cancelledDonations
       } : {
         totalDonations: 0,
-        pendingRequests: 0, 
-        completedDonations: 0
+        activeDonations: 0,
+        fulfilledDonations: 0,
+        expiredDonations: 0,
+        cancelledDonations: 0
       }
     });
   } catch (error) {

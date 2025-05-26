@@ -84,7 +84,6 @@
     background-color: white;
     color: #ff1a1a;
     font-size: 16px;
-    cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -184,7 +183,6 @@
     border-radius: 25px;
     background-color: #ffffff;
     color: #ff1a1a;
-    cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
 }
 
@@ -478,6 +476,13 @@
   .dark-theme .social-media-links a:hover {
     color: #ffffff;
   }
-  
 
-  
+  .blood-donor-label {
+    display: flex;
+    align-items: center;
+}
+
+.input-icon label {
+    margin-right: 85px;
+    display: inline;
+}

@@ -13,8 +13,6 @@ import DashboardMetrics from './admin/DashboardMetrics';
 import BloodSupplySection from './admin/BloodSupplySection';
 import RecentActivitySection from './admin/RecentActivitySection';
 import AdminSidebar from './admin/AdminSidebar';
-import ContentManagement from './admin/ContentManagement';
-import SystemSettings from './admin/SystemSettings';
 import UserManagement from './admin/UserManagement';
 import AdminManagement from './admin/AdminManagement';
 import AdminModals from './admin/AdminModals';
@@ -60,13 +58,7 @@ const INITIAL_ADMIN_FORM_DATA = {
   username: '',
   email: '',
   role: ROLES.ADMIN,
-  password: '',
-  permissions: {
-    manageUsers: true,
-    manageDonations: true,
-    manageContent: true,
-    manageSettings: false,
-  },
+  password: ''
 };
 
 const INITIAL_HOSPITAL_FORM_DATA = {
@@ -118,6 +110,7 @@ const AdminPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userRole, setUserRole] = useState('admin');
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
   const [isDarkMode, setIsDarkMode] = useState(() => document.body.classList.contains('dark-theme'));
 
@@ -143,6 +136,11 @@ const AdminPage = () => {
     bloodSupply: {},
     bloodCounts: {},
     bloodSupplyUnavailable: false,
+    totalDonations: 0,
+    activeDonations: 0,
+    fulfilledDonations: 0,
+    expiredDonations: 0,
+    cancelledDonations: 0,
   });
 
   const [loadingStates, setLoadingStates] = useState({
@@ -180,8 +178,6 @@ const AdminPage = () => {
       donationManagement: 'Donation Management',
       content: 'Content',
       contentManagement: 'Content Management',
-      settings: 'Settings',
-      systemSettings: 'System Settings',
       totalUsers: 'Total Users',
       totalDonations: 'Total Donations',
       scheduledDonations: 'Scheduled Donations',
@@ -192,6 +188,8 @@ const AdminPage = () => {
       available: 'Available',
       low: 'Low',
       critical: 'Critical',
+      totalDonations: 'Total Donations',
+      activeDonations: 'Active Donations',
       searchUsers: 'Search users...',
       searchDonations: 'Search donations...',
       addNewUser: 'Add New User',
@@ -270,7 +268,6 @@ const AdminPage = () => {
       manageUsers: 'Manage Users',
       manageHospitals: 'Manage Hospitals',
       manageContent: 'Manage Content',
-      manageSettings: 'Manage Settings',
       bloodTypeLabel: 'Blood Type',
       selectBloodType: 'Select Blood Type',
       hospitalName: 'Hospital Name',
@@ -313,8 +310,6 @@ const AdminPage = () => {
       donationManagement: 'Gestion des dons',
       content: 'Contenu',
       contentManagement: 'Gestion du contenu',
-      settings: 'Paramètres',
-      systemSettings: 'Paramètres du système',
       totalUsers: 'Utilisateurs totaux',
       totalDonations: 'Dons totaux',
       scheduledDonations: 'Dons programmés',
@@ -325,6 +320,8 @@ const AdminPage = () => {
       available: 'Disponible',
       low: 'Faible',
       critical: 'Critique',
+      totalDonations: 'Dons totaux',
+      activeDonations: 'Dons actifs',
       searchUsers: 'Rechercher des utilisateurs...',
       searchDonations: 'Rechercher des dons...',
       addNewUser: 'Ajouter un nouvel utilisateur',
@@ -403,7 +400,6 @@ const AdminPage = () => {
       manageUsers: 'Gérer les utilisateurs',
       manageHospitals: 'Gérer les hôpitaux',
       manageContent: 'Gérer le contenu',
-      manageSettings: 'Gérer les paramètres',
       bloodTypeLabel: 'Groupe sanguin',
       selectBloodType: 'Sélectionner un groupe sanguin',
       hospitalName: 'Nom de l\'hôpital',
@@ -421,7 +417,7 @@ const AdminPage = () => {
       donationRequestManagement: 'Gestion des Demandes de Don',
       activeRequests: 'Demandes Actives',
       expiredRequests: 'Demandes Expirées',
-      fulfilledRequests: 'Demandes Accomplies',
+      fulfilledRequests: 'Demande Accomplies',
       cancelledRequests: 'Demandes Annulées',
       expiryDate: 'Date d\'expiration',
       requestExpiresIn: 'Expire dans',
@@ -565,12 +561,42 @@ const AdminPage = () => {
     }
   }, [getAuthHeaders, handleApiError, setLoading]);
 
+  const fetchDonationStats = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/stats/donations/stats`, getAuthHeaders());
+      if (response.data?.success) {
+        const donationData = response.data.data;
+        setStats(prev => ({
+          ...prev,
+          totalDonations: donationData.totalDonations || 0,
+          activeDonations: donationData.activeDonations || 0,
+          fulfilledDonations: donationData.fulfilledDonations || 0,
+          expiredDonations: donationData.expiredDonations || 0,
+          cancelledDonations: donationData.cancelledDonations || 0
+        }));
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (err) {
+      console.error('Error fetching donation stats:', err);
+      setStats(prev => ({
+        ...prev,
+        totalDonations: 0,
+        activeDonations: 0,
+        fulfilledDonations: 0,
+        expiredDonations: 0,
+        cancelledDonations: 0
+      }));
+    }
+  }, [getAuthHeaders]);
+
   const fetchStats = useCallback(async () => {
     setLoading('dashboard', true);
     setError(null);
     
     try {
       await fetchStatsFromDatabase();
+      await fetchDonationStats();
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
     }
@@ -586,7 +612,7 @@ const AdminPage = () => {
     } finally {
       setLoading('dashboard', false);
     }
-  }, [fetchBloodSupply, fetchStatsFromDatabase, setLoading]);
+  }, [fetchBloodSupply, fetchStatsFromDatabase, fetchDonationStats, setLoading]);
 
   const fetchAllUsers = useCallback(async (page = 1, limit = ITEMS_PER_PAGE, searchQuery = '') => {
     setLoading('users', true);
@@ -694,10 +720,6 @@ const AdminPage = () => {
           username: admin.username || 'Unknown Admin',
           email: admin.email || 'No email',
           role: admin.role || ROLES.ADMIN,
-          permissions: admin.permissions || { 
-            ...INITIAL_ADMIN_FORM_DATA.permissions, 
-            manageSettings: admin.role === ROLES.SUPERADMIN 
-          },
           lastLogin: admin.lastLogin || null,
           isActive: admin.isActive !== false,
         }));
@@ -809,8 +831,7 @@ const AdminPage = () => {
         username: data.username,
         email: data.email,
         password: data.password,
-        role: data.role || ROLES.ADMIN,
-        permissions: data.permissions || INITIAL_ADMIN_FORM_DATA.permissions
+        role: data.role || ROLES.ADMIN
       });
       
       if (response.data?.success) {
@@ -990,6 +1011,7 @@ const AdminPage = () => {
       setLoading('global', true);
       const token = localStorage.getItem('token');
       const isAdminStored = localStorage.getItem('isAdmin') === 'true';
+      const storedRole = localStorage.getItem('userRole') || 'admin';
 
       if (!token) {
         navigate('/login');
@@ -997,12 +1019,15 @@ const AdminPage = () => {
       }
 
       let adminVerified = isAdminStored;
+      let currentRole = storedRole;
+      
       if (!isAdminStored) {
         try {
           const response = await axios.get(`${API_BASE_URL}/api/admin/verify`, { headers: { Authorization: `Bearer ${token}` } });
           if (response.data?.success) {
             localStorage.setItem('isAdmin', 'true');
-            localStorage.setItem('userRole', response.data.role || ROLES.ADMIN);
+            currentRole = response.data.role || 'admin';
+            localStorage.setItem('userRole', currentRole);
             adminVerified = true;
           } else {
             throw new Error('Not authorized');
@@ -1017,6 +1042,12 @@ const AdminPage = () => {
       }
 
       setIsAdmin(adminVerified);
+      setUserRole(currentRole);
+      
+      if (adminVerified && activeTab === 'adminManagement' && currentRole !== 'superadmin') {
+        setActiveTab('dashboard');
+      }
+      
       if (adminVerified) {
         fetchStats();
       }
@@ -1028,10 +1059,15 @@ const AdminPage = () => {
     const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
     setIsDarkMode(darkModeEnabled);
     document.body.classList.toggle('dark-theme', darkModeEnabled);
-  }, [navigate, fetchStats, setLoading]);
+  }, [navigate, fetchStats, setLoading, activeTab]);
 
   useEffect(() => {
     if (isAdmin) {
+      if (activeTab === 'adminManagement' && userRole !== 'superadmin') {
+        setActiveTab('dashboard');
+        return;
+      }
+
       if (['users', 'hospitals', 'adminManagement'].includes(activeTab)) {
         setSearchTerm('');
       }
@@ -1047,13 +1083,15 @@ const AdminPage = () => {
           fetchHospitals(1, ITEMS_PER_PAGE, '');
           break;
         case 'adminManagement':
-          fetchAdminAccounts();
+          if (userRole === 'superadmin') {
+            fetchAdminAccounts();
+          }
           break;
         default:
           break;
       }
     }
-  }, [activeTab, isAdmin, fetchStats, fetchAllUsers, fetchHospitals, fetchAdminAccounts]);
+  }, [activeTab, isAdmin, userRole, fetchStats, fetchAllUsers, fetchHospitals, fetchAdminAccounts]);
 
   const handleSearchChange = useCallback((e) => {
     const value = e.target.value;
@@ -1098,8 +1136,7 @@ const AdminPage = () => {
         username: data.username,
         email: data.email,
         role: data.role,
-        password: data.password || '',
-        permissions: { ...INITIAL_ADMIN_FORM_DATA.permissions, ...data.permissions },
+        password: data.password || ''
       } : INITIAL_ADMIN_FORM_DATA);
     } else if (type === MODAL_TYPE.HOSPITAL) {
       if (data) {
@@ -1140,18 +1177,10 @@ const AdminPage = () => {
 
   const handleAdminFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    if (name.startsWith('permission_')) {
-      const permission = name.replace('permission_', '');
-      setAdminFormData(prev => ({
-        ...prev,
-        permissions: { ...prev.permissions, [permission]: checked }
-      }));
-    } else {
-      setAdminFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
-      }));
-    }
+    setAdminFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   }, []);
 
   const handleHospitalFormChange = useCallback((e) => {
@@ -1333,39 +1362,6 @@ const AdminPage = () => {
         filename = 'hospitals-export.csv';
       } else if (type === 'admins') {
         console.log('Fetching all admin accounts for export...');
-        try {
-          const response = await adminService.getAllAdmins(1, 999999, '');
-          if (response.data?.success || response.data?.admins) {
-            const allAdminData = response.data.admins || [];
-            dataToExport = allAdminData.map(admin => ({
-              id: admin.id || admin._id,
-              username: admin.username || 'Unknown Admin',
-              email: admin.email || 'No email',
-              role: admin.role || ROLES.ADMIN,
-              isActive: admin.isActive !== false ? 'Active' : 'Inactive',
-              manageUsers: admin.permissions?.manageUsers ? 'Yes' : 'No',
-              manageDonations: admin.permissions?.manageDonations ? 'Yes' : 'No',
-              manageContent: admin.permissions?.manageContent ? 'Yes' : 'No',
-              manageSettings: admin.permissions?.manageSettings ? 'Yes' : 'No',
-              lastLogin: admin.lastLogin ? new Date(admin.lastLogin).toLocaleString() : 'Never'
-            }));
-          }
-        } catch (err) {
-          console.error('Failed to fetch all admin accounts for export:', err);
-          setError('Failed to fetch all admin accounts for export. Using current page data instead.');
-          dataToExport = adminAccounts.map(admin => ({
-            id: admin.id,
-            username: admin.username,
-            email: admin.email,
-            role: admin.role,
-            isActive: admin.isActive ? 'Active' : 'Inactive',
-            manageUsers: admin.permissions?.manageUsers ? 'Yes' : 'No',
-            manageDonations: admin.permissions?.manageDonations ? 'Yes' : 'No',
-            manageContent: admin.permissions?.manageContent ? 'Yes' : 'No',
-            manageSettings: admin.permissions?.manageSettings ? 'Yes' : 'No',
-            lastLogin: admin.lastLogin ? new Date(admin.lastLogin).toLocaleString() : 'Never'
-          }));
-        }
         filename = 'admin-accounts-export.csv';
       } else {
         throw new Error('Invalid export type');
@@ -1481,13 +1477,25 @@ const AdminPage = () => {
     );
   }, [t, adminAccounts, loadingStates.admins, searchTerm, handleSearchChange, openModal, deleteAdmin, exportToCSV]);
 
-  const renderContent = useCallback(() => {
-    return <ContentManagement translations={t} />;
-  }, [t]);
+  const renderTabContent = () => {
+    if (activeTab === 'adminManagement' && userRole !== 'superadmin') {
+      return (
+        <div className="admin-unauthorized">
+          <h2>{t.unauthorizedAccess}</h2>
+          <p>You do not have permission to access admin management.</p>
+          <button onClick={() => setActiveTab('dashboard')}>Return to Dashboard</button>
+        </div>
+      );
+    }
 
-  const renderSettings = useCallback(() => {
-    return <SystemSettings translations={t} />;
-  }, [t]);
+    switch (activeTab) {
+      case 'dashboard': return renderDashboard();
+      case 'users': return renderUsers();
+      case 'hospitals': return renderHospitals();
+      case 'adminManagement': return renderAdminManagement();
+      default: return <p>Unknown tab selected.</p>;
+    }
+  };
 
   if (loadingStates.global) {
     return <LoadingIndicator message="Verifying access..." />;
@@ -1506,18 +1514,6 @@ const AdminPage = () => {
     );
   }
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'dashboard': return renderDashboard();
-      case 'users': return renderUsers();
-      case 'hospitals': return renderHospitals();
-      case 'adminManagement': return renderAdminManagement();
-      case 'content': return renderContent();
-      case 'settings': return renderSettings();
-      default: return <p>Unknown tab selected.</p>;
-    }
-  };
-
   return (
     <div className="admin-wrapper">
       <Navbar />
@@ -1526,7 +1522,8 @@ const AdminPage = () => {
           <AdminSidebar 
             activeTab={activeTab} 
             setActiveTab={setActiveTab} 
-            translations={t} 
+            translations={t}
+            userRole={userRole}
           />
           <div className="admin-content-area">
             {renderTabContent()}

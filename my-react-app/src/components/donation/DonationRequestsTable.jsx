@@ -15,27 +15,22 @@ const DonationRequestsTable = ({
   onConfirm, 
   onViewDetails,
   onComplete,
-  onDelete, // Add onDelete handler
+  onDelete,
   translations, 
   isActionLoading,
   loadingDonations 
 }) => {
-  // State to store cityNames mapped from cityIds
   const [cityNames, setCityNames] = useState({});
-  const [cityNamesLoaded, setCityNamesLoaded] = useState(false);
 
-  // Fetch city names when donation requests change
   useEffect(() => {
     if (!donationRequests || donationRequests.length === 0) return;
     
-    // Get all unique cityIds from requests
     const uniqueCityIds = Array.from(new Set(
       donationRequests
         .filter(req => req.cityId)
         .map(req => req.cityId)
     ));
     
-    // Build a map of cityId -> cityName using our utility
     const newCityNames = {};
     try {
       uniqueCityIds.forEach(cityId => {
@@ -51,7 +46,6 @@ const DonationRequestsTable = ({
     }
   }, [donationRequests]);
 
-  // Helper function to format date
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -62,7 +56,6 @@ const DonationRequestsTable = ({
     }
   };
 
-  // Get appropriate status class
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
       case 'active': return 'status-pending';
@@ -73,7 +66,6 @@ const DonationRequestsTable = ({
     }
   };
 
-  // Get translated status text
   const getStatusText = (status) => {
     switch (status?.toLowerCase()) {
       case 'active': return translations.pending;
@@ -84,10 +76,8 @@ const DonationRequestsTable = ({
     }
   };
 
-  // Get requester info (handle both registered users and guests)
   const getRequesterInfo = (request) => {
     if (request.requester && typeof request.requester === 'object') {
-      // Return username with phone number if available
       return `${request.requester.username || request.requester.name || 'Unknown User'}${
         request.requester.phoneNumber ? ` (${request.requester.phoneNumber})` : ''
       }`;
@@ -99,20 +89,16 @@ const DonationRequestsTable = ({
     return 'Unknown Requester';
   };
 
-  // Helper function to get city name from cityId
   const getCityName = (cityId) => {
     if (!cityId) return 'No Location';
     
-    // Check if we have the city name in our state
     if (cityNames[cityId]) {
       return cityNames[cityId];
     }
     
-    // Try to get it directly as a fallback
     try {
       const directCityName = getCityNameSync(cityId);
       if (directCityName) {
-        // Add to our cache for next time
         setCityNames(prev => ({...prev, [cityId]: directCityName}));
         return directCityName;
       }
@@ -123,7 +109,6 @@ const DonationRequestsTable = ({
     return `Wilaya ${cityId}`;
   };
 
-  // Loading state
   if (loadingDonations) {
     return (
       <div className="donations-loading">
@@ -133,7 +118,6 @@ const DonationRequestsTable = ({
     );
   }
 
-  // Empty state
   if (!donationRequests || donationRequests.length === 0) {
     return (
       <div className="no-donations-message">
@@ -258,7 +242,7 @@ DonationRequestsTable.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   onViewDetails: PropTypes.func.isRequired,
   onComplete: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired, // Add this prop type
+  onDelete: PropTypes.func.isRequired,
   translations: PropTypes.object.isRequired,
   isActionLoading: PropTypes.bool,
   loadingDonations: PropTypes.bool.isRequired

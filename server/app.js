@@ -145,13 +145,6 @@ try {
       enum: ['admin', 'superadmin'],
       default: 'admin'
     },
-    permissions: {
-      manageUsers: { type: Boolean, default: true },
-      manageHospitals: { type: Boolean, default: true },
-      manageContent: { type: Boolean, default: false },
-      viewReports: { type: Boolean, default: true },
-      manageAdmins: { type: Boolean, default: false }
-    },
     isActive: {
       type: Boolean,
       default: true
@@ -193,4 +186,4 @@ connectDB().then(connected => {
   });
 });
 
-module.exports = app; 
+module.exports = app;

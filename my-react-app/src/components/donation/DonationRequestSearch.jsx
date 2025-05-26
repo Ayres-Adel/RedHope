@@ -14,12 +14,10 @@ const DonationRequestSearch = ({
   const [filteredRequests, setFilteredRequests] = useState(donationRequests);
   const [activeFilter, setActiveFilter] = useState('all');
 
-  // When donation requests change, update filtered results
   useEffect(() => {
     handleSearch(searchTerm, activeFilter);
   }, [donationRequests]);
 
-  // Filter function for donation requests
   const handleSearch = useCallback((term, filter) => {
     if (!donationRequests || !Array.isArray(donationRequests)) {
       return;
@@ -27,7 +25,6 @@ const DonationRequestSearch = ({
 
     let results = [...donationRequests];
 
-    // Filter by search term
     if (term) {
       const searchLower = term.toLowerCase();
       results = results.filter(request => 
@@ -42,7 +39,6 @@ const DonationRequestSearch = ({
       );
     }
 
-    // Filter by status
     if (filter !== 'all') {
       results = results.filter(request => 
         request.status && request.status.toLowerCase() === filter.toLowerCase()
@@ -53,39 +49,31 @@ const DonationRequestSearch = ({
     onSearchResults(results);
   }, [donationRequests, onSearchResults]);
 
-  // Handle input change
   const handleInputChange = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
     handleSearch(term, activeFilter);
   };
 
-  // Handle filter selection
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
     handleSearch(searchTerm, filter);
   };
 
-  // Clear search
   const clearSearch = () => {
     setSearchTerm('');
     handleSearch('', activeFilter);
   };
 
-  // Function to safely render children with filtered requests
   const renderChildren = () => {
-    // Check if children is a React element that can accept props
-    // If it's a DOM element or has no type, render as is
     if (!React.isValidElement(children)) {
       return children;
     }
 
-    // For React components, we can safely clone and pass props
     if (typeof children.type === 'function' || typeof children.type === 'object') {
       return React.cloneElement(children, { donationRequests: filteredRequests });
     }
 
-    // For DOM elements, just render as is without adding props
     return children;
   };
 
@@ -154,7 +142,6 @@ const DonationRequestSearch = ({
         )}
       </div>
 
-      {/* Render children with data */}
       {renderChildren()}
     </div>
   );

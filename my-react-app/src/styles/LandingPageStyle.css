@@ -398,6 +398,64 @@ h2 { font-size: 1.5rem; }
     color: #a0a0a0;
 }
 
+/* Homepage Banner Styles */
+.homepage-banner {
+  background: linear-gradient(135deg, #ff4747 0%, #e03a3a 100%);
+  color: white;
+  padding: 20px 0;
+  margin: 40px 0;
+}
+
+.banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.banner-icon {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.banner-text {
+  flex: 1;
+}
+
+.banner-title {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.banner-description {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.banner-cta {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.banner-cta:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 @media (max-width: 1200px) {
     h1 { font-size: 2.3rem; }
     h2 { font-size: 1.4rem; }
@@ -667,7 +725,6 @@ h2 { font-size: 1.5rem; }
   font-size: 16px;
   text-decoration: none;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  cursor: pointer;
   position: relative;
   overflow: hidden;
   min-width: 180px;
@@ -804,6 +861,10 @@ body.dark-theme .primary-button {
 body.dark-theme .primary-button:hover {
   background-color: #ff6e6e;
   border-color: #ff6e6e;
+}
+
+.dark-theme .homepage-banner {
+  background: linear-gradient(135deg, #d43333 0%, #b82828 100%);
 }
 
 

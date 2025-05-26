@@ -74,7 +74,6 @@
   padding: 10px 14px;
   border-radius: 8px;
   margin-bottom: 6px;
-  cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -255,7 +254,6 @@ section h2 {
   border: none;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s ease;
   margin-right: 6px;
   white-space: nowrap;
@@ -353,7 +351,6 @@ section h2 {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  cursor: pointer;
   color: #7f8c8d;
   display: flex;
 }
@@ -377,7 +374,6 @@ section h2 {
   border-radius: 8px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
-  cursor: pointer !important;
   transition: all 0.2s ease !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -429,7 +425,6 @@ section h2 {
   border-radius: 8px !important;
   font-size: 15px !important;
   font-weight: 500 !important;
-  cursor: pointer !important;
   transition: all 0.2s ease !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -551,7 +546,6 @@ section h2 {
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -615,7 +609,6 @@ section h2 {
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 0.75rem;
-  cursor: pointer;
   transition: background-color 0.3s ease;
   margin-top: 0;
   margin-left: 0;
@@ -648,7 +641,6 @@ section h2 {
 
 .toggle-slider {
   position: absolute;
-  cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
@@ -908,7 +900,6 @@ input:checked + .toggle-slider:before {
   border-radius: 8px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
-  cursor: pointer !important;
   transition: all 0.2s ease !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -1139,7 +1130,6 @@ input:checked + .toggle-slider:before {
 
 .toggle-slider {
   position: absolute;
-  cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
@@ -1193,7 +1183,6 @@ input:checked + .toggle-slider:before {
   border-radius: 8px;
   font-size: 15px;
   font-weight: 500;
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1214,7 +1203,6 @@ input:checked + .toggle-slider:before {
   border-radius: 8px !important;
   font-size: 15px !important;
   font-weight: 500 !important;
-  cursor: pointer !important;
   transition: all 0.2s ease !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -1255,7 +1243,6 @@ input:checked + .toggle-slider:before {
   border-radius: 4px;
   padding: 8px 15px;
   margin-left: 10px;
-  cursor: pointer;
   transition: all 0.2s;
 }
 
@@ -1393,7 +1380,6 @@ input:checked + .toggle-slider:before {
   border: none;
   padding: 8px 12px;
   border-radius: 4px;
-  cursor: pointer;
   font-size: 0.85rem;
   display: inline-flex;
   align-items: center;
@@ -1404,7 +1390,6 @@ input:checked + .toggle-slider:before {
   border: none;
   padding: 6px 12px;
   border-radius: 4px;
-  cursor: pointer;
   font-size: 0.85rem;
   display: inline-flex;
   align-items: center;
@@ -1549,7 +1534,6 @@ input:checked + .toggle-slider:before {
   padding: 8px 12px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
   font-size: 0.85rem;
   display: flex;
   align-items: center;
@@ -1643,7 +1627,6 @@ input:checked + .toggle-slider:before {
   background: none;
   border: none;
   font-size: 22px;
-  cursor: pointer;
   color: #666;
   display: flex;
   align-items: center;
@@ -1840,7 +1823,6 @@ input:checked + .toggle-slider:before {
   padding: 8px 16px;
   border-radius: 6px;
   border: none;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1873,7 +1855,6 @@ input:checked + .toggle-slider:before {
   border-radius: 6px;
   background-color: #f0f0f0;
   border: none;
-  cursor: pointer;
   color: #333;
   font-weight: 500;
   transition: all 0.2s ease;

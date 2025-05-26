@@ -3,14 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
 
-/**
- * Displays the blood supply availability visualization
- */
 const BloodSupplySection = ({ stats, translations }) => {
-  // Calculate max count for progress bars
   const maxCount = Math.max(
     ...Object.values(stats.bloodCounts || {}).map(count => Number(count) || 0),
-    10 // Set minimum max to 10 for visual purposes
+    10 
   );
 
   return (

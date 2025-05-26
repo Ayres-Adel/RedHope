@@ -25,8 +25,7 @@ module.exports.login_post = async (req, res) => {
       adminId: admin._id,
       token,
       role: admin.role,
-      username: admin.username,
-      permissions: admin.permissions
+      username: admin.username
     });
   } catch (err) {
     res.status(400).json({ error: err.message });

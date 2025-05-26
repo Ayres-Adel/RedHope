@@ -7,9 +7,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import ActionButton from '../ui/ActionButton';
 
-/**
- * AdminManagement component for handling administration accounts
- */
 const AdminManagement = ({
   admins,
   loading,
@@ -24,47 +21,14 @@ const AdminManagement = ({
   EmptyStateMessage,
   LoadingIndicator
 }) => {
-  // Add state to handle export action loading if needed
   const [exportLoading, setExportLoading] = useState(false);
   
-  // Create handler for export click with loading state
   const handleExportClick = async () => {
     if (exportLoading) return;
     
     setExportLoading(true);
     await onExportCSV('admins');
     setExportLoading(false);
-  };
-  
-  // Function to render permission icons for the table
-  const renderPermissionIcons = (permissions) => {
-    if (!permissions) return null;
-    
-    const permissionsList = [
-      { name: 'manageUsers', label: 'Users', icon: faUsers },
-      { name: 'manageHospitals', label: 'Hospitals', icon: faHospital },
-      { name: 'manageContent', label: 'Content', icon: faFileAlt },
-      { name: 'manageSettings', label: 'Settings', icon: faCog }
-    ];
-    
-    return (
-      <div className="permission-icons">
-        {permissionsList.map(p => (
-          permissions[p.name] ? (
-            <span 
-              key={p.name} 
-              className="permission-icon"
-              title={`Can manage ${p.label}`}
-            >
-              <FontAwesomeIcon icon={p.icon} />
-            </span>
-          ) : null
-        ))}
-        {!Object.values(permissions).some(Boolean) && (
-          <span className="no-permissions">No permissions</span>
-        )}
-      </div>
-    );
   };
   
   return (
@@ -109,7 +73,6 @@ const AdminManagement = ({
                   <th>{translations.name}</th>
                   <th>{translations.email}</th>
                   <th>{translations.role}</th>
-                  <th>Permissions</th>
                   <th>{translations.actions}</th>
               </tr></thead>
               <tbody>
@@ -118,10 +81,7 @@ const AdminManagement = ({
                     <td data-label={translations.name}>{admin.username}</td>
                     <td data-label={translations.email}>{admin.email}</td>
                     <td data-label={translations.role}>
-                      {admin.role === roles.SUPERADMIN ? translations.superAdministrator : translations.adminManagement}
-                    </td>
-                    <td data-label="Permissions" className="permissions-cell">
-                      {renderPermissionIcons(admin.permissions)}
+                      {admin.role === roles.SUPERADMIN ? translations.superAdministrator : 'Admin'}
                     </td>
                     <td className="actions">
                       <ActionButton type="edit" onClick={() => onOpenModal(modalType, admin)} />
@@ -135,7 +95,6 @@ const AdminManagement = ({
               </tbody>
             </table>
 
-            {/* Mobile card view similar to other management components */}
             <div className="data-cards">
               {admins.map(admin => (
                 <div className="data-card" key={admin.id}>
@@ -151,13 +110,7 @@ const AdminManagement = ({
                     <div className="data-card-field">
                       <span className="data-card-label">{translations.role}</span>
                       <span className="data-card-value">
-                        {admin.role === roles.SUPERADMIN ? translations.superAdministrator : translations.adminManagement}
-                      </span>
-                    </div>
-                    <div className="data-card-field">
-                      <span className="data-card-label">Permissions</span>
-                      <span className="data-card-value">
-                        {renderPermissionIcons(admin.permissions)}
+                        {admin.role === roles.SUPERADMIN ? translations.superAdministrator : 'Admin'}
                       </span>
                     </div>
                   </div>
@@ -189,7 +142,7 @@ AdminManagement.propTypes = {
   onSearchChange: PropTypes.func.isRequired,
   onOpenModal: PropTypes.func.isRequired,
   onDeleteAdmin: PropTypes.func.isRequired,
-  onExportCSV: PropTypes.func.isRequired, // Add prop type for export function
+  onExportCSV: PropTypes.func.isRequired,
   modalType: PropTypes.string.isRequired,
   roles: PropTypes.object.isRequired,
   EmptyStateMessage: PropTypes.elementType.isRequired,

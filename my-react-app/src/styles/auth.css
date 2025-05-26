@@ -119,7 +119,6 @@
   background-color: rgb(255, 71, 71);
   border: none;
   border-radius: 5px;
-  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
@@ -139,10 +138,6 @@
   padding: 12px 20px;
   letter-spacing: 1px;
   transition: background-color 0.3s ease;
-}
-
-.auth-specific-container button:hover {
-  cursor: pointer;
 }
 
 .auth-specific-container .error {
@@ -180,7 +175,6 @@
   top: 50%;
   right: 7px;
   transform: translateY(-50%);
-  cursor: pointer;
   color: rgb(255, 71, 71);
 }
 
@@ -191,7 +185,6 @@
 .auth-specific-container .blood-donor-label {
   display: flex;
   align-items: center;
-  cursor: pointer;
 }
 
 .auth-specific-container .blood-donor-label input[type="checkbox"] {
@@ -207,7 +200,6 @@
 
 .auth-specific-container .input-icon label {
   margin-right: 85px;
-  cursor: pointer;
   display: inline;
 }
 

@@ -1,11 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-/**
- * Displays recent activity logs in the admin dashboard
- */
 const RecentActivitySection = ({ translations, activities = [] }) => {
-  // If no activities provided, use defaults
   const defaultActivities = [
     {
       id: 1,

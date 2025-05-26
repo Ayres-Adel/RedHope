@@ -25,23 +25,12 @@ const adminSchema = new mongoose.Schema({
     enum: ['admin', 'superadmin'],
     default: 'admin'
   },
-  permissions: {
-    manageUsers: { type: Boolean, default: true },
-    manageHospitals: { type: Boolean, default: true },
-    viewReports: { type: Boolean, default: true },
-    manageContent: { type: Boolean, default: false },
-    manageAdmins: { type: Boolean, default: false }
-  },
   isActive: {
     type: Boolean,
     default: true
   },
   lastLogin: {
     type: Date
-  },
-  profileImage: {
-    type: String,
-    default: ''
   }
 }, { timestamps: true });
 

@@ -373,7 +373,6 @@ body.dark-theme .table-actions button:hover {
   border-radius: 4px;
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -821,7 +820,6 @@ body.dark-theme .donation-detail-item.highlight:hover {
   background: none;
   border: none;
   color: #6c757d;
-  cursor: pointer;
   font-size: 12px;
   width: 18px;
   height: 18px;
@@ -876,7 +874,6 @@ body.dark-theme .filter-label {
   font-size: 13px;
   padding: 6px 12px;
   border-radius: 4px;
-  cursor: pointer;
   transition: all 0.2s ease;
 }
 
@@ -1019,7 +1016,6 @@ body.dark-theme .filter-btn.active {
   border: 1px solid #dee2e6;
   background-color: #f8f9fa;
   border-radius: 4px;
-  cursor: pointer;
   transition: all 0.2s;
 }
 
@@ -1048,7 +1044,6 @@ body.dark-theme .view-toggle button.active {
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s ease;
 }
 

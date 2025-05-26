@@ -71,26 +71,22 @@ html {
 
 body {
   font-family: 'Quicksand', sans-serif;
-    font-size: var(--Font_size);
-    font-weight: var(--Weights_01);
-    animation: fadeIn 1s ease-in-out;
-    overflow-x: hidden;
-    cursor: url("./RedCursorHope.cur") , auto;
-    transition: 0.5s;
-    
+  font-size: var(--Font_size);
+  font-weight: var(--Weights_01);
+  animation: fadeIn 1s ease-in-out;
+  overflow-x: hidden;
+  cursor: url("./RedCursorHope.cur") , auto;
+  transition: 0.5s;
 }
 
+*{
+  cursor: url("./RedCursorHope.cur") , auto;
+}
 
-
-a, button {
+a, a *, button, button *, .HSA, select, [type="checkbox"], .toggle-slider, .hamburger, .hamburger *, .language-switcher, .language-switcher *, .admin-menu *,.admin-menu li, .login-icon, .login-icon *{
     cursor: url("./RedSelectLinkHope.cur"), auto;
   }
 
   input, textarea {
     cursor: url("./RedTextSelectHope.cur"), text;
   }
-
-
-
-
-

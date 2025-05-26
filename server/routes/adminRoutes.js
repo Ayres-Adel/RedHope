@@ -14,36 +14,22 @@ const fallbackAuth = (req, res, next) => {
 
 router.get('/profile', requireAuth || fallbackAuth, (req, res) => {
   try {
-
-    const Admin = mongoose.models.Admin || require('../models/Admin');
-    
-    if (!Admin) {
-      return res.status(500).json({ error: 'Admin model not registered' });
-    }
-    
-
     Admin.findById(req.user.userId || req.user.id)
       .select('-password')
       .then(admin => {
-        if (!admin) {
-          return res.status(404).json({ error: 'Admin not found' });
-        }
-        
-
         res.json({
           id: admin._id,
           username: admin.username,
           email: admin.email,
-          role: admin.role,
-          permissions: admin.permissions
+          role: admin.role
         });
       })
       .catch(err => {
-        console.error('Error finding admin:', err);
-        res.status(500).json({ error: 'Database error' });
+        console.error('Error fetching admin profile:', err);
+        res.status(500).json({ error: 'Server error' });
       });
   } catch (err) {
-    console.error('Admin profile error:', err);
+    console.error('Error in admin profile route:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -196,12 +182,6 @@ router.get('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       username: admin.username || `${admin.firstName || ''} ${admin.lastName || ''}`.trim() || 'Unknown Admin',
       email: admin.email || 'No email',
       role: admin.role || 'admin',
-      permissions: admin.permissions || {
-        manageUsers: true,
-        manageDonations: true,
-        manageContent: admin.role === 'superadmin',
-        manageSettings: admin.role === 'superadmin'
-      },
       lastLogin: admin.lastLogin || null,
       isActive: admin.isActive !== false
     }));
@@ -261,7 +241,6 @@ router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
         username: admin.username,
         email: admin.email,
         role: admin.role,
-        permissions: admin.permissions,
         lastLogin: admin.lastLogin,
         isActive: admin.isActive,
         createdAt: admin.createdAt
@@ -282,7 +261,7 @@ router.get('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
 router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
   try {
 
-    const { username, email, password, role, permissions } = req.body;
+    const { username, email, password, role } = req.body;
     
 
     if (!username || !email || !password) {
@@ -310,13 +289,7 @@ router.post('/accounts', requireAuth || fallbackAuth, async (req, res) => {
       username,
       email,
       password, 
-      role: role || 'admin',
-      permissions: permissions || {
-        manageUsers: true,
-        manageDonations: true,
-        manageContent: role === 'superadmin',
-        manageSettings: role === 'superadmin'
-      }
+      role: role || 'admin'
     });
     
 
@@ -349,7 +322,7 @@ router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { username, email, role, isActive, permissions } = req.body;
+    const { username, email, role, isActive } = req.body;
     
 
     const Admin = mongoose.model('Admin');
@@ -381,7 +354,6 @@ router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
     if (email) admin.email = email;
     if (role) admin.role = role;
     if (isActive !== undefined) admin.isActive = isActive;
-    if (permissions) admin.permissions = { ...admin.permissions, ...permissions };
     
 
     await admin.save();
@@ -394,8 +366,7 @@ router.put('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => {
         username: admin.username,
         email: admin.email,
         role: admin.role,
-        isActive: admin.isActive,
-        permissions: admin.permissions
+        isActive: admin.isActive
       }
     });
     
@@ -438,52 +409,6 @@ router.delete('/accounts/:id', requireAuth || fallbackAuth, async (req, res) => 
     res.status(500).json({
       success: false,
       message: 'Error deleting admin account',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
-  }
-});
-
-
-router.patch('/accounts/:id/permissions', requireAuth || fallbackAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { permissions } = req.body;
-    
-    if (!permissions || typeof permissions !== 'object') {
-      return res.status(400).json({
-        success: false,
-        message: 'Permissions object is required'
-      });
-    }
-    
-
-    const Admin = mongoose.model('Admin');
-    
-
-    const admin = await Admin.findById(id);
-    
-    if (!admin) {
-      return res.status(404).json({
-        success: false,
-        message: 'Admin not found'
-      });
-    }
-    
-
-    admin.permissions = { ...admin.permissions, ...permissions };
-    await admin.save();
-    
-    res.status(200).json({
-      success: true,
-      message: 'Admin permissions updated successfully',
-      permissions: admin.permissions
-    });
-    
-  } catch (err) {
-    console.error('Error updating admin permissions:', err);
-    res.status(500).json({
-      success: false,
-      message: 'Error updating admin permissions',
       error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
@@ -536,5 +461,8 @@ router.get('/check-model', (req, res) => {
     });
   }
 });
+
+// Add donation stats route for admin dashboard
+router.get('/stats/donations', authMiddleware);
 
 module.exports = router;

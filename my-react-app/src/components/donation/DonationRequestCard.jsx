@@ -19,7 +19,6 @@ const DonationRequestCard = ({
   translations, 
   isActionLoading 
 }) => {
-  // Helper function to format date
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     try {
@@ -30,7 +29,6 @@ const DonationRequestCard = ({
     }
   };
 
-  // Get appropriate status class
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
       case 'active': return 'status-pending';
@@ -41,7 +39,6 @@ const DonationRequestCard = ({
     }
   };
 
-  // Get translated status text
   const getStatusText = (status) => {
     switch (status?.toLowerCase()) {
       case 'active': return translations.pending;
@@ -52,10 +49,8 @@ const DonationRequestCard = ({
     }
   };
 
-  // Get requester info (handle both registered users and guests)
   const getRequesterInfo = (request) => {
     if (request.requester && typeof request.requester === 'object') {
-      // Return username with phone number if available
       return `${request.requester.username || request.requester.name || 'Unknown User'}${
         request.requester.phoneNumber ? ` (${request.requester.phoneNumber})` : ''
       }`;
@@ -67,7 +62,6 @@ const DonationRequestCard = ({
     return 'Unknown Requester';
   };
 
-  // Helper function to get location display with city name
   const getLocationDisplay = () => {
     if (donationRequest.wilaya) return donationRequest.wilaya;
     
@@ -93,19 +87,16 @@ const DonationRequestCard = ({
       
       <div className="donation-details">
         <div className="donation-info">
-          {/* Blood type */}
           <span className="donation-blood-type">
             <FontAwesomeIcon icon={faTint} />
             {donationRequest.bloodType || 'Unknown'}
           </span>
           
-          {/* Requester info */}
           <span className="donation-requester">
             <FontAwesomeIcon icon={faUserCircle} />
             {getRequesterInfo(donationRequest)}
           </span>
           
-          {/* Hospital info */}
           {donationRequest.hospital && (
             <span className="donation-hospital">
               <FontAwesomeIcon icon={faHospital} />
@@ -115,7 +106,6 @@ const DonationRequestCard = ({
             </span>
           )}
           
-          {/* Location info */}
           {(donationRequest.cityId || donationRequest.wilaya) && (
             <span className="donation-location">
               <FontAwesomeIcon icon={faMapMarkerAlt} />
@@ -123,7 +113,6 @@ const DonationRequestCard = ({
             </span>
           )}
           
-          {/* Phone number */}
           {donationRequest.guestPhoneNumber && (
             <span className="donation-phone">
               <FontAwesomeIcon icon={faPhone} />
@@ -131,7 +120,6 @@ const DonationRequestCard = ({
             </span>
           )}
           
-          {/* Expiry date */}
           {donationRequest.expiryDate && (
             <span className="donation-expiry">
               <FontAwesomeIcon icon={faCalendarAlt} />
@@ -139,7 +127,6 @@ const DonationRequestCard = ({
             </span>
           )}
           
-          {/* Donor information if available */}
           {donationRequest.donorName && donationRequest.donorName !== 'Not assigned' && (
             <span className="donation-donor">
               <FontAwesomeIcon icon={faUserCircle} />
@@ -170,7 +157,6 @@ const DonationRequestCard = ({
               {translations.completeRequest || 'Complete'}
             </button>
             
-            {/* Show confirm button conditionally */}
             {(donationRequest.userIsDonor || donationRequest.donorId) && (
               <button 
                 className="confirm-request-btn" 

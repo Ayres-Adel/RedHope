@@ -48,10 +48,6 @@ export const adminService = {
 
   deleteAdmin: async (adminId) => {
     return api.delete(`/api/admin/accounts/${adminId}`);
-  },
-
-  updateAdminPermissions: async (adminId, permissions) => {
-    return api.patch(`/api/admin/accounts/${adminId}/permissions`, { permissions });
   }
 };
 

@@ -75,7 +75,6 @@
 .recent-activity-section, 
 .blood-supply-section,
 .content-section,
-.settings-card,
 .system-info {
   background-color: white;
   border-radius: var(--radius-lg);
@@ -137,7 +136,6 @@
 .admin-menu li {
   padding: 12px 16px;
   border-radius: var(--radius-md);
-  cursor: pointer;
   transition: var(--transition-normal);
   display: flex;
   align-items: center;
@@ -488,7 +486,6 @@
   align-items: center;
   border-radius: var(--radius-md);
   font-weight: 500;
-  cursor: pointer;
   transition: var(--transition-normal);
 }
 
@@ -590,7 +587,6 @@
   align-items: center;
   justify-content: center;
   border: none;
-  cursor: pointer;
   transition: var(--transition-fast);
   position: relative;
 }
@@ -845,7 +841,6 @@
   border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
   transition: var(--transition-normal);
   display: inline-flex;
   align-items: center;
@@ -870,7 +865,6 @@
   background-color: var(--bg-light);
   color: #aaa;
   border-color: var(--border-light);
-  cursor: not-allowed;
   opacity: 0.7;
 }
 
@@ -1138,7 +1132,6 @@
   border-radius: var(--radius-md);
   font-size: 16px;
   font-weight: 500;
-  cursor: pointer;
   transition: var(--transition-normal);
 }
 
@@ -1163,7 +1156,6 @@
   border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
   transition: var(--transition-normal);
 }
 
@@ -1186,7 +1178,6 @@
 .checkbox-group label {
   display: flex;
   align-items: center;
-  cursor: pointer;
   margin-bottom: 0;
 }
 
@@ -1356,7 +1347,6 @@
   background: transparent;
   border: none;
   font-size: 24px;
-  cursor: pointer;
   color: var(--text-color-light);
   transition: color 0.2s;
 }
@@ -1382,9 +1372,7 @@
 .btn-cancel {
   padding: 8px 16px;
   background: transparent;
-
   border-radius: 4px;
-  cursor: pointer;
   transition: all 0.2s;
 }
 
@@ -1394,11 +1382,9 @@
 
 .btn-save {
   padding: 8px 16px;
-
   background-color: #ff6b6b;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
   transition: background-color 0.2s;
 }
 
@@ -1654,7 +1640,7 @@
   
   .table-container {
     width: 100% !important;
-    margin: 0 !important; 
+    margin: 0 !important;
     padding: 0 16px;
     position: static;
     display: block;
@@ -1772,7 +1758,6 @@
 .dark-theme .recent-activity-section,
 .dark-theme .blood-supply-section,
 .dark-theme .content-section,
-.dark-theme .settings-card,
 .dark-theme .system-info,
 .dark-theme .user-modal,
 .dark-theme .data-card {

@@ -14,10 +14,8 @@ export const SearchBar = ({
   handleSuggestionClick,
   language = 'en'
 }) => {
-  // Track hovered suggestion
   const [hoveredSuggestionIndex, setHoveredSuggestionIndex] = useState(null);
 
-  // Translations 
   const translations = useMemo(() => ({
     en: {
       searchPlaceholder: "Search hospitals...",
@@ -29,10 +27,8 @@ export const SearchBar = ({
     }
   }), []);
 
-  // Use the selected language translations
   const t = translations[language] || translations.en;
 
-  // Standard styling - minimal inline styles for positioning
   const searchIconStyle = {
     display: "flex",
     alignItems: "center",
@@ -89,7 +85,7 @@ export const SearchBar = ({
       onClick={() => {
         if (!showSearch) {
           setShowSearch(true);
-          setTimeout(() => searchInputRef.current?.focus(), 500); // Increased from 300 to 500
+          setTimeout(() => searchInputRef.current?.focus(), 500); 
         }
       }}
       aria-label={t.searchHospitals}

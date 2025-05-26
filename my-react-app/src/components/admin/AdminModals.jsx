@@ -3,9 +3,7 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
-// Create completely uncontrolled input components that don't re-render when typing
 const UncontrolledInput = memo(({ label, id, name, defaultValue, type = "text", required = false }) => {
-  // Use ref instead of state to avoid re-renders
   const inputRef = useRef();
   
   return (
@@ -79,19 +77,10 @@ const ModalWrapper = memo(({ title, isOpen, onClose, onSubmit, children, isSubmi
     const formData = new FormData(e.target);
     const data = {};
     
-    // Convert FormData to a regular object
     for (let [key, value] of formData.entries()) {
-      if (key.startsWith('permission_')) {
-        // Handle nested permissions
-        const permission = key.replace('permission_', '');
-        data.permissions = data.permissions || {};
-        data.permissions[permission] = true;
-      } else {
-        data[key] = value;
-      }
+      data[key] = value;
     }
 
-    // Convert string booleans to actual booleans
     if (formData.has('isDonor')) {
       data.isDonor = true;
     } else if (e.target.querySelector('input[name="isDonor"]')) {
@@ -104,19 +93,6 @@ const ModalWrapper = memo(({ title, isOpen, onClose, onSubmit, children, isSubmi
       data.isActive = false;
     }
     
-    // Handle permissions for unchecked boxes
-    const permissionInputs = e.target.querySelectorAll('input[name^="permission_"]');
-    if (permissionInputs.length > 0) {
-      data.permissions = data.permissions || {};
-      permissionInputs.forEach(input => {
-        const permission = input.name.replace('permission_', '');
-        if (!data.permissions[permission]) {
-          data.permissions[permission] = false;
-        }
-      });
-    }
-    
-    // Pass the actual form data object directly
     onSubmit(e, data);
   };
   
@@ -145,11 +121,9 @@ const ModalWrapper = memo(({ title, isOpen, onClose, onSubmit, children, isSubmi
   );
 });
 
-// New component for coordinates input with validation and better UI
 const CoordinatesInput = memo(({ defaultLatitude, defaultLongitude, translations }) => {
   const [errors, setErrors] = useState({ latitude: '', longitude: '' });
   
-  // Validate coordinate on blur
   const validateCoordinate = (value, type) => {
     if (!value) return '';
     const numValue = parseFloat(value);
@@ -215,9 +189,6 @@ const CoordinatesInput = memo(({ defaultLatitude, defaultLongitude, translations
   );
 });
 
-/**
- * AdminModals component containing user and admin form modals
- */
 const AdminModals = ({
   modalState,
   userFormData,
@@ -237,19 +208,15 @@ const AdminModals = ({
   const isEditingAdmin = Boolean(modalState.data && modalState.type === modalTypes.ADMIN);
   const isEditingHospital = Boolean(modalState.data && modalState.type === modalTypes.HOSPITAL);
   
-  // Handle form submissions - call parent handlers with direct form data
   const onUserSubmit = useCallback((e, formData) => {
-    // Pass the actual form data directly
     handleUserSubmit(e, formData);
   }, [handleUserSubmit]);
 
   const onAdminSubmit = useCallback((e, formData) => {
-    // Pass the actual form data directly
     handleAdminSubmit(e, formData);
   }, [handleAdminSubmit]);
   
   const onHospitalSubmit = useCallback((e, formData) => {
-    // Pass the actual form data directly
     handleHospitalSubmit(e, formData);
   }, [handleHospitalSubmit]);
 
@@ -286,9 +253,7 @@ const AdminModals = ({
         defaultValue={userFormData.password}  
         required={!isEditingUser} 
       />
-      {/* Role field is removed - users will always have the role "user" */}
       <input type="hidden" name="role" value={roles.USER} />
-      {/* Add hidden inputs for isDonor and isActive which will be true by default */}
       <input type="hidden" name="isDonor" value="true" />
       <input type="hidden" name="isActive" value="true" />
       <UncontrolledSelect 
@@ -345,35 +310,10 @@ const AdminModals = ({
         <option value={roles.ADMIN}>Admin</option>
         <option value={roles.SUPERADMIN}>Super Admin</option>
       </UncontrolledSelect>
-      <div className="form-group">
-        <label>{translations.permissions}</label>
-        <UncontrolledCheckbox 
-          label={translations.manageUsers} 
-          name="permission_manageUsers" 
-          defaultChecked={adminFormData.permissions?.manageUsers} 
-        />
-        <UncontrolledCheckbox 
-          label={translations.manageHospitals} 
-          name="permission_manageDonations" 
-          defaultChecked={adminFormData.permissions?.manageDonations} 
-        />
-        <UncontrolledCheckbox 
-          label={translations.manageContent} 
-          name="permission_manageContent" 
-          defaultChecked={adminFormData.permissions?.manageContent} 
-        />
-        <UncontrolledCheckbox 
-          label={translations.manageSettings} 
-          name="permission_manageSettings" 
-          defaultChecked={adminFormData.permissions?.manageSettings} 
-        />
-      </div>
     </ModalWrapper>
   );
   
-  // Improved Hospital Modal component with better coordinate input
   const HospitalModal = () => {
-    // Extract coordinates for default values
     const defaultLatitude = modalState.data?.location?.coordinates 
       ? modalState.data.location.coordinates[1] 
       : '';
@@ -425,7 +365,6 @@ const AdminModals = ({
           defaultValue={hospitalFormData.fax} 
         />
         
-        {/* Improved coordinates input */}
         <CoordinatesInput 
           defaultLatitude={defaultLatitude} 
           defaultLongitude={defaultLongitude} 
@@ -468,7 +407,6 @@ UncontrolledCheckbox.propTypes = {
   defaultChecked: PropTypes.bool
 };
 
-// Update PropTypes for ModalWrapper
 ModalWrapper.propTypes = {
   title: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
@@ -480,14 +418,12 @@ ModalWrapper.propTypes = {
   translations: PropTypes.object.isRequired
 };
 
-// Update PropTypes for CoordinatesInput
 CoordinatesInput.propTypes = {
   defaultLatitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   defaultLongitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   translations: PropTypes.object.isRequired
 };
 
-// Update PropTypes for AdminModals
 AdminModals.propTypes = {
   modalState: PropTypes.object.isRequired,
   userFormData: PropTypes.object.isRequired,

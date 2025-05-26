@@ -43,7 +43,7 @@ const INITIAL_CONTENT_DATA = {
     status: 'published',
   },
   [CONTENT_TYPES.CONTACT_INFO]: {
-    title: 'Contact Info',
+    title: 'Contact Information',
     description: 'Address: 123 Main St, Algiers\nPhone: +213 123 456 789\nEmail: contact@redhope.dz',
     lastModified: new Date().toISOString(),
     status: 'published',
@@ -250,8 +250,8 @@ export default function LandingPage() {
             <div className="about-content">
               <p>
                 {language === "fr"
-                  ? contentData[CONTENT_TYPES.ABOUT_US].descriptionFr || contentData[CONTENT_TYPES.ABOUT_US].description
-                  : contentData[CONTENT_TYPES.ABOUT_US].descriptionEn || contentData[CONTENT_TYPES.ABOUT_US].description}
+                  ? contentData[CONTENT_TYPES.ABOUT_US]?.descriptionFr || contentData[CONTENT_TYPES.ABOUT_US]?.description
+                  : contentData[CONTENT_TYPES.ABOUT_US]?.descriptionEn || contentData[CONTENT_TYPES.ABOUT_US]?.description}
               </p>
             </div>
             <div className="flip-card-container">

@@ -144,7 +144,6 @@ body.dark-theme .stats-header .donor-count {
   align-items: center;
   gap: 12px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
   position: relative;
   overflow: hidden;
 }
@@ -285,7 +284,6 @@ body.dark-theme .chart-bar-value {
   height: 45px;
   padding: 0 15px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
   display: flex;
   align-items: center;
   transition: all 0.3s ease, background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
@@ -358,7 +356,6 @@ body.dark-theme .suggestions-container {
 
 .suggestion-item {
   padding: 12px 15px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -595,7 +592,6 @@ body.dark-theme .stats-error {
   padding: 8px 16px;
   border-radius: 6px;
   margin-top: 10px;
-  cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s;
 }

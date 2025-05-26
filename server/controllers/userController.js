@@ -1,4 +1,3 @@
-
 const User = require('../models/User');
 const mongoose = require('mongoose'); 
 const bcrypt = require('bcrypt');
@@ -25,7 +24,6 @@ module.exports = {
           username: user.username,
           email: user.email,
           role: user.role,
-          permissions: user.permissions,
           lastLogin: user.lastLogin,
           isAdmin: true
         });
@@ -163,79 +161,139 @@ module.exports = {
       console.error(err);
       res.status(500).json({ error: 'Server error' });
     }
-  }
-};
+  },
 
-exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find({});
-    
-    res.status(200).json({
-      success: true,
-      users: users
-    });
-  } catch (error) {
-    console.error('Error fetching all users:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching users'
-    });
-  }
-};
-
-
-exports.createUser = async (req, res) => {
-  try {
-    const { username, email, password, role, bloodType, isDonor, isActive } = req.body;
-    
-
-    if (!username || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide username, email and password'
+  // Content Management endpoints
+  getContent: async (req, res) => {
+    try {
+      const { type } = req.params;
+      
+      // For now, we'll store content in localStorage on frontend
+      // In production, this would fetch from database
+      res.json({
+        success: true,
+        message: 'Content fetched successfully',
+        data: {
+          type,
+          // This endpoint will be used by frontend to sync content
+        }
       });
+    } catch (err) {
+      console.error('Error fetching content:', err);
+      res.status(500).json({ error: 'Server error' });
     }
-    
+  },
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'User with this email already exists'
-      });
-    }
-    
-
-    const user = new User({
-      username,
-      email,
-      password,
-      role: role || 'user',
-      bloodType,
-      isDonor: isDonor || false,
-      isActive: isActive !== false
-    });
-    
-    await user.save();
-    
-    res.status(201).json({
-      success: true,
-      message: 'User created successfully',
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        bloodType: user.bloodType,
-        isDonor: user.isDonor,
-        isActive: user.isActive
+  updateContent: async (req, res) => {
+    try {
+      const { type } = req.params;
+      const { title, description, descriptionEn, descriptionFr, status } = req.body;
+      
+      // Validate content type
+      const validTypes = ['homepage_banner', 'about_us', 'contact_info'];
+      if (!validTypes.includes(type)) {
+        return res.status(400).json({ error: 'Invalid content type' });
       }
-    });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error creating user'
-    });
+
+      // Validate required fields
+      if (!title) {
+        return res.status(400).json({ error: 'Title is required' });
+      }
+
+      // In production, this would save to database
+      // For now, we'll return success and let frontend handle storage
+      const updatedContent = {
+        type,
+        title,
+        description: description || '',
+        descriptionEn: descriptionEn || description || '',
+        descriptionFr: descriptionFr || description || '',
+        status: status || 'published',
+        lastModified: new Date().toISOString()
+      };
+
+      res.json({
+        success: true,
+        message: 'Content updated successfully',
+        data: updatedContent
+      });
+    } catch (err) {
+      console.error('Error updating content:', err);
+      res.status(500).json({ error: 'Server error' });
+    }
+  },
+
+  getAllUsers: async (req, res) => {
+    try {
+      const users = await User.find({});
+      
+      res.status(200).json({
+        success: true,
+        users: users
+      });
+    } catch (error) {
+      console.error('Error fetching all users:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching users'
+      });
+    }
+  },
+
+
+  createUser: async (req, res) => {
+    try {
+      const { username, email, password, role, bloodType, isDonor, isActive } = req.body;
+      
+
+      if (!username || !email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide username, email and password'
+        });
+      }
+      
+
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'User with this email already exists'
+        });
+      }
+      
+
+      const user = new User({
+        username,
+        email,
+        password,
+        role: role || 'user',
+        bloodType,
+        isDonor: isDonor || false,
+        isActive: isActive !== false
+      });
+      
+      await user.save();
+      
+      res.status(201).json({
+        success: true,
+        message: 'User created successfully',
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          bloodType: user.bloodType,
+          isDonor: user.isDonor,
+          isActive: user.isActive
+        }
+      });
+    } catch (error) {
+      console.error('Error creating user:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error creating user'
+      });
+    }
   }
 };

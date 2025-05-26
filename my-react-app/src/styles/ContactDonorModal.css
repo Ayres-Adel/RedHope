@@ -10,7 +10,6 @@
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(3px);
-  cursor: pointer;
   transition: all 0.3s ease;
 }
 
@@ -21,7 +20,6 @@
   max-width: 500px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  cursor: default;
   border: 1px solid #edf0f7;
   animation: modal-in 0.3s ease;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -60,7 +58,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   transition: all 0.2s ease;
 }
 
@@ -105,7 +102,6 @@
   border: none;
   padding: 12px 20px;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 16px;
   width: 100%;
   margin-top: 16px;

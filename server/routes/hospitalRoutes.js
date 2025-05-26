@@ -45,11 +45,8 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error',
-      error: err.message 
-    });
+    console.error('Error fetching hospitals:', err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

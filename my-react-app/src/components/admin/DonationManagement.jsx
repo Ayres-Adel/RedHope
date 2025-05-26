@@ -8,9 +8,6 @@ import {
 import ActionButton from '../ui/ActionButton';
 import StatusBadge from '../ui/StatusBadge';
 
-/**
- * Enhanced DonationManagement component for handling blood donation data and operations
- */
 const DonationManagement = ({
   donations,
   loading,
@@ -27,13 +24,12 @@ const DonationManagement = ({
   Pagination,
   LoadingIndicator,
   STATUS,
-  filters = {} // Added filters prop with default
+  filters = {}
 }) => {
   return (
     <div className="admin-donations">
       <h2>{translations.donationManagement}</h2>
       
-      {/* Enhanced controls section with filters */}
       <div className="controls">
         <div className="search-container">
           <FontAwesomeIcon icon={faSearch} className="search-icon" />
@@ -46,7 +42,6 @@ const DonationManagement = ({
           />
         </div>
         
-        {/* New filter section */}
         <div className="filter-group">
           <div className="filter-container">
             <FontAwesomeIcon icon={faFilter} className="filter-icon" />
@@ -105,7 +100,6 @@ const DonationManagement = ({
           />
         ) : (
           <div className="table-wrapper">
-            {/* Enhanced table for desktop view */}
             <table className="data-table">
               <thead><tr>
                   <th>{translations.id}</th>
@@ -164,7 +158,6 @@ const DonationManagement = ({
               </tbody>
             </table>
             
-            {/* Improved card view for mobile */}
             <div className="data-cards">
               {donations.map(donation => (
                 <div 

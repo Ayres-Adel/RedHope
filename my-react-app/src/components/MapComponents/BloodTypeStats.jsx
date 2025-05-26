@@ -3,13 +3,11 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTint, faUsers, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-// Constants for blood supply thresholds
 const SUPPLY_THRESHOLDS = {
   STABLE: 20,
   LOW: 10
 };
 
-// Constants for status colors
 const STATUS_COLORS = {
   STABLE: {
     main: '#27ae60',
@@ -25,7 +23,6 @@ const STATUS_COLORS = {
   }
 };
 
-// Blood type card component
 const BloodTypeCard = ({ type, count, percentage, statusColor, statusBgColor, donorsLabel }) => (
   <div className="blood-type-card">
     <div className="blood-type-symbol" style={{ 
@@ -58,7 +55,6 @@ const BloodTypeCard = ({ type, count, percentage, statusColor, statusBgColor, do
   </div>
 );
 
-// Chart bar component
 const ChartBar = ({ type, percentage, color }) => (
   <div className="chart-bar-container">
     <div className="chart-bar-label">{type}</div>
@@ -89,7 +85,6 @@ export const BloodTypeStats = ({
   fetchBloodTypeStats = () => {},
   language = 'en'
 }) => {
-  // Translations
   const translations = useMemo(() => ({
     en: {
       bloodTypeStatistics: "Blood Type Statistics",
@@ -117,16 +112,13 @@ export const BloodTypeStats = ({
     }
   }), []);
   
-  // Use the selected language translations
   const t = translations[language] || translations.en;
 
-  // Process blood type data with memoization to avoid recalculation on re-renders
   const processedBloodTypes = useMemo(() => {
     return Object.entries(bloodTypeStats || {}).map(([type, data]) => {
       const count = data.count || 0;
       const percentage = totalDonors > 0 ? (count / totalDonors) * 100 : 0;
       
-      // Determine supply status and color
       let status, statusColor, statusBgColor;
       
       if (count >= SUPPLY_THRESHOLDS.STABLE) {
@@ -155,7 +147,6 @@ export const BloodTypeStats = ({
     });
   }, [bloodTypeStats, totalDonors, t]);
   
-  // Render skeleton loading cards
   const renderSkeletonCards = () => (
     <div className="stats-loading">
       <div className="blood-type-grid">
@@ -166,7 +157,6 @@ export const BloodTypeStats = ({
     </div>
   );
   
-  // Render error state
   const renderError = () => (
     <div className="stats-error" role="alert">
       <p>{t.couldNotLoad}</p>
@@ -180,7 +170,6 @@ export const BloodTypeStats = ({
     </div>
   );
   
-  // Render blood types grid
   const renderBloodTypesGrid = () => (
     <div className="blood-type-grid">
       {processedBloodTypes.map(({ type, count, percentage, statusColor, statusBgColor }) => (
@@ -197,7 +186,6 @@ export const BloodTypeStats = ({
     </div>
   );
   
-  // Render chart bars
   const renderChartBars = () => (
     <div className="blood-chart">
       <div className="chart-bars">
@@ -245,7 +233,6 @@ export const BloodTypeStats = ({
   );
 };
 
-// Update PropTypes for new language prop
 BloodTypeStats.propTypes = {
   bloodTypeStats: PropTypes.object,
   selectedCityName: PropTypes.string,
@@ -256,7 +243,6 @@ BloodTypeStats.propTypes = {
   language: PropTypes.string
 };
 
-// PropTypes for sub-components
 BloodTypeCard.propTypes = {
   type: PropTypes.string.isRequired,
   count: PropTypes.number.isRequired,
