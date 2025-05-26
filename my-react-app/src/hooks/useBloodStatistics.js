@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { API_BASE_URL } from '../config';
 
 export const useBloodStatistics = () => {
-  // Default blood type data structure with colors
   const defaultBloodTypeStats = {
     "A+": { count: 0, color: "#ff4747" },
     "A-": { count: 0, color: "#ff6b6b" },
@@ -18,8 +17,7 @@ export const useBloodStatistics = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
   const [totalDonors, setTotalDonors] = useState(0);
-  
-  // Improved fetch function with proper error handling and data normalization
+
   const fetchBloodTypeStats = useCallback(async (cityId = null) => {
     setLoadingStats(true);
     setStatsError(null);
@@ -40,16 +38,13 @@ export const useBloodStatistics = () => {
       if (!data.success) {
         throw new Error(data.message || 'Failed to fetch blood type statistics');
       }
-      
-      // Build a standardized data object
+
       const newStats = { ...defaultBloodTypeStats };
       let donorCount = 0;
       
-      // Handle different response formats
       const statsData = data.data || data;
       
       if (statsData.bloodTypes) {
-        // Handle nested structure
         Object.entries(statsData.bloodTypes).forEach(([type, count]) => {
           if (newStats[type]) {
             newStats[type] = { ...newStats[type], count: count };
@@ -57,7 +52,6 @@ export const useBloodStatistics = () => {
           }
         });
       } else {
-        // Handle direct object structure
         Object.entries(statsData).forEach(([type, count]) => {
           const normalizedType = type.replace('_PLUS', '+').replace('_MINUS', '-');
           if (newStats[normalizedType]) {
@@ -76,15 +70,13 @@ export const useBloodStatistics = () => {
     } catch (error) {
       console.error("Error fetching blood type statistics:", error);
       setStatsError(error.message);
-      // Reset blood stats to zeros when fetch fails
       setBloodTypeStats(defaultBloodTypeStats);
       setTotalDonors(0);
     } finally {
       setLoadingStats(false);
     }
   }, []);
-  
-  // Initial fetch on component mount
+
   useEffect(() => {
     fetchBloodTypeStats();
   }, [fetchBloodTypeStats]);

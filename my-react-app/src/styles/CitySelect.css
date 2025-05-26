@@ -1,13 +1,9 @@
-/* CitySelector.css - Comprehensive styling with proper dark mode support */
-
-/* Base styles for the city selector */
 .city-selector {
   margin: 0 auto 20px;
   max-width: 300px;
   position: relative;
 }
 
-/* Select element base styles */
 .city-selector select {
   width: 100%;
   padding: 12px 16px;
@@ -27,7 +23,6 @@
   letter-spacing: 0.2px;
 }
 
-/* Light mode specific styles */
 body:not(.dark-theme) .city-selector select,
 .city-selector select.light-mode {
   background-color: #fff;
@@ -37,7 +32,6 @@ body:not(.dark-theme) .city-selector select,
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ff4747' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
 }
 
-/* Dark mode specific styles - high specificity approach */
 body.dark-theme .city-selector select,
 .city-selector.dark-theme select,
 select.dark-mode {
@@ -48,7 +42,6 @@ select.dark-mode {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ff6b6b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
 }
 
-/* Option element styling */
 option {
   padding: 8px;
 }
@@ -58,13 +51,11 @@ option:disabled {
   color: #999;
 }
 
-/* Dark mode option styles using classes */
 option.dark-mode-option {
   background-color: #292929 !important;
   color: #f0f0f0 !important;
 }
 
-/* Try to style options differently for dark mode */
 body.dark-theme option,
 .dark-theme option,
 select.dark-mode option {
@@ -72,7 +63,6 @@ select.dark-mode option {
   color: #f0f0f0 !important;
 }
 
-/* Browser-specific styles for Firefox */
 @-moz-document url-prefix() {
   select.dark-mode,
   .city-selector.dark-theme select {
@@ -88,7 +78,6 @@ select.dark-mode option {
   }
 }
 
-/* Browser-specific styles for WebKit */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   select.dark-mode,
   .city-selector.dark-theme select {
@@ -103,7 +92,6 @@ select.dark-mode option {
   }
 }
 
-/* Focus states */
 .city-selector select:focus {
   outline: none;
   border-color: #ff4747 !important;
@@ -117,7 +105,6 @@ select.dark-mode:focus {
   box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.25) !important;
 }
 
-/* Error message styles */
 .city-selector-error {
   text-align: center;
   color: #ff4747;
@@ -134,7 +121,6 @@ body.dark-theme .city-selector-error,
   color: #ff6b6b;
 }
 
-/* Loading indicator styles */
 .loading-indicator {
   text-align: center;
   font-size: 14px;
@@ -156,13 +142,11 @@ body.dark-theme .loading-indicator,
   100% { opacity: 0.6; }
 }
 
-/* Handle disabled state */
 .city-selector select:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-/* Hover state */
 body:not(.dark-theme) .city-selector select:hover:not(:disabled),
 .city-selector select.light-mode:hover:not(:disabled) {
   border-color: #ccc;
@@ -178,7 +162,6 @@ select.dark-mode:hover:not(:disabled) {
   background-color: #333 !important;
 }
 
-/* Force option styling in dark mode with attribute selectors */
 .dark-theme select[class="dark-mode"] option,
 select[class="dark-mode"] option {
   background-color: #292929 !important; 

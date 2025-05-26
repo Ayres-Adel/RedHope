@@ -1,8 +1,4 @@
-/* Admin Page CSS - Thoroughly Optimized */
-
-/* CSS Variables for consistent theming */
 :root {
-  /* Colors */
   --primary: #ff4747;
   --primary-light: rgba(255, 71, 71, 0.1);
   --primary-hover: #e03a3a;
@@ -21,23 +17,19 @@
   --info-light: rgba(3, 169, 244, 0.12);
   --danger: #dc3545;
   
-  /* Shadows */
   --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
   
-  /* Transitions */
   --transition-fast: all 0.15s ease;
   --transition-normal: all 0.2s ease;
   --transition-slow: all 0.3s ease;
   
-  /* Border Radius */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -63,7 +55,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Base Layout */
 .admin-page {
   padding-top: 80px;
   min-height: 97.6vh;
@@ -78,7 +69,6 @@
   padding: 0 20px;
 }
 
-/* Common Box Styles */
 .admin-sidebar,
 .admin-content-area,
 .metric-card,
@@ -92,7 +82,6 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Sidebar */
 .admin-sidebar {
   width: 260px;
   padding: 24px;
@@ -136,7 +125,6 @@
   color: var(--text-muted);
 }
 
-/* Admin Menu */
 .admin-menu {
   margin: 20px 0 0;
   display: flex;
@@ -173,7 +161,6 @@
   color: white;
 }
 
-/* Content Area */
 .admin-content-area {
   flex: 1;
   padding: 32px;
@@ -188,7 +175,6 @@
   font-weight: 600;
 }
 
-/* Dashboard Metrics */
 .dashboard-metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -209,7 +195,6 @@
   box-shadow: var(--shadow-lg);
 }
 
-/* Icon Containers - Combined similar styles */
 .metric-icon,
 .section-icon,
 .card-icon {
@@ -260,7 +245,6 @@
   color: var(--text-dark);
 }
 
-/* Activity & Sections */
 .recent-activity-section, 
 .blood-supply-section {
   margin-top: 30px;
@@ -330,7 +314,6 @@
   line-height: 1.4;
 }
 
-/* Blood Supply Cards */
 .blood-types-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -370,7 +353,6 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* Status Variants */
 .blood-type-card.stable {
   background: linear-gradient(to bottom right, #e6f7e6, #d0f0d0);
   border: 1px solid #c3e6c3;
@@ -404,7 +386,6 @@
   box-shadow: 0 1px 2px rgba(255, 71, 71, 0.1);
 }
 
-/* Blood Status Indicators */
 .blood-type-card .blood-status-indicator {
   position: absolute;
   top: 8px;
@@ -431,7 +412,6 @@
   animation: pulse 1.5s infinite;
 }
 
-/* Donor Count */
 .blood-count {
   width: 100%;
   margin-top: 10px;
@@ -458,7 +438,6 @@
   font-size: 9px;
 }
 
-/* Controls & Search */
 .controls {
   display: flex;
   justify-content: space-between;
@@ -491,7 +470,6 @@
   transition: var(--transition-normal);
 }
 
-/* Input Focus - merged with other inputs */
 .search-container input:focus,
 .form-group input:focus,
 .form-group select:focus {
@@ -500,7 +478,6 @@
   box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.1);
 }
 
-/* Buttons - Consolidated similar properties */
 .action-button, 
 .add-button, 
 .control-button,
@@ -515,7 +492,6 @@
   transition: var(--transition-normal);
 }
 
-/* Primary Buttons */
 .action-button, 
 .add-button {
   padding: 10px 16px;
@@ -558,7 +534,6 @@
   flex-wrap: wrap;
 }
 
-/* Secondary Buttons */
 .control-button,
 .btn-cancel {
   background-color: var(--bg-light);
@@ -582,7 +557,6 @@
   color: var(--primary);
 }
 
-/* Settings Button */
 .settings-btn {
   background: #fff;
   color: var(--primary);
@@ -600,7 +574,6 @@
   box-shadow: 0 4px 12px rgba(255, 71, 71, 0.2);
 }
 
-/* Action Buttons */
 .actions {
   display: flex;
   gap: 10px;
@@ -639,7 +612,6 @@
   transform: scale(1.1);
 }
 
-/* Action Button Types */
 .action-btn.edit {
   background-color: var(--info-light);
   color: var(--info);
@@ -675,20 +647,19 @@
   box-shadow: 0 3px 6px rgba(46,213,115,0.25);
 }
 
-/* Tables */
 .table-container {
   overflow-x: auto;
   margin-bottom: 32px;
   background: transparent;
   border: none;
   box-shadow: none;
-  margin: 0; /* Reset all margins */
+  margin: 0;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: none;
-  width: 100%; /* Full width */
-  box-sizing: border-box; /* Include padding in width */
-  display: block; /* Ensure proper display */
-  flex: 1; /* Use flexbox growing if inside flex container */
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+  flex: 1;
 }
 
 .table-wrapper {
@@ -698,12 +669,10 @@
   padding: 0;
 }
 
-/* Hide cards by default */
 .table-wrapper .data-cards {
   display: none !important;
 }
 
-/* Scrollbar Styling */
 .table-container::-webkit-scrollbar {
   height: 6px;
 }
@@ -778,7 +747,6 @@
   white-space: nowrap;
 }
 
-/* Status Badges */
 .status-badge {
   display: inline-block;
   padding: 4px 8px;
@@ -814,7 +782,6 @@
   color: var(--primary);
 }
 
-/* Permission Badges */
 .permission-badges {
   display: flex;
   gap: 6px;
@@ -832,7 +799,6 @@
   font-size: 12px;
 }
 
-/* Add these styles for permission icons */
 .permission-icons {
   display: flex;
   gap: 10px;
@@ -863,7 +829,6 @@
   min-width: 120px;
 }
 
-/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -916,7 +881,6 @@
   padding: 0 8px;
 }
 
-/* Content Sections */
 .content-sections-container,
 .settings-grid {
   display: grid;
@@ -939,7 +903,6 @@
   box-shadow: var(--shadow-lg);
 }
 
-/* Card Structure */
 .section-header {
   padding: 0;
   display: flex;
@@ -961,7 +924,6 @@
   flex-direction: column;
 }
 
-/* Typography in Cards */
 .section-content h3,
 .card-content h3 {
   color: var(--text-dark);
@@ -1018,7 +980,6 @@
   font-size: 12px;
 }
 
-/* Admin Settings */
 .admin-settings h2 {
   margin-bottom: 28px;
   color: var(--text-dark);
@@ -1026,7 +987,6 @@
   font-size: 24px;
 }
 
-/* System Info */
 .system-info {
   padding: 24px;
   border: 1px solid #f0f0f0;
@@ -1082,7 +1042,6 @@
   font-weight: 600;
 }
 
-/* Status Indicators */
 .info-value.status-ok,
 .info-value.status-warning,
 .info-value.status-error {
@@ -1125,7 +1084,6 @@
   background-color: var(--danger);
 }
 
-/* Loading States */
 .admin-loading {
   display: flex;
   flex-direction: column;
@@ -1149,7 +1107,6 @@
   color: var(--text-muted);
 }
 
-/* Unauthorized Access */
 .admin-unauthorized {
   display: flex;
   flex-direction: column;
@@ -1190,7 +1147,6 @@
   transform: translateY(-2px);
 }
 
-/* Language Selector */
 .admin-language-selector {
   position: absolute;
   top: 32px;
@@ -1221,7 +1177,6 @@
   border-color: var(--primary);
 }
 
-/* Form Elements */
 .checkbox-group {
   display: flex;
   align-items: center;
@@ -1266,7 +1221,6 @@
   transition: var(--transition-normal);
 }
 
-/* Coordinate input styling */
 .coordinates-group {
   margin-bottom: 20px;
 }
@@ -1341,7 +1295,6 @@
   color: var(--primary-color);
 }
 
-/* Hospital table enhancements */
 .hospitals-table .actions {
   white-space: nowrap;
   text-align: center;
@@ -1386,7 +1339,6 @@
   color: var(--text-color);
 }
 
-/* Modal improvements */
 .modal-header {
   padding: 15px 20px;
   border-bottom: 1px solid var(--border-color);
@@ -1455,7 +1407,6 @@
   cursor: not-allowed;
 }
 
-/* Mobile Card View - Changed from 576px to 768px */
 @media (max-width: 768px) {
   .table-wrapper .data-table {
     display: none !important; 
@@ -1468,7 +1419,6 @@
     margin: 10px 0 20px 0;
   }
   
-  /* Card Styles for Mobile */
   .data-card {
     position: relative;
     background-color: white;
@@ -1573,7 +1523,6 @@
   }
 }
 
-/* Blood Supply States */
 .blood-supply-unavailable,
 .no-blood-data {
   text-align: center;
@@ -1635,7 +1584,6 @@
   margin: auto;
 }
 
-/* Responsive Layout */
 @media (max-width: 1024px) {
   .admin-container {
     flex-direction: column;
@@ -1705,15 +1653,14 @@
   }
   
   .table-container {
-    width: 100% !important; /* Force full width */
-    margin: 0 !important; /* Remove all margins */
+    width: 100% !important;
+    margin: 0 !important; 
     padding: 0 16px;
     position: static;
     display: block;
     box-sizing: border-box;
   }
 
-  /* Remove negative margins that cause width issues */
   .admin-users .table-container,
   .admin-hospitals .table-container,
   .admin-management .table-container {
@@ -1805,9 +1752,7 @@
   }
 }
 
-/* Dark Theme Support */
 .dark-theme {
-  /* Dark Theme Variables */
   --bg-dark: #121212;
   --bg-card: #1e1e1e;
   --bg-input: #2a2a2a;
@@ -1836,7 +1781,6 @@
   color: var(--text-primary);
 }
 
-/* Dark Theme Typography */
 .dark-theme .admin-info h3,
 .dark-theme .admin-content-area h2,
 .dark-theme .metric-data p,
@@ -1861,7 +1805,6 @@
   color: var(--text-secondary);
 }
 
-/* Dark Theme Elements */
 .dark-theme .admin-menu li {
   color: var(--text-primary);
 }
@@ -1883,7 +1826,6 @@
   color: black;
 }
 
-/* Dark Theme Forms */
 .dark-theme .search-container input,
 .dark-theme .form-group input[type="text"],
 .dark-theme .form-group input[type="email"],
@@ -1894,7 +1836,6 @@
   color: var(--text-primary);
 }
 
-/* Dark Theme Cards & Sections */
 .dark-theme .activity-item {
   background-color: #2a2a2a;
   border-bottom-color: #3a3a3a;
@@ -1908,7 +1849,6 @@
   color: var(--text-primary);
 }
 
-/* Dark Theme Blood Cards */
 .dark-theme .blood-type-card {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -1940,7 +1880,6 @@
   background-color: rgba(255, 71, 71, 0.25);
 }
 
-/* Dark Theme Buttons */
 .dark-theme .control-button,
 .dark-theme .settings-btn,
 .dark-theme .btn-cancel {
@@ -1968,7 +1907,6 @@
   transform: translateY(-3px);
 }
 
-/* Dark Theme Status */
 .dark-theme .content-status.published {
   background: #143a14;
   color: #81c784;
@@ -1979,7 +1917,6 @@
   color: #ffcc80;
 }
 
-/* Dark Theme Tables */
 .dark-theme .table-container::-webkit-scrollbar-track {
   background: #2a2a2a;
 }
@@ -2000,7 +1937,6 @@
   background-color: rgba(255, 107, 107, 0.1);
 }
 
-/* Dark Theme Cards & Borders */
 .dark-theme .modal-header,
 .dark-theme .modal-footer,
 .dark-theme .card-header,
@@ -2058,7 +1994,6 @@
   background-color: #ff5252;
 }
 
-/* Dark Theme Action Buttons */
 .dark-theme .action-btn.edit {
   background-color: rgba(3, 169, 244, 0.18);
 }
@@ -2085,7 +2020,6 @@
   box-shadow: 0 3px 6px rgba(46, 213, 115, 0.3);
 }
 
-/* Dark Theme Mobile Cards */
 .dark-theme .data-card-blood-type {
   background-color: rgba(255, 71, 71, 0.2);
   color: #ff6b6b;
@@ -2104,7 +2038,6 @@
   color: #4eca6a;
 }
 
-/* Dark Theme Pagination */
 .dark-theme .pagination button {
   background-color: #2a2a2a;
   color: var(--text-primary);
@@ -2133,7 +2066,6 @@
   color: #adb5bd;
 }
 
-/* Media Queries - Grouped at end to override any general styles */
 @media (max-width: 1024px) {
   .admin-container {
     flex-direction: column;
@@ -2203,15 +2135,14 @@
   }
   
   .table-container {
-    width: 100% !important; /* Force full width */
-    margin: 0 !important; /* Remove all margins */
+    width: 100% !important;
+    margin: 0 !important;
     padding: 0 16px;
     position: static;
     display: block;
     box-sizing: border-box;
   }
 
-  /* Remove negative margins that cause width issues */
   .admin-users .table-container,
   .admin-hospitals .table-container,
   .admin-management .table-container {

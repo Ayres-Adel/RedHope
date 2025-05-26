@@ -1,4 +1,3 @@
-/* Auth-specific CSS - Scoped to prevent affecting other components */
 .auth-specific-container form {
   width: 600px;
   margin: 40px auto;
@@ -70,7 +69,6 @@
   align-items: center;
 }
 
-/* Fix span that affects all pages */
 .auth-specific-container span {
   color: #ff4747;
 }
@@ -91,8 +89,6 @@
   transition: border-color 0.3s ease;
 }
 
-/* Fix the global checkbox selector that was breaking dark mode toggle */
-/* Instead of hiding all checkboxes, only hide those in this container */
 .auth-specific-container input[type="checkbox"] {
   display: none;
 }
@@ -198,13 +194,11 @@
   cursor: pointer;
 }
 
-/* Restore a proper visible checkbox for the auth components */
 .auth-specific-container .blood-donor-label input[type="checkbox"] {
   margin-left: -244px;
   display: inline;
 }
 
-/* Fix the input[type="radio"] */
 .auth-specific-container .input-icon input[type="radio"] {
   width: auto;
   margin-right: 5px;
@@ -217,7 +211,6 @@
   display: inline;
 }
 
-/* Balloon Styles */
 .auth-specific-container .balloon {
   position: absolute;
   top: 20%;
@@ -240,7 +233,6 @@
   max-width: 200px;
 }
 
-/* Dark theme styles scoped to auth container */
 .dark-theme .auth-specific-container form {
   background: rgb(30, 30, 30, 0.7);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
@@ -296,7 +288,6 @@
   background-color: #8b0000;
 }
 
-/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
   .auth-specific-container form {
     width: 90%;

@@ -5,9 +5,6 @@ import { faSearch, faDownload, faUserPlus } from '@fortawesome/free-solid-svg-ic
 import ActionButton from '../ui/ActionButton';
 import StatusBadge from '../ui/StatusBadge';
 
-/**
- * UserManagement component for handling user data display and operations
- */
 const UserManagement = ({
   users,
   loading,
@@ -55,7 +52,6 @@ const UserManagement = ({
           <EmptyStateMessage type="user" message={searchTerm ? 'No users match search.' : 'No users found.'} />
         ) : (
           <div className="table-wrapper">
-            {/* Regular table for desktop view */}
             <table className="data-table">
               <thead><tr>
                   <th>{translations.id}</th>
@@ -84,7 +80,6 @@ const UserManagement = ({
               </tbody>
             </table>
 
-            {/* Card view for mobile */}
             <div className="data-cards">
               {users.map(user => (
                 <div className="data-card" key={user._id}>

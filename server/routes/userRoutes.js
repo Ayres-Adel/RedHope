@@ -22,7 +22,6 @@ router.use((req, res, next) => {
 // Get all users from actual MongoDB Atlas database
 router.get('/all', async (req, res) => {
   try {
-    // Remove console.log and proceed directly with the function
     // Try to get real users from the database
     const users = await User.find({});
     
@@ -125,7 +124,6 @@ router.get('/profile', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Profile route error:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error',
@@ -158,7 +156,6 @@ router.get('/stats/dashboard', async (req, res) => {
       stats
     });
   } catch (error) {
-    console.error('Stats API error:', error);
     return res.status(500).json({
       success: false,
       message: 'Error fetching dashboard stats'
@@ -229,7 +226,6 @@ router.post('/create', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error creating user:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to create user',
@@ -322,7 +318,6 @@ router.put('/change-password', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Password change error:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error',
@@ -359,7 +354,6 @@ router.put('/:userId', async (req, res) => {
       user: updatedUser
     });
   } catch (error) {
-    console.error('Error updating user:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to update user',
@@ -387,7 +381,6 @@ router.delete('/:userId', async (req, res) => {
       message: 'User deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting user:', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to delete user',
@@ -523,7 +516,6 @@ router.get('/paginated', async (req, res) => {
 
     return res.status(200).json(response);
   } catch (error) {
-    console.error('Error fetching paginated users:', error);
     return res.status(500).json({
       success: false,
       message: 'Error fetching paginated users',

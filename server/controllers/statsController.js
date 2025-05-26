@@ -22,7 +22,7 @@ const handleError = (res, error, message) => {
  */
 exports.getUserStats = async (req, res) => {
   try {
-    const users = await User.find({}, { password: 0 }); // Exclude password field
+    const users = await User.find({}, { password: 0 }); 
     
     const totalUsers = users.length;
     const totalDonors = users.filter(user => user.isDonor).length;

@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Full viewport height */
+    height: 100vh;
     padding: 0 20px;
     transition: background-color 0.3s ease, color 0.3s ease;
     background-color: #ffffff;
@@ -22,9 +22,9 @@ body.dark-theme .loading {
 
 .logo_loading img {
     width: 100%;
-    max-width: 180px; /* Slightly smaller */
+    max-width: 180px;
     height: auto;
-    margin-bottom: 8px; /* Reduced space between logo and text */
+    margin-bottom: 8px;
     transition: filter 0.3s ease;
 }
 
@@ -34,11 +34,11 @@ body.dark-theme .logo_loading img {
 
 .logo_loading > a {
     color: var(--Primary_blue);
-    font-size: 26px; /* Slightly smaller */
+    font-size: 26px;
     text-decoration: none;
     position: relative;
     display: inline-block;
-    margin-top: 5px; /* Reduced space above text */
+    margin-top: 5px;
     font-weight: 600;
     transition: color 0.3s ease;
 }
@@ -56,11 +56,10 @@ body.dark-theme .logo_loading span {
     color: rgb(255, 0, 0);
 }
 
-/* Loading spinner animation */
 .loading-spinner {
-    margin-top: 20px; /* Reduced space above spinner */
-    width: 35px; /* Slightly smaller */
-    height: 35px; /* Slightly smaller */
+    margin-top: 20px;
+    width: 35px;
+    height: 35px;
     border: 3px solid rgba(255, 71, 71, 0.2);
     border-top-color: rgb(255, 71, 71);
     border-radius: 50%;
@@ -81,7 +80,6 @@ body.dark-theme .loading-spinner {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
     .logo_loading img {
         max-width: 150px;

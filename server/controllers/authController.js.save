@@ -3,16 +3,13 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
 
-// Max token age: 3 days
 const maxAge = 3 * 24 * 60 * 60;
 
-// Function to create JWT token
 const createToken = (id) => {
   return jwt.sign({ id }, 'net ninja secret', { expiresIn: maxAge });
 };
 ^T^Z
 
-// Handle errors (customized for various cases)
 const handleErrors = (err) => {
   let errors = { email: '', password: '' };
 
@@ -45,7 +42,7 @@ module.exports.signup_post = async (req, res) => {
     await User.checkExisting({ email, phoneNumber, password });
 
     const user = await User.create({
-      username,  // Even if the username repeats, MongoDB will allow it
+      username,
       email,
       dateOfBirth,
       location,
@@ -66,12 +63,11 @@ module.exports.signup_post = async (req, res) => {
 
 
 
-// Handle login
 module.exports.login_post = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.login(email, password); // Assuming User model has login method
+    const user = await User.login(email, password);
 
     const payload = { userId: user.id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -94,7 +90,6 @@ module.exports.dashboard_get =  async (req, res) => {
         msg: `${user.email}`,
       });
   } catch (err) {
-      console.error(err.message);
       res.status(500).send('Server error');
   }
 };
@@ -105,7 +100,7 @@ const haversineDistance = (coords1, coords2) => {
   const [lat1, lon1] = coords1;
   const [lat2, lon2] = coords2;
 
-  const R = 6371; // Earth's radius in kilometers
+  const R = 6371;
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
 
@@ -117,7 +112,7 @@ const haversineDistance = (coords1, coords2) => {
       Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in kilometers
+  return R * c;
 };
 
 module.exports.nearby_get = async (req, res) => {
@@ -127,27 +122,23 @@ module.exports.nearby_get = async (req, res) => {
       return res.status(400).json({ msg: 'User location not found.' });
     }
 
-    const userLocation = user.location.split(',').map(Number); // Convert to [latitude, longitude]
+    const userLocation = user.location.split(',').map(Number);
 
-    // Fetch all users who are donors except the current user
     const donors = await User.find({
       isDonor: true,
-      _id: { $ne: req.user.userId }, // Exclude the current user
+      _id: { $ne: req.user.userId },
     });
 
-    // Calculate distances for each donor
     const donorsWithDistance = donors.map((donor) => {
-      const donorLocation = donor.location.split(',').map(Number); // Convert to [latitude, longitude]
+      const donorLocation = donor.location.split(',').map(Number);
       const distance = haversineDistance(userLocation, donorLocation);
-      return { ...donor._doc, distance }; // Spread donor fields and add distance
+      return { ...donor._doc, distance };
     });
 
-    // Sort donors by distance (ascending)
     donorsWithDistance.sort((a, b) => a.distance - b.distance);
 
     res.json(donorsWithDistance);
   } catch (err) {
-    console.error(err.message);
     res.status(500).send('Server error');
   }
 };

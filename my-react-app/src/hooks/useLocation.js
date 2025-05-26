@@ -24,8 +24,7 @@ export const useLocation = () => {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
           };
-          
-          // Save coordinates using the LocationService
+
           saveCoordinates(location);
           
           setLocationStatus('success');
@@ -35,8 +34,7 @@ export const useLocation = () => {
           console.error('Error getting location:', error);
           setLocationError(error.message);
           setLocationStatus('error');
-          
-          // Default to a fallback location (e.g., center of Algiers)
+
           const fallbackLocation = { latitude: 36.7538, longitude: 3.0588 };
           resolve(fallbackLocation);
         },

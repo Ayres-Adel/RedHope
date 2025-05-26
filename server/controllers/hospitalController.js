@@ -95,7 +95,6 @@ module.exports = {
   // Add this utility function to seed hospitals if needed
   seedHospitals: async (req, res) => {
     try {
-      // Check if hospitals already exist
       const count = await Hospital.countDocuments();
       
       if (count > 0) {
@@ -106,12 +105,10 @@ module.exports = {
         });
       }
       
-      // If no hospitals exist, let's seed from the JSON file
       const fs = require('fs');
       const path = require('path');
       const hospitalsPath = path.join(__dirname, '../../my-react-app/src/assets/Hospitals.json');
       
-      // Read the file
       const hospitalsData = JSON.parse(fs.readFileSync(hospitalsPath, 'utf8'));
       
       if (!hospitalsData.hospitals || !Array.isArray(hospitalsData.hospitals)) {
@@ -121,27 +118,16 @@ module.exports = {
         });
       }
       
-      // Format the data for our MongoDB model
       const formattedHospitals = hospitalsData.hospitals.map(hospital => ({
         name: hospital.name,
         structure: hospital.structure,
         location: {
           type: 'Point',
-          coordinates: [hospital.longitude, hospital.latitude] // MongoDB uses [longitude, latitude]
-        },
+          coordinates: [hospital.longitude, hospital.latitude]        },
         telephone: hospital.telephone,
         fax: hospital.fax,
         wilaya: hospital.wilaya
       }));
-      
-      // Insert the data
-      await Hospital.insertMany(formattedHospitals);
-      
-      res.json({ 
-        success: true, 
-        message: `Successfully seeded database with ${formattedHospitals.length} hospitals`,
-        seeded: true
-      });
       
     } catch (err) {
       console.error('Error seeding hospitals:', err);

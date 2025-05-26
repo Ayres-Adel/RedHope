@@ -2,7 +2,6 @@ const DonationRequest = require('../models/DonationRequest');
 const User = require('../models/User');
 const Guest = require('../models/Guest');
 
-// Add timeout promise utility
 const withTimeout = (promise, ms = 5000) => {
   const timeout = new Promise((_, reject) =>
     setTimeout(() => reject(new Error(`Operation timed out after ${ms}ms`)), ms)
@@ -11,12 +10,10 @@ const withTimeout = (promise, ms = 5000) => {
 };
 
 module.exports = {
-  // Create a new donation request
   createDonationRequest: async (req, res) => {
     try {
       const { bloodType, hospitalId, expiryDate, donorId, cityId } = req.body;
       
-      // Get wilaya name from cityId if available
       let wilayaName = null;
       if (cityId) {
         try {
@@ -27,21 +24,18 @@ module.exports = {
           }
         } catch (wilayaErr) {
           console.error('Error fetching wilaya:', wilayaErr);
-          // Continue without wilaya name
         }
       }
 
-      // Create request data
       const requestData = {
         requester: req.user.userId,
         bloodType,
         status: 'Active',
         expiryDate: new Date(expiryDate),
         cityId: cityId || null,
-        wilayaName // Include wilayaName in the request data
+        wilayaName
       };
       
-      // If no cityId provided directly, try to get it from user
       if (!requestData.cityId) {
         try {
           const user = await withTimeout(User.findById(req.user.userId), 3000);
@@ -50,18 +44,14 @@ module.exports = {
           }
         } catch (userErr) {
           console.error('Error getting user cityId:', userErr);
-          // Continue without cityId if there's an error
         }
       }
       
-      // Add hospital if provided
       if (hospitalId) {
         requestData.hospital = hospitalId;
       }
       
-      // Add donor if provided
       if (donorId) {
-        // Verify the donor exists
         try {
           const donor = await withTimeout(User.findById(donorId), 3000);
           if (!donor) {
@@ -83,15 +73,12 @@ module.exports = {
       
       const donationRequest = await withTimeout(DonationRequest.create(requestData), 5000);
       
-      // Determine which donors to notify
       let potentialDonors = [];
       
       try {
         if (donorId) {
-          // If a specific donor was selected, only notify that donor
           potentialDonors = [{ _id: donorId }];
         } else {
-          // Otherwise find potential donors with matching blood type
           const compatibleBloodTypes = getCompatibleBloodTypes(bloodType);
           
           potentialDonors = await withTimeout(User.find({
@@ -101,12 +88,9 @@ module.exports = {
         }
       } catch (donorFindErr) {
         console.error('Error finding potential donors:', donorFindErr);
-        // Continue without sending notifications if this fails
       }
       
-      // Create notifications for potential donors - make non-blocking
       if (global.Notification && potentialDonors.length > 0) {
-        // Don't await this - run in background
         (async () => {
           try {
             const notificationPromises = potentialDonors.map(donor => 
@@ -119,7 +103,7 @@ module.exports = {
                   itemType: 'DonationRequest',
                   itemId: donationRequest._id
                 },
-                priority: donorId ? 'Urgent' : 'High' // Higher priority for directed requests
+                priority: donorId ? 'Urgent' : 'High'
               })
             );
             
@@ -127,7 +111,6 @@ module.exports = {
             console.log(`Sent ${notificationPromises.length} notifications for donation request ${donationRequest._id}`);
           } catch (notifyErr) {
             console.error('Error sending notifications:', notifyErr);
-            // Errors in background process won't affect response
           }
         })();
       }
@@ -145,8 +128,6 @@ module.exports = {
       });
     }
   },
-  
-  // Create donation request for guest users
   createGuestDonationRequest: async (req, res) => {
     try {
       const {
@@ -159,7 +140,6 @@ module.exports = {
         cityId  // Add cityId parameter to request body
       } = req.body;
       
-      // Validate either guestId or phoneNumber is provided
       if (!guestId && !phoneNumber) {
         return res.status(400).json({ 
           success: false, 
@@ -167,7 +147,6 @@ module.exports = {
         });
       }
       
-      // Validate required fields
       if (!bloodType) {
         return res.status(400).json({
           success: false,
@@ -175,7 +154,6 @@ module.exports = {
         });
       }
       
-      // Find or create guest
       let guest;
       if (guestId) {
         guest = await Guest.findById(guestId);
@@ -186,10 +164,8 @@ module.exports = {
           });
         }
       } else {
-        // Try to find guest by phone number
         guest = await Guest.findOne({ phoneNumber });
         
-        // If guest doesn't exist, create a new guest
         if (!guest) {
           guest = new Guest({
             phoneNumber,
@@ -201,12 +177,10 @@ module.exports = {
           await guest.save();
         }
         
-        // Update last active time
         guest.lastActive = Date.now();
         await guest.save();
       }
       
-      // If donor ID is not provided, try to find compatible donors
       let donorToAssign = donorId;
       if (!donorToAssign) {
         const compatibleDonors = await User.find({
@@ -217,12 +191,10 @@ module.exports = {
         if (compatibleDonors.length > 0) {
           donorToAssign = compatibleDonors[0]._id;
         } else {
-          // If no compatible donor found, mark as blank initially
           donorToAssign = null;
         }
       }
       
-      // Prepare donation request data
       const donationRequestData = {
         guestRequester: guest._id,
         bloodType,
@@ -231,23 +203,18 @@ module.exports = {
         cityId: cityId || guest.cityId || null // Prioritize provided cityId, then fallback to guest's cityId
       };
       
-      // Add hospital if provided
       if (hospitalId) {
         donationRequestData.hospital = hospitalId;
       }
       
-      // Add donor if found
       if (donorToAssign) {
         donationRequestData.donor = donorToAssign;
       }
       
-      // Create donation request
       const donationRequest = await DonationRequest.create(donationRequestData);
       
-      // If we have a donor, find potential donors with matching blood type for notifications
       if (donorToAssign) {
         try {
-          // Find potential donors with matching blood type
           const compatibleBloodTypes = getCompatibleBloodTypes(bloodType);
           
           const potentialDonors = await User.find({
@@ -255,7 +222,6 @@ module.exports = {
             bloodType: { $in: compatibleBloodTypes }
           }).limit(20);
           
-          // Create notifications for potential donors (if notification system is implemented)
           if (global.Notification) {
             const notificationPromises = potentialDonors.map(donor => 
               global.Notification.create({
@@ -275,7 +241,6 @@ module.exports = {
           }
         } catch (notificationError) {
           console.error('Error sending notifications:', notificationError);
-          // Continue even if notification sending fails
         }
       }
       
@@ -297,27 +262,22 @@ module.exports = {
       });
     }
   },
-  
-  // Get all donation requests (with optional filtering)
   getDonationRequests: async (req, res) => {
     try {
       const { bloodType, status } = req.query;
       
       const filter = {};
       
-      // Filter by blood type compatibility if specified
       if (bloodType) {
         filter.bloodType = bloodType;
       }
       
-      // Filter by status
       if (status) {
         filter.status = status;
       } else {
         filter.status = 'Active'; // Default to active requests
       }
       
-      // Filter by expiry date
       filter.expiryDate = { $gt: new Date() };
       
       const donationRequests = await DonationRequest.find(filter)
@@ -332,8 +292,6 @@ module.exports = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-  
-  // Get donation request by ID
   getDonationRequestById: async (req, res) => {
     try {
       const { requestId } = req.params;
@@ -353,8 +311,6 @@ module.exports = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-  
-  // Update donation request status
   updateDonationRequestStatus: async (req, res) => {
     try {
       const { requestId } = req.params;
@@ -371,7 +327,6 @@ module.exports = {
         return res.status(404).json({ error: 'Donation request not found' });
       }
       
-      // Check if user is the requester
       if (donationRequest.requester && donationRequest.requester.toString() !== req.user.userId) {
         return res.status(403).json({ error: 'Not authorized' });
       }
@@ -385,14 +340,11 @@ module.exports = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-  
-  // Update donation request
   updateDonationRequest: async (req, res) => {
     try {
       const { id } = req.params;
       const { bloodType, hospitalId, expiryDate, donorId, cityId } = req.body;
       
-      // Find the donation request
       const donationRequest = await DonationRequest.findById(id);
       
       if (!donationRequest) {
@@ -402,7 +354,6 @@ module.exports = {
         });
       }
       
-      // Check if user is authorized to update this request
       if (donationRequest.requester && donationRequest.requester.toString() !== req.user.userId) {
         return res.status(403).json({ 
           success: false, 
@@ -410,7 +361,6 @@ module.exports = {
         });
       }
       
-      // Check if request can be updated (not fulfilled or cancelled)
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -418,15 +368,12 @@ module.exports = {
         });
       }
       
-      // Update fields if provided
       if (bloodType) donationRequest.bloodType = bloodType;
       if (hospitalId) donationRequest.hospital = hospitalId;
       if (expiryDate) donationRequest.expiryDate = new Date(expiryDate);
       if (cityId) donationRequest.cityId = cityId;
       
-      // Update donor if provided
       if (donorId) {
-        // Verify the donor exists
         const donor = await User.findById(donorId);
         if (!donor) {
           return res.status(404).json({
@@ -437,7 +384,6 @@ module.exports = {
         donationRequest.donor = donorId;
       }
       
-      // Save the updated request
       await donationRequest.save();
       
       res.status(200).json({
@@ -454,8 +400,6 @@ module.exports = {
       });
     }
   },
-  
-  // Get user's donation requests
   getUserDonationRequests: async (req, res) => {
     try {
       const donationRequests = await DonationRequest.find({ requester: req.user.userId })
@@ -468,8 +412,6 @@ module.exports = {
       res.status(500).json({ error: 'Server error' });
     }
   },
-  
-  // Get donation requests where the authenticated user is a donor
   getUserDonorRequests: async (req, res) => {
     try {
       const donorId = req.user.id;
@@ -494,11 +436,8 @@ module.exports = {
       });
     }
   },
-  
-  // Get all requests where user is either requester or donor
   getAllUserRequests: async (req, res) => {
     try {
-      // Get authenticated user ID from req.user
       const userId = req.user && req.user.id;
       
       if (!userId) {
@@ -508,7 +447,6 @@ module.exports = {
         });
       }
       
-      // Find all requests where user is either requester or donor
       const requests = await DonationRequest.find({
         $or: [
           { requester: userId },
@@ -531,14 +469,11 @@ module.exports = {
       });
     }
   },
-  
-  // Cancel donation request
   cancelDonationRequest: async (req, res) => {
     try {
       const { requestId } = req.params;
       const userId = req.user?.id || req.user?._id;
 
-      // Find the donation request
       const donationRequest = await DonationRequest.findById(requestId);
       
       if (!donationRequest) {
@@ -548,7 +483,6 @@ module.exports = {
         });
       }
       
-      // Check if user is authorized (either requester or admin)
       if (donationRequest.requester && donationRequest.requester.toString() !== userId.toString()) {
         return res.status(403).json({
           success: false,
@@ -556,7 +490,6 @@ module.exports = {
         });
       }
       
-      // Check if request can be cancelled (not already fulfilled or cancelled)
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -564,7 +497,6 @@ module.exports = {
         });
       }
       
-      // Update the status to Cancelled
       donationRequest.status = 'Cancelled';
       await donationRequest.save();
       
@@ -582,15 +514,12 @@ module.exports = {
       });
     }
   },
-  
-  // Update donation request
   updateDonationRequest: async (req, res) => {
     try {
       const { requestId } = req.params;
       const updateData = req.body;
       const userId = req.user?.id || req.user?._id;
 
-      // Find the donation request
       const donationRequest = await DonationRequest.findById(requestId);
       
       if (!donationRequest) {
@@ -600,7 +529,6 @@ module.exports = {
         });
       }
       
-      // Check if user is authorized to update this request
       if (donationRequest.requester && donationRequest.requester.toString() !== userId.toString()) {
         return res.status(403).json({
           success: false,
@@ -608,7 +536,6 @@ module.exports = {
         });
       }
       
-      // Check if request can be updated (not fulfilled or cancelled)
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -616,10 +543,8 @@ module.exports = {
         });
       }
       
-      // Fields that can be updated
       const allowedFields = ['bloodType', 'hospital', 'expiryDate', 'donor', 'cityId'];
       
-      // Update only allowed fields
       for (const field of allowedFields) {
         if (updateData[field] !== undefined) {
           donationRequest[field] = updateData[field];
@@ -642,14 +567,11 @@ module.exports = {
       });
     }
   },
-  
-  // Complete donation request
   completeDonationRequest: async (req, res) => {
     try {
       const { requestId } = req.params;
       const userId = req.user?.id || req.user?._id;
 
-      // Find the donation request
       const donationRequest = await DonationRequest.findById(requestId);
       
       if (!donationRequest) {
@@ -659,7 +581,6 @@ module.exports = {
         });
       }
       
-      // Check authorization: requester or donor can complete
       const isRequester = donationRequest.requester && 
         donationRequest.requester.toString() === userId.toString();
       const isDonor = donationRequest.donor && 
@@ -672,7 +593,6 @@ module.exports = {
         });
       }
       
-      // Check if request can be completed (must be active)
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -680,7 +600,6 @@ module.exports = {
         });
       }
       
-      // Update the status to Fulfilled
       donationRequest.status = 'Fulfilled';
       donationRequest.completedAt = new Date();
       await donationRequest.save();
@@ -699,14 +618,11 @@ module.exports = {
       });
     }
   },
-  
-  // Fulfill donation request
   fulfillDonationRequest: async (req, res) => {
     try {
       const { requestId } = req.params;
       const userId = req.user?.id || req.user?._id;
 
-      // Find the donation request
       const donationRequest = await DonationRequest.findById(requestId);
       
       if (!donationRequest) {
@@ -716,7 +632,6 @@ module.exports = {
         });
       }
       
-      // Check if user is a donor (only donors can fulfill requests)
       const user = await User.findById(userId);
       if (!user || !user.isDonor) {
         return res.status(403).json({
@@ -725,7 +640,6 @@ module.exports = {
         });
       }
       
-      // Check if request can be fulfilled (must be active)
       if (donationRequest.status !== 'Active') {
         return res.status(400).json({
           success: false,
@@ -733,7 +647,6 @@ module.exports = {
         });
       }
       
-      // Update the request with donor info and status
       donationRequest.donor = userId;
       donationRequest.status = 'Fulfilled';
       donationRequest.fulfilledAt = new Date();
@@ -753,13 +666,10 @@ module.exports = {
       });
     }
   },
-  
-  // Delete a donation request
   deleteDonationRequest: async (req, res) => {
     try {
       const donationRequestId = req.params.requestId; // Changed from req.params.id to req.params.requestId
       
-      // Find and delete the donation request
       const deletedRequest = await DonationRequest.findByIdAndDelete(donationRequestId);
       
       if (!deletedRequest) {
@@ -782,7 +692,6 @@ module.exports = {
   }
 };
 
-// Helper function to get compatible blood types
 function getCompatibleBloodTypes(bloodType) {
   const compatibilityMap = {
     'A+': ['A+', 'A-', 'O+', 'O-'],

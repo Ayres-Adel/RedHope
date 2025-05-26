@@ -1,11 +1,10 @@
-/* Base Flip Card Styles */
 .flip-card {
     background-color: transparent;
     width: 350px;
     height: 450px;
     perspective: 1000px;
-    transform: rotate(-5deg); /* Tilt the card */
-    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+    transform: rotate(-5deg);
+    transition: transform 0.3s ease;
 }
 
 .flip-card-front img {
@@ -13,8 +12,8 @@
     height: 150px;
     margin-top: 20px;
     border-radius: 50%;
-    border: 3px solid white; /* White border for the image */
-    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+    border: 3px solid white;
+    transition: transform 0.3s ease;
 }
 
 .flip-card-back h2 {
@@ -23,11 +22,11 @@
 }
 
 .flip-card-front img:hover {
-    transform: scale(1.1); /* Slightly scale up the image on hover */
+    transform: scale(1.1);
 }
 
 .flip-card:hover {
-    transform: rotate(-5deg) scale(1.05); /* Slightly scale up on hover */
+    transform: rotate(-5deg) scale(1.05);
 }
 
 .flip-card-inner {
@@ -104,13 +103,12 @@
     color: white;
 }
 
-/* Dark Theme Styles */
 .dark-theme .flip-card {
     background-color: transparent;
     width: 350px;
     height: 450px;
     perspective: 1000px;
-    margin: -90px auto; /* Match the light mode margin */
+    margin: -90px auto;
     transform: rotate(-5deg);
     transition: transform 0.3s ease;
 }
@@ -200,7 +198,6 @@
     color: white;
 }
 
-/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
     .flip-card {
         width: 300px;
@@ -429,7 +426,6 @@
     
 }
 
-/* Gradient Animation */
 @keyframes gradientAnimation {
     0% {
         background-position: 0% 50%;
@@ -446,7 +442,6 @@
   
 
   
-  /* Social Media Links */
   .social-media-links {
     display: flex;
     flex-direction: column;

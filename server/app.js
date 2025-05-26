@@ -135,7 +135,6 @@ try {
       unique: true,
       lowercase: true
     },
-    // firstName and lastName fields removed
     password: {
       type: String,
       required: [true, 'Please enter a password'],

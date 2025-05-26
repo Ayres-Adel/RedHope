@@ -36,7 +36,6 @@ exports.login = async (req, res) => {
         user = await User.findOne({ email }).select('+password');
       }
     } catch (dbError) {
-      console.error('Database error:', dbError);
       return res.status(500).json({
         success: false,
         message: 'Database error occurred',
@@ -44,7 +43,6 @@ exports.login = async (req, res) => {
       });
     }
     
-    // If no user found in either collection
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -52,12 +50,10 @@ exports.login = async (req, res) => {
       });
     }
     
-    // Check password
     let isPasswordValid = false;
     try {
       isPasswordValid = await bcrypt.compare(password, user.password);
     } catch (bcryptError) {
-      console.error('Bcrypt error:', bcryptError);
       return res.status(500).json({
         success: false,
         message: 'Authentication error',
@@ -72,29 +68,23 @@ exports.login = async (req, res) => {
       });
     }
     
-    // Determine role for token
     const role = isAdmin ? (admin.role || 'admin') : (user.role || 'user');
     
-    // Create token
     const token = createToken(user._id, role);
     
-    // Create refresh token
     const refreshToken = jwt.sign(
       { id: user._id, role },
       process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
       { expiresIn: '7d' }
     );
     
-    // If admin, update last login time
     if (isAdmin) {
       try {
         await Admin.findByIdAndUpdate(admin._id, { lastLogin: new Date() });
       } catch (updateError) {
-        console.error('Error updating last login time:', updateError);
       }
     }
     
-    // Send response
     return res.status(200).json({
       success: true,
       message: 'Login successful',
@@ -110,7 +100,6 @@ exports.login = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Unexpected error in login:', error);
     return res.status(500).json({
       success: false,
       message: 'An error occurred during login',
@@ -119,10 +108,8 @@ exports.login = async (req, res) => {
   }
 };
 
-// Register controller
 exports.register = async (req, res) => {
   try {
-    console.log('Registration attempt with data:', req.body);
     const { 
       username, 
       email, 
@@ -132,10 +119,9 @@ exports.register = async (req, res) => {
       dateOfBirth,
       location,
       phoneNumber,
-      cityId  // Add support for cityId field from client
+      cityId
     } = req.body;
     
-    // Validation
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -143,7 +129,6 @@ exports.register = async (req, res) => {
       });
     }
     
-    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -152,7 +137,6 @@ exports.register = async (req, res) => {
       });
     }
     
-    // Create new user with all required fields
     const user = await User.create({
       username,
       email,
@@ -163,14 +147,12 @@ exports.register = async (req, res) => {
       dateOfBirth,
       location,
       phoneNumber,
-      cityId: cityId || null, // Store the cityId in the user document
-      lastCityUpdate: cityId ? new Date() : null // Track when cityId was set
+      cityId: cityId || null,
+      lastCityUpdate: cityId ? new Date() : null
     });
     
-    // Generate token
     const token = createToken(user._id, 'user');
     
-    // Send response
     res.status(201).json({
       success: true,
       message: 'Registration successful',
@@ -183,7 +165,6 @@ exports.register = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Registration error:', error);
     res.status(500).json({
       success: false,
       message: 'Registration failed',
@@ -192,7 +173,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// Logout controller
 exports.logout = (req, res) => {
   res.status(200).json({
     success: true,
@@ -200,7 +180,6 @@ exports.logout = (req, res) => {
   });
 };
 
-// Refresh token controller
 exports.refreshToken = async (req, res) => {
   try {
     const { token } = req.body;
@@ -230,7 +209,6 @@ exports.refreshToken = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Token refresh error:', error);
     res.status(401).json({
       success: false,
       message: 'Invalid or expired token'
@@ -245,7 +223,6 @@ module.exports.dashboard_get =  async (req, res) => {
         msg: `${user.email}`,
       });
   } catch (err) {
-      console.error(err.message);
       res.status(500).send('Server error');
   }
 };
@@ -256,7 +233,7 @@ const haversineDistance = (coords1, coords2) => {
   const [lat1, lon1] = coords1;
   const [lat2, lon2] = coords2;
 
-  const R = 6371; // Earth's radius in kilometers
+  const R = 6371;
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
 
@@ -268,25 +245,20 @@ const haversineDistance = (coords1, coords2) => {
       Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in kilometers
+  return R * c;
 };
 
 module.exports.nearby_get = async (req, res) => {
   try {
-    console.log('nearby_get called with user ID:', req.user?.userId || 'undefined');
-    
-    // Extract pagination and filter parameters
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const bloodType = req.query.bloodType || null; // Add bloodType filter parameter
+    const bloodType = req.query.bloodType || null;
     
     let userLocation;
     
-    // Check if location parameters are provided in the request
     const { lat, lng } = req.query;
     
     if (lat && lng) {
-      // Use provided location parameters
       userLocation = [parseFloat(lat), parseFloat(lng)];
       
       if (userLocation.length !== 2 || isNaN(userLocation[0]) || isNaN(userLocation[1])) {
@@ -295,10 +267,7 @@ module.exports.nearby_get = async (req, res) => {
           message: 'Invalid location format in query parameters.' 
         });
       }
-      
-      console.log('Using query location parameters:', userLocation);
     } else {
-      // Fall back to user's stored location
       if (!req.user || !req.user.userId) {
         return res.status(401).json({ 
           success: false,
@@ -321,8 +290,7 @@ module.exports.nearby_get = async (req, res) => {
         });
       }
 
-      console.log('Using stored user location:', user.location);
-      userLocation = user.location.split(',').map(Number); // Convert to [latitude, longitude]
+      userLocation = user.location.split(',').map(Number);
       
       if (userLocation.length !== 2 || isNaN(userLocation[0]) || isNaN(userLocation[1])) {
         return res.status(400).json({ 
@@ -332,49 +300,38 @@ module.exports.nearby_get = async (req, res) => {
       }
     }
 
-    // Fetch ALL donors matching the query (without pagination yet)
     const donorQuery = { isDonor: true };
     
-    // Add blood type filter if provided
     if (bloodType) {
       donorQuery.bloodType = bloodType;
     }
     
     if (req.user && req.user.userId) {
-      donorQuery._id = { $ne: req.user.userId }; // Exclude the current user if authenticated
+      donorQuery._id = { $ne: req.user.userId };
     }
     
-    // Get all donors matching filters - we'll paginate after sorting by distance
     const allDonors = await User.find(donorQuery);
     
-    // Calculate distances for each donor
     const donorsWithDistance = allDonors
-      .filter(donor => donor.location) // Only include donors with location
+      .filter(donor => donor.location)
       .map((donor) => {
         try {
           const donorLocation = donor.location.split(',').map(Number);
           const distance = haversineDistance(userLocation, donorLocation);
-          return { ...donor._doc, distance }; // Spread donor fields and add distance
+          return { ...donor._doc, distance };
         } catch (error) {
-          console.error(`Error processing donor ${donor._id}:`, error);
           return null;
         }
       })
       .filter(donor => donor !== null);
 
-    // Sort by distance (closest first)
     donorsWithDistance.sort((a, b) => a.distance - b.distance);
 
-    // Get total count for pagination metadata
     const totalDonors = donorsWithDistance.length;
     
-    // Apply pagination AFTER sorting by distance
     const skip = (page - 1) * limit;
     const paginatedDonors = donorsWithDistance.slice(skip, skip + limit);
-
-    console.log(`Found ${donorsWithDistance.length} nearby donors, returning page ${page} (${paginatedDonors.length} items)`);
     
-    // Return with pagination metadata
     res.json({
       data: paginatedDonors,
       pagination: {
@@ -385,7 +342,6 @@ module.exports.nearby_get = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Error in nearby_get:', err);
     res.status(500).json({
       success: false,
       message: 'Server error when finding nearby donors',
@@ -396,14 +352,10 @@ module.exports.nearby_get = async (req, res) => {
 
 module.exports.public_nearby_get = async (req, res) => {
   try {
-    console.log('public_nearby_get called');
-    
-    // Extract pagination and filter parameters
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const bloodType = req.query.bloodType || null; // Add bloodType filter parameter
+    const bloodType = req.query.bloodType || null;
     
-    // Get location from query parameters
     const { lat, lng } = req.query;
     
     if (!lat || !lng) {
@@ -422,18 +374,14 @@ module.exports.public_nearby_get = async (req, res) => {
       });
     }
 
-    // Create query object with filters
     const donorQuery = { isDonor: true };
     
-    // Add blood type filter if provided
     if (bloodType) {
       donorQuery.bloodType = bloodType;
     }
     
-    // Get all donors matching filters - we'll paginate after sorting by distance
     const allDonors = await User.find(donorQuery);
     
-    // Calculate distances for each donor
     const donorsWithDistance = allDonors
       .filter(donor => donor.location)
       .map((donor) => {
@@ -442,25 +390,18 @@ module.exports.public_nearby_get = async (req, res) => {
           const distance = haversineDistance(userLocation, donorLocation);
           return { ...donor._doc, distance };
         } catch (error) {
-          console.error(`Error processing donor ${donor._id}:`, error);
           return null;
         }
       })
       .filter(donor => donor !== null);
 
-    // Sort by distance (closest first)
     donorsWithDistance.sort((a, b) => a.distance - b.distance);
 
-    // Get total count for pagination metadata
     const totalDonors = donorsWithDistance.length;
     
-    // Apply pagination AFTER sorting by distance
     const skip = (page - 1) * limit;
     const paginatedDonors = donorsWithDistance.slice(skip, skip + limit);
-
-    console.log(`Found ${donorsWithDistance.length} nearby donors for public request, returning page ${page} (${paginatedDonors.length} items)`);
     
-    // Return with pagination metadata
     res.json({
       data: paginatedDonors,
       pagination: {
@@ -471,7 +412,6 @@ module.exports.public_nearby_get = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Error in public_nearby_get:', err);
     res.status(500).json({
       success: false,
       message: 'Server error when finding nearby donors',
@@ -480,7 +420,6 @@ module.exports.public_nearby_get = async (req, res) => {
   }
 };
 
-// This is a conceptual example - modify your actual endpoint
 exports.findNearbyDonors = async (req, res) => {
   try {
     const { lat, lng, page = 1, limit = 10 } = req.query;
@@ -488,7 +427,6 @@ exports.findNearbyDonors = async (req, res) => {
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    // Validate coordinates
     if (!lat || !lng) {
       return res.status(400).json({
         success: false, 
@@ -496,16 +434,11 @@ exports.findNearbyDonors = async (req, res) => {
       });
     }
 
-    // Find donors with pagination
     const donors = await User.find({ isDonor: true })
       .skip(skip)
       .limit(limitNum);
     
-    // Calculate total for pagination
     const totalDonors = await User.countDocuments({ isDonor: true });
-    
-    // Calculate distances and add to response
-    // ...your existing distance calculation code...
 
     return res.status(200).json({
       success: true,
@@ -518,7 +451,6 @@ exports.findNearbyDonors = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error in findNearbyDonors:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error',

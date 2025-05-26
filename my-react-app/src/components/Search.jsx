@@ -21,29 +21,24 @@ import { getCurrentLocation, reverseGeocode, saveCoordinates, getSavedCoordinate
 import ContactDonorModal from './ContactDonorModal';
 
 export default function Search() {
-  // Navigation and location
   const navigate = useNavigate();
   const location = useLocation();
   const isMapPage = location.pathname === '/map';
   
-  // UI state management - removed unused variables
   const [buttonClicked, setButtonClicked] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [locationStatus, setLocationStatus] = useState('loading'); // 'loading', 'success', 'error'
+  const [locationStatus, setLocationStatus] = useState('loading');
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
 
-  // Updated language effect to listen for custom events - optimized for performance
   useEffect(() => {
-    // Handle direct language change events from navbar
     const handleLanguageChange = (e) => {
       setLanguage(e.detail.language);
     };
     
     document.addEventListener('languageChanged', handleLanguageChange);
     
-    // Use storage event instead of polling with setInterval for better performance
     const handleStorageChange = (e) => {
       if (e.key === 'language') {
         const newLang = e.newValue || 'en';
@@ -55,7 +50,6 @@ export default function Search() {
     
     window.addEventListener('storage', handleStorageChange);
     
-    // Check once on mount
     const currentLang = localStorage.getItem('language') || 'en';
     if (currentLang !== language) {
       setLanguage(currentLang);
@@ -67,7 +61,6 @@ export default function Search() {
     };
   }, [language]);
 
-  // Map state
   const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
   const [userLocation, setUserLocation] = useState({ lat: 0, lng: 0 });
   const [mapZoom, setMapZoom] = useState(14);
@@ -75,11 +68,9 @@ export default function Search() {
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [isControlled, setIsControlled] = useState(false);
   
-  // Data state
   const [donors, setDonors] = useState([]);
   const [filters, setFilters] = useState({ bloodType: '' });
 
-  // Pagination state
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -87,18 +78,15 @@ export default function Search() {
     itemsPerPage: 10
   });
   
-  // UI refs
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const homeRef = useRef(null);
   const servicesRef = useRef(null);
   const aboutRef = useRef(null);
   
-  // Navigation state
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
   const [activeSection, setActiveSection] = useState(isMapPage ? 'map' : 'home');
 
-  // Translation system - memoized to prevent recreation
   const translations = useMemo(() => ({
     en: {
       findNearby: 'Find Nearby Donors',
@@ -117,7 +105,6 @@ export default function Search() {
       location: 'Location',
       distance: 'Distance',
       contact: 'Contact',
-      // New translations
       loading: 'Loading donors...',
       nearbyDonors: 'Nearby Blood Donors',
       allBloodTypes: 'All Blood Types',
@@ -135,7 +122,6 @@ export default function Search() {
       contactTelegram: 'Contact via Telegram',
       previousPage: 'Previous page',
       nextPage: 'Next page',
-      // Additional translations for missing text
       aPlus: 'A+',
       aMinus: 'A-',
       bPlus: 'B+',
@@ -176,7 +162,6 @@ export default function Search() {
       location: 'Emplacement',
       distance: 'Distance',
       contact: 'Contacter',
-      // New translations
       loading: 'Chargement des donneurs...',
       nearbyDonors: 'Donneurs de sang à proximité',
       allBloodTypes: 'Tous les groupes sanguins',
@@ -194,7 +179,6 @@ export default function Search() {
       contactTelegram: 'Contacter via Telegram',
       previousPage: 'Page précédente',
       nextPage: 'Page suivante',
-      // Additional translations for missing text
       aPlus: 'A+',
       aMinus: 'A-',
       bPlus: 'B+',
@@ -220,7 +204,6 @@ export default function Search() {
     },
   }), []);
 
-  // Fetch location details - optimized with proper caching
   const fetchLocationDetails = useCallback(async (latitude, longitude) => {
     try {
       const geoData = await reverseGeocode(latitude, longitude, language);
@@ -241,7 +224,6 @@ export default function Search() {
         formatted: 'N/A' 
       };
     } catch (error) {
-      console.error("Error fetching location details:", error);
       return { 
         country: 'Error fetching location', 
         county: '', 
@@ -251,7 +233,6 @@ export default function Search() {
     }
   }, [language]);
 
-  // Handle finding donors - improved error handling and promise structure
   const handleFindDonorsClick = useCallback(async (page = 1, filterOverrides = null) => {
     setButtonClicked(true);
     setIsLoading(true);
@@ -263,25 +244,19 @@ export default function Search() {
     if (currentCoords.lat === 0 || currentCoords.lng === 0) {
       setIsLoading(false);
       setError('Unable to determine your location. Please enable location services and try again.');
-      return Promise.resolve(); // Return a resolved promise
-    }
+      return Promise.resolve();    }
     
-    // Use provided filters or current state
     const currentFilters = filterOverrides || filters;
     
-    // Return the promise so we can use it for coordinating actions
     return new Promise(async (resolve) => {
       try {
         const token = localStorage.getItem('token');
-        // Build query string with all parameters
         let queryParams = `lat=${currentCoords.lat}&lng=${currentCoords.lng}&page=${page}&limit=${pagination.itemsPerPage}`;
         
-        // Add blood type filter if selected
         if (currentFilters.bloodType) {
           queryParams += `&bloodType=${encodeURIComponent(currentFilters.bloodType)}`;
         }
         
-        // Add pagination parameters to the endpoint
         let endpoint = token 
           ? `${API_BASE_URL}/api/auth/nearby?${queryParams}`
           : `${API_BASE_URL}/api/auth/public/nearby?${queryParams}`;
@@ -290,7 +265,6 @@ export default function Search() {
           headers: { Authorization: `Bearer ${token}` }
         } : {});
         
-        // Extract donor data from response, handling both array format and {data: [...]} format
         const donorData = Array.isArray(response.data) ? response.data : (response.data.data || []);
         
         if (!donorData || donorData.length === 0) {
@@ -301,7 +275,6 @@ export default function Search() {
           return;
         }
 
-        // Extract pagination info from response if available
         if (response.data.pagination) {
           setPagination({
             currentPage: response.data.pagination.currentPage || page,
@@ -311,7 +284,6 @@ export default function Search() {
           });
         }
 
-        // Process donors with basic info first for faster UI updates
         const basicDonors = donorData.map(donor => {
           let latitude = 0, longitude = 0;
           
@@ -334,15 +306,11 @@ export default function Search() {
           };
         });
         
-        // Update UI immediately with basic data - already sorted by distance
         setDonors(basicDonors);
         setShowTable(true);
         
-        // Initial data is loaded, let's resolve so we can scroll
         resolve();
         
-        // Then enhance with location details in background (don't wait for this)
-        // Use AbortController to manage requests that might be canceled
         const controller = new AbortController();
         const signal = controller.signal;
         
@@ -351,7 +319,6 @@ export default function Search() {
             if (!donor.latitude || !donor.longitude) return donor;
             
             try {
-              // Check if the request has been aborted
               if (signal.aborted) return donor;
               
               const locationDetails = await fetchLocationDetails(donor.latitude, donor.longitude);
@@ -371,7 +338,6 @@ export default function Search() {
           }
         });
         
-        // Return a cleanup function to abort pending requests if component unmounts
         return () => {
           controller.abort();
         };
@@ -385,14 +351,12 @@ export default function Search() {
           setError(err.message || 'Failed to fetch nearby donors. Please try again.');
         }
         setDonors([]);
-        resolve(); // Resolve even on error
-      } finally {
+        resolve();      } finally {
         setIsLoading(false);
       }
     });
   }, [userLocation, mapCenter, filters, pagination.itemsPerPage, fetchLocationDetails]);
 
-  // Function to handle filter changes - optimized with debounce logic
   const handleFilterChange = useCallback((e) => {
     const { name, value } = e.target;
     setFilters(prevFilters => {
@@ -401,24 +365,20 @@ export default function Search() {
         [name]: value,
       };
       
-      // Reset to page 1 when filters change and refetch data
       if (buttonClicked) {
-        // Use debounce to prevent excessive API calls
         if (window.filterTimeout) {
           clearTimeout(window.filterTimeout);
         }
         
-        // Increase debounce timeout
         window.filterTimeout = setTimeout(() => {
           handleFindDonorsClick(1, newFilters);
-        }, 500); // Increased from 300ms to 500ms for better performance
+        }, 500);
       }
       
       return newFilters;
     });
   }, [buttonClicked, handleFindDonorsClick]);
 
-  // Handle row click in the table - optimized for better performance
   const handleRowClick = useCallback((donor) => {
     if (!donor || !donor.latitude || !donor.longitude) return;
     
@@ -427,41 +387,33 @@ export default function Search() {
     setMapZoom(15);
     setIsControlled(true);
     
-    // Set a timeout to allow user zoom control after a brief period
     setTimeout(() => {
       setZoomControlActive(true);
     }, 1000);
 
-    // Update map container scroll behavior to prevent jumping to top
     const mapElement = document.querySelector('.map-container');
     if (mapElement) {
-      // Calculate the position to scroll to
       const rect = mapElement.getBoundingClientRect();
       const isVisible = 
         rect.top >= 0 && 
         rect.bottom <= window.innerHeight;
       
-      // Only scroll if the map isn't fully visible
       if (!isVisible) {
-        // Scroll just enough to make the map visible in the viewport
         mapElement.scrollIntoView({
           behavior: 'smooth',
-          block: 'nearest' // This prevents scrolling all the way to top
+          block: 'nearest'
         });
       }
     }
   }, []);
 
-  // Location request function - improved error handling
   const requestUserLocation = useCallback((fallbackToStored = true) => {
     setLocationStatus('loading');
     const token = localStorage.getItem('token');
     const isLoggedIn = !!token;
     
-    // Get saved coordinates if available
     const savedCoords = getSavedCoordinates(isLoggedIn);
     
-    // Use saved coordinates while waiting for fresh location
     if (savedCoords && isLoggedIn) {
       setMapCenter(savedCoords);
       setUserLocation(savedCoords);
@@ -502,46 +454,36 @@ export default function Search() {
     });
   }, []);
 
-  // Update the handleContactDonor function to ensure correct donor information is passed
   const handleContactDonor = useCallback(async (method, donor) => {
     if (!donor || !donor.phoneNumber) {
-      console.error("Missing phone number for donor");
       return;
     }
     
-    // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
-      // Non-registered users see the contact modal which handles the donation request creation
       const donorForModal = {
         ...donor,
         contactMethod: method,
-        // Include these fields explicitly to ensure they're passed correctly
         _id: donor._id,
         username: donor.username,
         bloodType: donor.bloodType,
         phoneNumber: donor.phoneNumber,
       };
       
-      // Set the selected donor and show modal
       setSelectedDonorContact(donorForModal);
       setShowContactModal(true);
       
-      // Debug logging to help track donor information
-      console.log("Opening modal for donor:", donorForModal.username, donorForModal);
       return;
     }
     
-    // For logged in users, first create a donation request in the database
-    setIsLoading(true); // Show loading indicator
+    setIsLoading(true);
     try {
-      // Make API call to create donation request
       await axios.post(
         `${API_BASE_URL}/api/donation-request`, 
         { 
           donorId: donor._id,
           bloodType: donor.bloodType,
-          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
+          expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
         },
         { 
           headers: { 
@@ -550,31 +492,22 @@ export default function Search() {
         }
       );
       
-      console.log(`Donation request created for donor: ${donor.username}`);
-      
-      // After successful request creation, proceed with the contact method
-      
-      // Format phone number for international dialing
       let formattedPhone = donor.phoneNumber;
       
-      // Format for Algeria (213)
       if (formattedPhone.startsWith('0')) {
         formattedPhone = `213${formattedPhone.substring(1)}`;
       } else if (!formattedPhone.startsWith('213') && !formattedPhone.startsWith('+213')) {
         formattedPhone = `213${formattedPhone}`;
       }
       
-      // Remove any plus sign for services that don't need it
       formattedPhone = formattedPhone.replace(/^\+/, '');
       
-      // Use localized message if available
       const messageText = encodeURIComponent(
         language === 'fr' 
           ? 'Bonjour, je vous ai trouvé sur RedHope. J\'ai besoin de votre aide pour un don de sang.'
           : 'Hello, I found you on RedHope. I need your help with a blood donation.'
       );
       
-      // Open the appropriate communication channel
       switch (method) {
         case 'whatsapp':
           window.open(`https://wa.me/${formattedPhone}?text=${messageText}`, '_blank');
@@ -596,14 +529,10 @@ export default function Search() {
           window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
       }
     } catch (error) {
-      console.error("Error creating donation request:", error);
-      
-      // Show error message
       setError(error.response?.data?.message || 
                error.response?.data?.error || 
                "Failed to create donation request. Opening contact method anyway.");
       
-      // Still try to open the contact method even if request creation fails
       let formattedPhone = donor.phoneNumber;
       if (formattedPhone.startsWith('0')) {
         formattedPhone = `213${formattedPhone.substring(1)}`;
@@ -637,32 +566,25 @@ export default function Search() {
             window.open(`sms:${donor.phoneNumber}?body=${messageText}`, '_blank');
         }
       } catch (contactErr) {
-        console.error("Error opening contact method:", contactErr);
       }
     } finally {
-      setIsLoading(false); // Hide loading indicator
+      setIsLoading(false);
       
-      // Clear any error message after 3 seconds
       if (error) {
         setTimeout(() => setError(''), 3000);
       }
     }
   }, [language, API_BASE_URL]);
 
-  // Improved page change handler with better scrolling coordination
   const handlePageChange = useCallback((newPage) => {
     if (newPage < 1 || newPage > pagination.totalPages) return;
     
-    // Show loading state
     setIsLoading(true);
     
-    // Fetch donors for the new page with current filters, then scroll when basic data is ready
     handleFindDonorsClick(newPage, filters).then(() => {
-      // Use requestAnimationFrame to wait for the next paint cycle
       requestAnimationFrame(() => {
         const tableContainer = document.querySelector('.table-container');
         if (tableContainer) {
-          // Scroll to slightly above the table container
           window.scrollTo({
             top: tableContainer.offsetTop - 90,
             behavior: 'smooth'
@@ -672,17 +594,14 @@ export default function Search() {
     });
   }, [pagination.totalPages, handleFindDonorsClick, filters]);
 
-  // Simplified helper functions
   const changeLanguage = useCallback((lang) => {
     setLanguage(lang);
     localStorage.setItem('language', lang);
   }, []);
   
-  // Initial location request
   useEffect(() => {
     requestUserLocation(true);
     
-    // Cleanup function to abort any pending requests when component unmounts
     return () => {
       if (window.filterTimeout) {
         clearTimeout(window.filterTimeout);
@@ -690,7 +609,6 @@ export default function Search() {
     };
   }, [requestUserLocation]);
 
-  // Update line position based on active section
   useEffect(() => {
     const updateLinePosition = () => {
       let ref;
@@ -710,19 +628,16 @@ export default function Search() {
 
     updateLinePosition();
     
-    // Add event listener with proper cleanup
     window.addEventListener('resize', updateLinePosition);
     return () => window.removeEventListener('resize', updateLinePosition);
   }, [activeSection]);
 
-  // Set active section to 'map' when on the map page
   useEffect(() => {
     if (isMapPage) {
       setActiveSection('map');
     }
   }, [isMapPage]);
 
-  // Use IntersectionObserver to detect active section
   useEffect(() => {
     const sections = ['home', 'services', 'about'];
     const observer = new IntersectionObserver(
@@ -746,7 +661,6 @@ export default function Search() {
     return () => observer.disconnect();
   }, []);
 
-  // Optimize marker rendering by using memo for stable marker styles
   const userLocationMarkerStyle = useMemo(() => ({
     width: "16px",
     height: "16px",
@@ -766,17 +680,14 @@ export default function Search() {
     boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
   }), []);
 
-  // Add these new state variables
   const [showContactModal, setShowContactModal] = useState(false);
   const [selectedDonorContact, setSelectedDonorContact] = useState(null);
   
-  // Add this function to handle contact button click
   const handleContactClick = (donor) => {
     setSelectedDonorContact(donor);
     setShowContactModal(true);
   };
   
-  // Main render
   return (
     <>
       <Navbar />

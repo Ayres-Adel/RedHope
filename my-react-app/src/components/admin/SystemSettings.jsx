@@ -6,9 +6,6 @@ import {
   faCog, faDownload, faEdit 
 } from '@fortawesome/free-solid-svg-icons';
 
-/**
- * SystemSettings component for managing system configuration
- */
 const SystemSettings = ({ translations }) => {
   return (
     <div className="admin-settings">

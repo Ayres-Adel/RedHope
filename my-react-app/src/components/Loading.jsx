@@ -4,7 +4,6 @@ import '../styles/loading.css';
 import RedHopeLogo from '../assets/images/RedHope_Logo.png';
 
 const Loading = () => {
-  // Apply dark theme from localStorage on component mount
   useEffect(() => {
     const isDarkMode = localStorage.getItem("darkMode") === "true";
     if (isDarkMode) {

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
-// Create axios instance with base URL
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -9,7 +8,6 @@ const api = axios.create({
   }
 });
 
-// Add token to requests if available
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -18,7 +16,6 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Authentication service
 export const authService = {
   login: async (email, password) => {
     const response = await api.post('/login', { email, password });
@@ -41,7 +38,6 @@ export const authService = {
   }
 };
 
-// User service
 export const userService = {
   getProfile: async () => {
     return api.get('/api/user/profile');
@@ -60,7 +56,6 @@ export const userService = {
   }
 };
 
-// Hospital service
 export const hospitalService = {
   getAllHospitals: async () => {
     return api.get('/api/hospitals');
@@ -77,7 +72,6 @@ export const hospitalService = {
   }
 };
 
-// Donation service
 export const donationService = {
   createDonation: async (donationData) => {
     return api.post('/api/donations', donationData);
@@ -96,7 +90,6 @@ export const donationService = {
   }
 };
 
-// Donation Request service
 export const donationRequestService = {
   createDonationRequest: async (requestData) => {
     try {
@@ -137,8 +130,7 @@ export const donationRequestService = {
       throw error;
     }
   },
-  
-  // Add new methods for donor requests
+
   getUserDonorRequests: async (filters = {}) => {
     try {
       const response = await api.get('/api/donation-request/donor', { params: filters });
@@ -148,8 +140,7 @@ export const donationRequestService = {
       throw error;
     }
   },
-  
-  // Get all requests where user is either requester or donor
+
   getAllUserRequests: async (filters = {}) => {
     try {
       const response = await api.get('/api/donation-request/all-user', { params: filters });
@@ -191,7 +182,6 @@ export const donationRequestService = {
   },
   
   updateDonationRequestStatus: async (requestId, newStatus) => {
-    // This is a generalized method that calls the appropriate endpoint based on status
     if (newStatus === 'Fulfilled') {
       return donationRequestService.fulfillDonationRequest(requestId);
     } else if (newStatus === 'Completed') {
@@ -204,7 +194,6 @@ export const donationRequestService = {
   }
 };
 
-// Notification service
 export const notificationService = {
   getUserNotifications: async () => {
     return api.get('/api/notifications');
@@ -223,7 +212,6 @@ export const notificationService = {
   }
 };
 
-// Wilaya service
 export const wilayaService = {
   getAllWilayas: async () => {
     return api.get('/api/wilaya/all');
