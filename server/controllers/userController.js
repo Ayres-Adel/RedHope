@@ -6,12 +6,10 @@ module.exports = {
 
   getProfile: async (req, res) => {
     try {
-
       const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
       let user;
       
       if (isAdmin) {
-
         const Admin = mongoose.model('Admin');
         user = await Admin.findById(req.user.userId)
           .select('-password -__v'); 
@@ -25,10 +23,10 @@ module.exports = {
           email: user.email,
           role: user.role,
           lastLogin: user.lastLogin,
+          dateOfBirth: user.dateOfBirth,
           isAdmin: true
         });
       } else {
-
         user = await User.findById(req.user.userId)
           .select('-password -__v'); 
       
@@ -52,13 +50,28 @@ module.exports = {
     }
   },
 
-  // Update profile
   updateProfile: async (req, res) => {
     try {
       const userId = req.params.id;
       const updateData = req.body;
       
-      // Explicitly handle location and cityId
+      if (updateData.dateOfBirth) {
+        const today = new Date();
+        const birthDate = new Date(updateData.dateOfBirth);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+          ? age - 1 
+          : age;
+
+        if (exactAge < 16) {
+          return res.status(400).json({ 
+            success: false,
+            error: 'You must be at least 16 years old' 
+          });
+        }
+      }
+      
       if (updateData.location) {
         // If location is updated, ensure cityId is saved too
         // This preserves cityId even if it wasn't explicitly provided
@@ -89,6 +102,13 @@ module.exports = {
         }
       });
     } catch (err) {
+      if (err.name === 'ValidationError') {
+        const validationErrors = Object.values(err.errors).map(e => e.message);
+        return res.status(400).json({ 
+          success: false,
+          error: validationErrors.join(', ') 
+        });
+      }
       res.status(500).json({ error: 'Failed to update profile' });
     }
   },
@@ -163,19 +183,15 @@ module.exports = {
     }
   },
 
-  // Content Management endpoints
   getContent: async (req, res) => {
     try {
       const { type } = req.params;
       
-      // For now, we'll store content in localStorage on frontend
-      // In production, this would fetch from database
       res.json({
         success: true,
         message: 'Content fetched successfully',
         data: {
           type,
-          // This endpoint will be used by frontend to sync content
         }
       });
     } catch (err) {
@@ -189,19 +205,15 @@ module.exports = {
       const { type } = req.params;
       const { title, description, descriptionEn, descriptionFr, status } = req.body;
       
-      // Validate content type
       const validTypes = ['homepage_banner', 'about_us', 'contact_info'];
       if (!validTypes.includes(type)) {
         return res.status(400).json({ error: 'Invalid content type' });
       }
 
-      // Validate required fields
       if (!title) {
         return res.status(400).json({ error: 'Title is required' });
       }
 
-      // In production, this would save to database
-      // For now, we'll return success and let frontend handle storage
       const updatedContent = {
         type,
         title,
@@ -231,68 +243,11 @@ module.exports = {
         success: true,
         users: users
       });
-    } catch (error) {
-      console.error('Error fetching all users:', error);
-      res.status(500).json({
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      res.status(500).json({ 
         success: false,
-        message: 'Error fetching users'
-      });
-    }
-  },
-
-
-  createUser: async (req, res) => {
-    try {
-      const { username, email, password, role, bloodType, isDonor, isActive } = req.body;
-      
-
-      if (!username || !email || !password) {
-        return res.status(400).json({
-          success: false,
-          message: 'Please provide username, email and password'
-        });
-      }
-      
-
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({
-          success: false,
-          message: 'User with this email already exists'
-        });
-      }
-      
-
-      const user = new User({
-        username,
-        email,
-        password,
-        role: role || 'user',
-        bloodType,
-        isDonor: isDonor || false,
-        isActive: isActive !== false
-      });
-      
-      await user.save();
-      
-      res.status(201).json({
-        success: true,
-        message: 'User created successfully',
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          bloodType: user.bloodType,
-          isDonor: user.isDonor,
-          isActive: user.isActive
-        }
-      });
-    } catch (error) {
-      console.error('Error creating user:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Error creating user'
+        error: 'Server error' 
       });
     }
   }

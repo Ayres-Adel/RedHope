@@ -128,6 +128,24 @@ export default function Sign() {
       valid = false;
     }
 
+    // Validate age (16+ years)
+    if (formData.dateOfBirth) {
+      const today = new Date();
+      const birthDate = new Date(formData.dateOfBirth);
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+        ? age - 1 
+        : age;
+
+      if (exactAge < 16) {
+        newErrors.dateOfBirth = language === 'fr'
+          ? 'Vous devez avoir au moins 16 ans pour vous inscrire'
+          : 'You must be at least 16 years old to register';
+        valid = false;
+      }
+    }
+
     const phoneRegex = /^(0|\+)?[0-9]{10,15}$/;
     if (!phoneRegex.test(formData.phoneNumber.replace(/\D/g, ''))) {
       newErrors.phoneNumber = language === 'fr'
@@ -179,8 +197,19 @@ export default function Sign() {
       } else {
         const newErrors = { ...errors };
   
-        if (data.error) {
-          newErrors.general = data.error;
+        if (data.message || data.error) {
+          const errorMessage = data.message || data.error;
+          if (errorMessage.toLowerCase().includes('age') || errorMessage.toLowerCase().includes('16')) {
+            newErrors.dateOfBirth = errorMessage;
+          } else if (errorMessage.toLowerCase().includes('email')) {
+            newErrors.email = errorMessage;
+          } else if (errorMessage.toLowerCase().includes('phone')) {
+            newErrors.phoneNumber = errorMessage;
+          } else if (errorMessage.toLowerCase().includes('password')) {
+            newErrors.password = errorMessage;
+          } else {
+            newErrors.general = errorMessage;
+          }
         } else if (data.errors) {
           data.errors.forEach(error => {
             if (error.toLowerCase().includes("email")) {
@@ -189,6 +218,8 @@ export default function Sign() {
               newErrors.phoneNumber = error;
             } else if (error.toLowerCase().includes("password")) {
               newErrors.password = error;
+            } else if (error.toLowerCase().includes("age") || error.toLowerCase().includes("16")) {
+              newErrors.dateOfBirth = error;
             }
           });
         }

@@ -33,6 +33,26 @@ const UserSchema = new mongoose.Schema({
       message: props => `${props.value} is not a valid phone number!`
     }
   },
+  dateOfBirth: {
+    type: Date,
+    required: [true, 'Please enter your date of birth'],
+    validate: {
+      validator: function(value) {
+        const today = new Date();
+        const birthDate = new Date(value);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        // Calculate exact age
+        const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+          ? age - 1 
+          : age;
+        
+        return exactAge >= 16;
+      },
+      message: 'You must be at least 16 years old to register'
+    }
+  },
   bloodType: {
     type: String,
     required: [true, 'Please select your blood type'],

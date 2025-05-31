@@ -57,7 +57,6 @@ const UserManagement = ({
                   <th>{translations.id}</th>
                   <th>{translations.name}</th>
                   <th>{translations.email}</th>
-                  <th>{translations.role}</th>
                   <th>{translations.bloodType}</th>
                   <th>{translations.location}</th>
                   <th>{translations.status}</th>
@@ -69,7 +68,6 @@ const UserManagement = ({
                     <td>{user._id.slice(-6)}</td>
                     <td data-label={translations.name}>{user.username}</td>
                     <td data-label={translations.email}>{user.email}</td>
-                    <td data-label={translations.role}>{user.role}</td>
                     <td data-label={translations.bloodType} className="blood-type-cell">{user.bloodType}</td>
                     <td data-label={translations.location}>{user.location}</td>
                     <td data-label={translations.status}><StatusBadge isDonor={user.isDonor} /></td>
@@ -100,11 +98,6 @@ const UserManagement = ({
                     <div className="data-card-field">
                       <span className="data-card-label">{translations.email}</span>
                       <span className="data-card-value">{user.email}</span>
-                    </div>
-                    
-                    <div className="data-card-field">
-                      <span className="data-card-label">{translations.role}</span>
-                      <span className="data-card-value">{user.role}</span>
                     </div>
                     
                     <div className="data-card-field">

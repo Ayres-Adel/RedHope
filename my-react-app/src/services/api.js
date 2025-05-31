@@ -40,7 +40,8 @@ export const authService = {
 
 export const userService = {
   getProfile: async () => {
-    return api.get('/api/user/profile');
+    const response = await api.get('/api/user/profile');
+    return response;
   },
   
   changePassword: async (currentPassword, newPassword, confirmNewPassword) => {

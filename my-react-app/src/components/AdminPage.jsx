@@ -44,7 +44,6 @@ const MODAL_TYPE = {
 const INITIAL_USER_FORM_DATA = {
   username: '',
   email: '',
-  role: ROLES.USER,
   bloodType: '',
   isDonor: true,
   isActive: true,
@@ -508,7 +507,6 @@ const AdminPage = () => {
             _id: user._id || user.id,
             username: user.username || user.name,
             email: user.email,
-            role: user.role || 'user',
             bloodType: user.bloodType || 'N/A',
             status: user.isActive !== false ? 'Active' : 'Inactive',
             location: user.location || 'N/A',
@@ -627,7 +625,6 @@ const AdminPage = () => {
           _id: user._id || user.id,
           username: user.username || user.name || 'Unknown',
           email: user.email || 'No email',
-          role: user.role || ROLES.USER,
           bloodType: user.bloodType || 'N/A',
           location: user.location || 'N/A',
           isDonor: Boolean(user.isDonor),
@@ -743,8 +740,22 @@ const AdminPage = () => {
     try {
       console.log('Sending user data to API:', userData);
       
-      if (!userData.username || !userData.email || !userData.password) {
-        setError('Username, email, and password are required fields.');
+      if (!userData.username || !userData.email || !userData.password || !userData.dateOfBirth) {
+        setError('Username, email, password, and date of birth are required fields.');
+        return false;
+      }
+
+      // Validate age (16+ years)
+      const today = new Date();
+      const birthDate = new Date(userData.dateOfBirth);
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+        ? age - 1 
+        : age;
+
+      if (exactAge < 16) {
+        setError('User must be at least 16 years old.');
         return false;
       }
       
@@ -752,12 +763,11 @@ const AdminPage = () => {
         username: userData.username,
         email: userData.email,
         password: userData.password,
-        role: userData.role || ROLES.USER,
         bloodType: userData.bloodType || '',
         isDonor: userData.isDonor || true,
         isActive: userData.isActive !== false,
         phoneNumber: userData.phoneNumber || '0500000000',
-        dateOfBirth: userData.dateOfBirth || new Date('1990-01-01').toISOString().split('T')[0],
+        dateOfBirth: userData.dateOfBirth,
         location: userData.location || 'N/A',
       });
       
@@ -780,6 +790,22 @@ const AdminPage = () => {
     setLoading('action', true);
     setError(null);
     try {
+      // Validate age if dateOfBirth is being updated
+      if (userData.dateOfBirth) {
+        const today = new Date();
+        const birthDate = new Date(userData.dateOfBirth);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+          ? age - 1 
+          : age;
+
+        if (exactAge < 16) {
+          setError('User must be at least 16 years old.');
+          return false;
+        }
+      }
+
       const response = await userService.updateUser(userId, userData);
       if (response.data?.success) {
         alert('User updated successfully!');
@@ -794,7 +820,7 @@ const AdminPage = () => {
     } finally {
       setLoading('action', false);
     }
-  }, [handleApiError, fetchAllUsers, pageInfo.users.page, searchTerm, setLoading]);
+  }, [handleApiError, fetchAllUsers, pageInfo.users.page, searchTerm, setLoading, setError]);
 
   const deleteUser = useCallback(async (userId, username) => {
     if (window.confirm(`Are you sure you want to delete user: ${username}?`)) {
@@ -1125,11 +1151,13 @@ const AdminPage = () => {
       setUserFormData(data ? {
         username: data.username,
         email: data.email,
-        role: data.role,
         bloodType: data.bloodType || '',
-        isDonor: true,
-        isActive: true,
+        isDonor: data.isDonor,
+        isActive: data.isActive,
         password: data.password || '',
+        phoneNumber: data.phoneNumber || '0500000000',
+        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString().split('T')[0] : new Date('1990-01-01').toISOString().split('T')[0],
+        location: data.location || '0.000000, 0.000000'
       } : INITIAL_USER_FORM_DATA);
     } else if (type === MODAL_TYPE.ADMIN) {
       setAdminFormData(data ? {
@@ -1207,8 +1235,8 @@ const AdminPage = () => {
   const handleUserSubmit = useCallback(async (e, formData) => {
     e.preventDefault();
     
-    if (!formData.username || !formData.email || (!modalState.data && !formData.password)) {
-      setError('Username, email, and password are required fields.');
+    if (!formData.username || !formData.email || (!modalState.data && !formData.password) || !formData.dateOfBirth) {
+      setError('Username, email, password, and date of birth are required fields.');
       return;
     }
     
@@ -1310,7 +1338,6 @@ const AdminPage = () => {
               location: user.location || 'N/A',
               isDonor: user.isDonor ? 'Yes' : 'No',
               isActive: user.isActive !== false ? 'Active' : 'Inactive',
-              role: user.role || ROLES.USER
             }));
           }
         } catch (err) {
@@ -1324,7 +1351,6 @@ const AdminPage = () => {
             location: user.location || 'N/A',
             isDonor: user.isDonor ? 'Yes' : 'No',
             isActive: user.isActive ? 'Active' : 'Inactive',
-            role: user.role
           }));
         }
         filename = 'users-export.csv';

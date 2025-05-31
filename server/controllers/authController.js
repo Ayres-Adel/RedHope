@@ -122,10 +122,26 @@ exports.register = async (req, res) => {
       cityId
     } = req.body;
     
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !phoneNumber || !dateOfBirth) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide username, email and password'
+        message: 'Username, email, password, phone number, and date of birth are required'
+      });
+    }
+
+    // Validate age (16+ years)
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+      ? age - 1 
+      : age;
+
+    if (exactAge < 16) {
+      return res.status(400).json({
+        success: false,
+        message: 'You must be at least 16 years old to register'
       });
     }
     
@@ -133,7 +149,7 @@ exports.register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'Email is already registered'
+        message: 'User with this email already exists'
       });
     }
     
@@ -144,7 +160,7 @@ exports.register = async (req, res) => {
       bloodType: bloodType || 'Unknown',
       role: 'user',
       isDonor: isDonor || false,
-      dateOfBirth,
+      dateOfBirth: new Date(dateOfBirth),
       location,
       phoneNumber,
       cityId: cityId || null,
@@ -165,6 +181,13 @@ exports.register = async (req, res) => {
     });
     
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({
+        success: false,
+        message: validationErrors.join(', ')
+      });
+    }
     res.status(500).json({
       success: false,
       message: 'Registration failed',

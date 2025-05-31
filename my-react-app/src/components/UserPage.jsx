@@ -32,6 +32,7 @@ const UserPage = () => {
     phone: '',
     bloodType: '',
     location: '',
+    dateOfBirth: '',
     isDonor: false
   });
   const [editMode, setEditMode] = useState(false);
@@ -41,6 +42,7 @@ const UserPage = () => {
     phoneNumber: '',
     bloodType: '',
     location: '',
+    dateOfBirth: '',
     isDonor: false
   });
   const [messages, setMessages] = useState([]);
@@ -68,6 +70,7 @@ const UserPage = () => {
       phone: 'Phone',
       bloodType: 'Blood Type',
       location: 'Location',
+      dateOfBirth: 'Date of Birth',
       editInformation: 'Edit Information',
       changePassword: 'Change Password',
       currentPassword: 'Current Password',
@@ -104,6 +107,7 @@ const UserPage = () => {
       nonDonor: 'Non-Donor',
       changeDonorStatus: 'Change Status',
       donorStatusUpdated: 'Donor status updated successfully!',
+      ageValidationError: 'You must be at least 16 years old',
       donationDate: 'Request Date',
       donationStatus: 'Status',
       donationLocation: 'Location',
@@ -264,6 +268,7 @@ const UserPage = () => {
               phone: userData.phoneNumber || 'N/A',
               bloodType: userData.bloodType || 'N/A',
               location: formattedLocation,
+              dateOfBirth: userData.dateOfBirth ? new Date(userData.dateOfBirth).toISOString().split('T')[0] : 'N/A',
               isDonor: Boolean(userData.isDonor)
             };
             
@@ -275,6 +280,7 @@ const UserPage = () => {
               phoneNumber: userData.phoneNumber || '',
               bloodType: userData.bloodType || '',
               location: userData.location || '',
+              dateOfBirth: userData.dateOfBirth ? new Date(userData.dateOfBirth).toISOString().split('T')[0] : '',
               isDonor: Boolean(userData.isDonor)
             });
             
@@ -487,6 +493,23 @@ const UserPage = () => {
         navigate('/login');
         return;
       }
+
+      // Validate age if dateOfBirth is provided
+      if (editForm.dateOfBirth) {
+        const today = new Date();
+        const birthDate = new Date(editForm.dateOfBirth);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+          ? age - 1 
+          : age;
+
+        if (exactAge < 16) {
+          addMessage(t.ageValidationError || 'You must be at least 16 years old', 'error');
+          setUpdating(false);
+          return;
+        }
+      }
       
       if (editForm.location && editForm.location !== userInfo.location && editForm.location.includes(',')) {
         try {
@@ -532,7 +555,8 @@ const UserPage = () => {
         phone: editForm.phoneNumber,
         bloodType: editForm.bloodType,
         isDonor: editForm.isDonor,
-        location: formattedLocation
+        location: formattedLocation,
+        dateOfBirth: editForm.dateOfBirth
       });
       
       addMessage(t.profileUpdated, 'success');
@@ -550,6 +574,7 @@ const UserPage = () => {
           email: userData.email || prev.email,
           phone: userData.phoneNumber || prev.phone,
           bloodType: userData.bloodType || prev.bloodType,
+          dateOfBirth: userData.dateOfBirth ? new Date(userData.dateOfBirth).toISOString().split('T')[0] : prev.dateOfBirth,
           isDonor: Boolean(userData.isDonor)
         }));
       }
@@ -560,7 +585,8 @@ const UserPage = () => {
         addMessage(t.sessionExpired, 'error');
         navigate('/login');
       } else {
-        addMessage(err.response?.data?.error || t.networkError, 'error');
+        const errorMessage = err.response?.data?.error || t.networkError;
+        addMessage(errorMessage, 'error');
       }
     } finally {
       setUpdating(false);
@@ -988,6 +1014,13 @@ const UserPage = () => {
                               </span>
                               <span className="info-value">{userInfo.location}</span>
                             </div>
+                            <div className="info-item">
+                              <span className="info-label">
+                                <FiCalendar className="info-icon" />
+                                {t.dateOfBirth}
+                              </span>
+                              <span className="info-value">{userInfo.dateOfBirth}</span>
+                            </div>
                             <div className="info-item donor-status-item">
                               <span className="info-label">
                                 <FiHeart className="info-icon" />
@@ -1086,7 +1119,16 @@ const UserPage = () => {
                                 </button>
                               </div>
                             </div>
-                            
+                            <div className="form-field">
+                              <label><FiCalendar className="info-icon" /> {t.dateOfBirth}</label>
+                              <input
+                                type="date"
+                                name="dateOfBirth"
+                                value={editForm.dateOfBirth}
+                                onChange={handleEditFormChange}
+                                className="profile-input"
+                              />
+                            </div>
                             <div className="form-field">
                               <label><FiHeart className="info-icon" /> {t.donorStatus}</label>
                               <div className="donor-toggle-container">

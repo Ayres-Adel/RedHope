@@ -96,7 +96,8 @@ router.get('/profile', async (req, res) => {
         role: userData.role || userRole || 'user',
         bloodType: userData.bloodType || 'Not specified',
         location: userData.location || userData.address || 'Not specified',
-        phoneNumber: userData.phoneNumber || 'Not specified', 
+        phoneNumber: userData.phoneNumber || 'Not specified',
+        dateOfBirth: userData.dateOfBirth,
         isActive: userData.isActive !== false,
         isDonor: userData.isDonor || false
       };
@@ -176,15 +177,29 @@ router.post('/create', async (req, res) => {
       dateOfBirth  
     } = req.body;
     
-
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !phoneNumber || !dateOfBirth) {
       return res.status(400).json({
         success: false,
-        message: 'Username, email and password are required'
+        message: 'Username, email, password, phone number, and date of birth are required'
+      });
+    }
+
+    // Validate age (16+ years)
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const exactAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+      ? age - 1 
+      : age;
+
+    if (exactAge < 16) {
+      return res.status(400).json({
+        success: false,
+        message: 'You must be at least 16 years old to register'
       });
     }
     
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -193,7 +208,6 @@ router.post('/create', async (req, res) => {
       });
     }
     
-
     const newUser = new User({
       username,
       email,
@@ -204,7 +218,7 @@ router.post('/create', async (req, res) => {
       isDonor: isDonor || false,
       isActive: true,
       phoneNumber: phoneNumber || '0000000000', 
-      dateOfBirth: dateOfBirth || new Date('1990-01-01') 
+      dateOfBirth: new Date(dateOfBirth)
     });
     
  
