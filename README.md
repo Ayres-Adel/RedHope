@@ -37,7 +37,7 @@ RedHope is a real-time, geolocation-based platform that connects blood donors, r
 ## 💻 Tech Stack
 
 ### Frontend
-- React.js
+- React.js  
 - HTML5 + CSS3
 - JavaScript
 
@@ -184,8 +184,8 @@ Project by:
 ## 👨‍💻 Contact
 If you have any questions, feedback, or would like to collaborate, feel free to reach out:
 
-- 📧 Email: your.email@example.com
-- 🌍 GitHub: [yourusername](https://github.com/yourusername)
+- 📧 Email: mr.ladouiadel@gmail.com & Abdennour.kellal.02@gmail.com
+- 🌍 GitHub: [Ayres-Adel](https://github.com/Ayres-Adel) & [Abdoukl](https://github.com/Abdoukl)
 
 ## 📜 Dedication
 
