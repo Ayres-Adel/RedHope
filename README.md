@@ -66,7 +66,7 @@ RedHope follows a 3-tier MVC architecture:
 
 ### 🧩 MVC Pattern
 <div align="center">
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/gZB0FDn1/image.png" alt="image" border="0"></a>
+<a href="https://imgbb.com/"><img src="[https://i.ibb.co/gZB0FDn1/image.png](https://ibb.co/Kz5Js08n)" alt="image" border="0"></a>
 </div>
 
 ---
